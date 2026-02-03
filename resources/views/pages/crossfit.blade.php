@@ -19,25 +19,25 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.3/assets/owl.carousel.min.css" />
 
   <!-- bootstrap core css -->
-  <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+  <link href="{{ asset('assets/css/bootstrap.css') }}" rel="stylesheet">
 
   <!-- fonts style -->
   <link href="https://fonts.googleapis.com/css?family=Baloo+Chettan|Dosis:400,600,700|Poppins:400,600,700&display=swap"
     rel="stylesheet" />
   <!-- Custom styles for this template -->
-  <link href="css/style.css" rel="stylesheet" />
+  <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
   <!-- responsive style -->
-  <link href="css/responsive.css" rel="stylesheet" />
+  <link href="{{ asset('assets/css/responsive.css') }}" rel="stylesheet">
 </head>
 
-<body class="sub_page">
+<body>
   <div class="hero_area">
     <!-- header section strats -->
     <header class="header_section">
       <div class="container">
         <nav class="navbar navbar-expand-lg custom_nav-container">
-          <a class="navbar-brand" href="index.html">
-            <img src="images/logo.jpg" alt="" />
+          <a class="navbar-brand" href="{{ route('home') }}">
+            <img src="{{ asset('assets/images/logo.png') }}" alt="" />
             <span>
               Stronghold Gym
             </span>
@@ -45,20 +45,20 @@
           <div class="contact_nav" id="">
             <ul class="navbar-nav ">
               <li class="nav-item">
-                <a class="nav-link" href="service.html">
-                  <img src="images/location.png" alt="" />
+                <a class="nav-link" href="{{ route('service') }}">
+                  <img src="{{ asset('assets/images/location.png') }}" alt="" />
                   <span>Donetsk</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="service.html">
-                  <img src="images/call.png" alt="" />
+                <a class="nav-link" href="{{ route('service') }}">
+                  <img src="{{ asset('assets/images/call.png') }}" alt="" />
                   <span>Call : +7 (949) 413-56-16</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="service.html">
-                  <img src="images/envelope.png" alt="" />
+                <a class="nav-link" href="{{ route('service') }}">
+                  <img src="{{ asset('assets/images/envelope.png') }}" alt="" />
                   <span>Stronghold@gmail.com</span>
                 </a>
               </li>
@@ -82,17 +82,17 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <div class="d-flex  flex-column flex-lg-row align-items-center">
                 <ul class="navbar-nav  ">
-                  <li class="nav-item ">
-                    <a class="nav-link" href="index.html">Главная <span class="sr-only">(current)</span></a>
+                  <li class="nav-item active">
+                    <a class="nav-link" href="{{ route('home') }}">Главная <span class="sr-only">(current)</span></a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="about.html">О нас </a>
+                    <a class="nav-link" href="{{ route('about') }}">О нас </a>
                   </li>
                   <li class="nav-item active">
-                    <a class="nav-link" href="service.html">Услуги </a>
+                    <a class="nav-link" href="{{ route('service') }}">Услуги </a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="contact.html">Связаться с нами</a>
+                    <a class="nav-link" href="{{ route('contact') }}">Связаться с нами</a>
                   </li>
                 </ul>
                 <form class="form-inline my-2 my-lg-0 ml-0 ml-lg-4 mb-3 mb-lg-0">
@@ -118,7 +118,7 @@
       </div>
       <div class="box">
         <div class="img-box">
-          <img src="images/Сrossfit.png" alt="">
+         <img src="{{ asset('assets/images/Сrossfit.png') }}" alt="" />
         </div>
         <div class="detail-box">
           <h3>
@@ -148,7 +148,7 @@
       <div class="box">
         <div class="video-container">
             <video controls>
-                <source src="images/vc-1.mp4">
+                <source src="{{ asset('assets/images/vc-1.mp4') }}" alt="" />
                 Ваш браузер не поддерживает видео.
             </video>
         <div class="detail-box">
@@ -199,7 +199,7 @@
       <div class="box">
         <div class="video-container">
             <video controls>
-                <source src="images/vc-2.mp4">
+                <source src="{{ asset('assets/images/vc-2.mp4') }}" alt="" />
                 Ваш браузер не поддерживает видео.
             </video>
         <div class="detail-box">
@@ -243,7 +243,7 @@
       <div class="box">
         <div class="video-container">
             <video controls>
-                <source src="images/vc-3.mp4">
+                <source src="{{ asset('assets/images/vc-3.mp4') }}" alt="" />
                 Ваш браузер не поддерживает видео.
             </video>
         <div class="detail-box">
@@ -323,19 +323,16 @@
           </h6>
           <ul>
             <li class=" active">
-              <a class="" href="index.html">Главная <span class="sr-only">(current)</span></a>
+              <a class="" href="{{ route('home') }}">Главная <span class="sr-only">(current)</span></a>
             </li>
             <li class="">
-              <a class="" href="about.html">О нас </a>
+              <a class="" href="{{ route('about') }}">О нас </a>
             </li>
             <li class="">
-              <a class="" href="service.html">Услуги </a>
+              <a class="" href="{{ route('service') }}">Услуги </a>
             </li>
             <li class="">
-              <a class="" href="contact.html">Связаться с нами</a>
-            </li>
-            <li class="">
-              <a class="" href="#">Вход</a>
+              <a class="" href="{{ route('contact') }}">Связаться с нами</a>
             </li>
           </ul>
         </div>
@@ -372,37 +369,37 @@
           </h6>
           <div class="info_link-box">
             <a href="">
-              <img src="images/location-white.png" alt="">
+              <img src="{{ asset('assets/images/location-white.png') }}" alt="" />
               <span> Ленинский просп., 77А</span>
             </a>
             <a href="">
-              <img src="images/call-white.png" alt="">
+              <img src="{{ asset('assets/images/call-white.png') }}" alt="" />
               <span>+7 (949) 413-56-16</span>
             </a>
             <a href="">
-              <img src="images/mail-white.png" alt="">
+              <img src="{{ asset('assets/images/mail-white.png') }}" alt="" />
               <span> Stronghold@gmail.com</span>
             </a>
           </div>
           <div class="info_social">
             <div>
               <a href="">
-                <img src="images/facebook-logo-button.png" alt="">
+                <img src="{{ asset('assets/images/facebook-logo-button.png') }}" alt="" />
               </a>
             </div>
             <div>
               <a href="">
-                <img src="images/twitter-logo-button.png" alt="">
+                <img src="{{ asset('assets/images/twitter-logo-button.png') }}" alt="" /> 
               </a>
             </div>
             <div>
               <a href="">
-                <img src="images/linkedin.png" alt="">
+                <img src="{{ asset('assets/images/linkedin.png') }}" alt="" />
               </a>
             </div>
             <div>
               <a href="https://vk.com/id320753965">
-                <img src="images/instagram.png" alt="">
+                <img src="{{ asset('assets/images/instagram.png') }}" alt="" />
               </a>
             </div>
           </div>
@@ -413,18 +410,17 @@
 
   <!-- end info section -->
 
-
   <!-- footer section -->
   <section class="container-fluid footer_section ">
     <p>
-      &copy; 2025 All Rights Reserved. Design by
+      &copy; 2026 All Rights Reserved. Design by
       <a href="https://html.design/">bodybuilders</a>
     </p>
   </section>
   <!-- footer section -->
 
-  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
-  <script type="text/javascript" src="js/bootstrap.js"></script>
+  <script src="{{ asset('assets/js/jquery-3.4.1.min.js') }}"></script>
+  <script src="{{ asset('assets/js/bootstrap.js') }}"></script>
 
   <script>
     function openNav() {

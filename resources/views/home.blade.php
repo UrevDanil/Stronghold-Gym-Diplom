@@ -28,7 +28,6 @@
   <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
   <!-- responsive style -->
   <link href="{{ asset('assets/css/responsive.css') }}" rel="stylesheet">
-
 </head>
 
 <body>
@@ -70,6 +69,7 @@
 
     </header>
     <!-- end header section -->
+
     <!-- slider section -->
     <section class=" slider_section position-relative">
       <div class="container">
@@ -271,7 +271,7 @@
         </div>
 
         <div class="box">
-          <img src="{{ asset('assets/images/s-4.png') }}" alt="" />
+          <img src="{{ asset('assets/images/s-43.jpeg') }}" alt="" />
           <h6 class="visible_heading">
             Питание
           </h6>
