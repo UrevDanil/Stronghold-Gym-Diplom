@@ -6,6 +6,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Публичные маршруты
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::view('/about', 'about')->name('about');
+Route::view('/services', 'service')->name('services');
+
 // Главная страница
 Route::get('/', function () {return view('home');})->name('home');
 
@@ -18,27 +23,39 @@ Route::get('/powerlifting', function () {return view('pages.powerlifting');})->n
 Route::get('/nutrition', function () {return view('pages.nutrition');})->name('nutrition');
 Route::get('/contact', function () {return view('pages.contact');})->name('contact');
 
-// Позже добавим динамические маршруты
-// Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule');
-Route::get('/check-files', function() {
-    $files = [
-        'bootstrap.css' => public_path('assets/css/bootstrap.css'),
-        'style.css' => public_path('assets/css/style.css'),
-        'jquery.js' => public_path('assets/js/jquery-3.4.1.min.js'),
-        'hero-bg.jpg' => public_path('assets/images/hero-bg.jpg')
-    ];
+// Аутентификация
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Защищенные маршруты (требуют авторизации)
+Route::middleware(['auth'])->group(function () {
     
-    echo '<h1>Проверка файлов</h1>';
-    foreach($files as $name => $path) {
-        echo "<p>$name: " . (file_exists($path) ? 
-             '✅ СУЩЕСТВУЕТ (' . filesize($path) . ' байт)' : 
-             '❌ НЕ НАЙДЕН') . "</p>";
-    }
+    // Для клиентов
+    Route::middleware(['role:client'])->prefix('client')->name('client.')->group(function () {
+        Route::get('/dashboard', [ClientController::class, 'dashboard'])->name('dashboard');
+        Route::get('/schedule', [ClientController::class, 'schedule'])->name('schedule');
+        Route::post('/book/{schedule}', [ClientController::class, 'book'])->name('book');
+        Route::get('/my-bookings', [ClientController::class, 'myBookings'])->name('bookings');
+        Route::get('/my-subscriptions', [ClientController::class, 'mySubscriptions'])->name('subscriptions');
+    });
     
-    echo '<h2>Прямые ссылки:</h2>';
-    echo '<ul>';
-    echo '<li><a href="/assets/css/bootstrap.css" target="_blank">/assets/css/bootstrap.css</a></li>';
-    echo '<li><a href="/assets/css/style.css" target="_blank">/assets/css/style.css</a></li>';
-    echo '<li><a href="/assets/images/hero-bg.jpg" target="_blank">/assets/images/hero-bg.jpg</a></li>';
-    echo '</ul>';
+    // Для тренеров
+    Route::middleware(['role:trainer'])->prefix('trainer')->name('trainer.')->group(function () {
+        Route::get('/dashboard', [TrainerController::class, 'dashboard'])->name('dashboard');
+        Route::get('/my-schedule', [TrainerController::class, 'mySchedule'])->name('schedule');
+        Route::get('/attendance/{schedule}', [TrainerController::class, 'attendance'])->name('attendance');
+        Route::post('/mark-attendance', [TrainerController::class, 'markAttendance'])->name('mark.attendance');
+    });
+
+    // Для администраторов
+    Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::resource('/users', UserController::class);
+        Route::resource('/workouts', WorkoutController::class);
+        Route::resource('/schedules', ScheduleController::class);
+        Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+    });
 });
