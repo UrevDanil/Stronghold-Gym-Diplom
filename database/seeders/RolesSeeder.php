@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class RolesSeeder extends Seeder
 {
-    /*public function run()
+    public function run()
     {
         // Очистить таблицу перед заполнением (опционально)
         Role::truncate();
@@ -27,5 +27,5 @@ class RolesSeeder extends Seeder
         }
         
         $this->command->info('Роли успешно добавлены!');
-    }*/
+    }
 }
