@@ -1,51 +1,123 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Stronghold Gym')</title>
     
-    <!-- Подключение CSS -->
-    <link href="{{ asset('assets/css/bootstrap.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/responsive.css') }}" rel="stylesheet">
-    
-    <!-- Иконка сайта -->
-    <img src="{{ asset('assets/images/logo.jpg') }}">
-    
+    <!-- CSS -->
+    @vite(['resources/css/app.css'])
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            padding-top: 20px;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+    </style>
     @yield('styles')
 </head>
 <body>
-
-    <!-- Навигационное меню (скопируйте из index.html) -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <img src="{{ asset('assets/images/logo.png') }}" alt="Logo" height="40">
-                <span class="fw-bold">STRONGHOLD GYM</span>
-            </a>
-            <!-- Остальное меню... -->
+    @auth
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-2 d-none d-md-block sidebar">
+                <div class="sidebar-sticky">
+                    <h4 class="mb-4">Stronghold Gym</h4>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ route('dashboard') }}">
+                                📊 Дашборд
+                            </a>
+                        </li>
+                        
+                        @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
+                        <!-- Меню для админа -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.clients') }}">
+                                👥 Клиенты
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.trainers') }}">
+                                💪 Тренеры
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.schedules') }}">
+                                📅 Расписание
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.bookings') }}">
+                                🎫 Записи
+                            </a>
+                        </li>
+                        @endif
+                        
+                        @if(auth()->user()->isClient())
+                        <!-- Меню для клиента -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('client.schedule') }}">
+                                📅 Расписание
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('client.subscriptions') }}">
+                                💳 Абонементы
+                            </a>
+                        </li>
+                        @endif
+                        
+                        @if(auth()->user()->isTrainer())
+                        <!-- Меню для тренера -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('trainer.schedule') }}">
+                                📅 Мое расписание
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('trainer.clients') }}">
+                                👥 Мои клиенты
+                            </a>
+                        </li>
+                        @endif
+                        
+                        <li class="nav-item mt-4">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    🚪 Выйти
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <!-- Main content -->
+            <main class="col-md-10 main-content">
+                @yield('content')
+            </main>
         </div>
-    </nav>
-
-    <!-- Основной контент -->
-    <main>
+    </div>
+    @else
         @yield('content')
-    </main>
-
-    <!-- Футер (скопируйте из index.html) -->
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container">
-            <div class="row">
-                <!-- Контент футера... -->
-            </div>
-        </div>
-    </footer>
-
-    <!-- Подключение JavaScript -->
-    <script src="{{ asset('assets/js/jquery-3.4.1.min.js') }}"></script>
-    <script src="{{ asset('assets/js/bootstrap.js') }}"></script>
+    @endauth
     
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @yield('scripts')
 </body>
 </html>
