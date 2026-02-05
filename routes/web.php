@@ -74,12 +74,22 @@ Route::middleware(['auth', 'role:admin,owner'])->prefix('admin')->name('admin.')
 // ====================
 
 Route::middleware(['auth', 'role:client'])->prefix('client')->name('client.')->group(function () {
+    // Дашборд
     Route::get('/dashboard', [ClientDashboardController::class, 'dashboard'])->name('dashboard');
+    
+    // Профиль - разные URL для разных действий
     Route::get('/profile', [ClientDashboardController::class, 'profile'])->name('profile');
-    Route::post('/profile/update', [ClientDashboardController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile', [ClientDashboardController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/password', [ClientDashboardController::class, 'updatePassword'])->name('password.update');
+    
+    // Расписание
     Route::get('/schedule', [ClientDashboardController::class, 'schedule'])->name('schedule');
     Route::post('/schedule/{schedule}/book', [ClientDashboardController::class, 'book'])->name('schedule.book');
+    
+    // Бронирования
     Route::post('/bookings/{booking}/cancel', [ClientDashboardController::class, 'cancelBooking'])->name('bookings.cancel');
+    
+    // Абонементы
     Route::get('/subscriptions', [ClientDashboardController::class, 'subscriptions'])->name('subscriptions');
     Route::post('/subscriptions/{subscription}/purchase', [ClientDashboardController::class, 'purchaseSubscription'])->name('subscriptions.purchase');
 });

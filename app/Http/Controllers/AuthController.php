@@ -50,12 +50,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'phone' => 'required|string|max:20',
-            'birth_date' => 'required|date|before:today',
-            'agree_terms' => 'required|accepted',
-        ], [
-            'birth_date.before' => 'Дата рождения не может быть в будущем',
-            'agree_terms.accepted' => 'Вы должны принять условия соглашения',
-        ]);
+        ]); 
 
         if ($validator->fails()) {
             return redirect()->back()

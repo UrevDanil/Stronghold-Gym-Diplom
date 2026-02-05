@@ -191,7 +191,7 @@ public function profile()
     return view('client.profile', compact('user'));
 }
 
-// Обновление профиля пользователя
+    //Обновление пользователя
 public function updateProfile(Request $request)
 {
     $user = Auth::user();
@@ -201,21 +201,27 @@ public function updateProfile(Request $request)
         'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
         'phone' => 'nullable|string|max:20',
         'birth_date' => 'nullable|date|before:today',
-        'address' => 'nullable|string|max:500',
-        'health_info' => 'nullable|string|max:1000',
     ]);
-    
-    // Обновляем пароль, если он указан
-    if ($request->filled('password')) {
-        $request->validate([
-            'password' => 'string|min:8|confirmed',
-        ]);
-        $validated['password'] = Hash::make($request->password);
-    }
     
     $user->update($validated);
     
     return redirect()->route('client.profile')
         ->with('success', 'Профиль успешно обновлен');
+}
+
+public function updatePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required|current_password',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
+    
+    $user = Auth::user();
+    $user->update([
+        'password' => Hash::make($request->password)
+    ]);
+    
+    return redirect()->route('client.profile')
+        ->with('success', 'Пароль успешно изменен');
 }
 }

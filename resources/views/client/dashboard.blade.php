@@ -294,11 +294,8 @@
                         <a href="{{ route('client.subscriptions') }}" class="btn btn-outline-success">
                             <i class="fas fa-credit-card me-2"></i> Абонементы
                         </a>
-                        <!--<a href="{{ route('client.profile') }}" class="btn btn-outline-info">
-                            <i class="fas fa-user-cog me-2"></i> Профиль
-                        </a>-->
-                        <a href="#" class="btn btn-outline-info disabled">
-                        <i class="fas fa-user-cog me-2"></i> Профиль (скоро)
+                        <a href="{{ route('client.profile') }}" class="btn btn-outline-info">
+                        <i class="fas fa-user-cog me-2"></i> Профиль
                         </a>
                     </div>
                 </div>
