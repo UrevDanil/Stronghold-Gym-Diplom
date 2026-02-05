@@ -59,12 +59,24 @@ class User extends Authenticatable
     
     public function upcomingBookings()
     {
-        return $this->hasMany(Booking::class)
-            ->whereHas('schedule', function($query) {
-                $query->where('date', '>=', now()->toDateString());
-            })
-            ->with('schedule.workout')
-            ->orderBy('created_at', 'desc');
+    return $this->hasMany(Booking::class)
+        ->whereHas('schedule', function($query) {
+            $query->where('date', '>=', now()->toDateString())
+                  ->where('status', 'scheduled');
+        })
+        ->with(['schedule.workout', 'schedule.trainer'])
+        ->orderBy('created_at', 'desc');
+    }
+
+// Добавьте также метод для истории бронирований
+    public function bookingHistory()
+    {
+    return $this->hasMany(Booking::class)
+        ->whereHas('schedule', function($query) {
+            $query->where('date', '<', now()->toDateString());
+        })
+        ->with(['schedule.workout', 'schedule.trainer'])
+        ->latest();
     }
     
     public function attendances()
