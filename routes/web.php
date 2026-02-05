@@ -75,12 +75,16 @@ Route::middleware(['auth', 'role:admin,owner'])->prefix('admin')->name('admin.')
 
 Route::middleware(['auth', 'role:client'])->prefix('client')->name('client.')->group(function () {
     Route::get('/dashboard', [ClientDashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/profile', [ClientDashboardController::class, 'profile'])->name('profile');
+    Route::post('/profile/update', [ClientDashboardController::class, 'updateProfile'])->name('profile.update');
     Route::get('/schedule', [ClientDashboardController::class, 'schedule'])->name('schedule');
     Route::post('/schedule/{schedule}/book', [ClientDashboardController::class, 'book'])->name('schedule.book');
     Route::post('/bookings/{booking}/cancel', [ClientDashboardController::class, 'cancelBooking'])->name('bookings.cancel');
     Route::get('/subscriptions', [ClientDashboardController::class, 'subscriptions'])->name('subscriptions');
     Route::post('/subscriptions/{subscription}/purchase', [ClientDashboardController::class, 'purchaseSubscription'])->name('subscriptions.purchase');
 });
+
+
 
 // ====================
 // ТРЕНЕР

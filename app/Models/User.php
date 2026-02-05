@@ -1,5 +1,6 @@
 <?php
 
+// app/Models/User.php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,12 +12,20 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'phone', 'role_id', 
-        'birth_date', 'notes', 'avatar', 'qualification', 'specialization'
+        'name',
+        'email',
+        'password',
+        'phone',
+        'birth_date',
+        'role_id',
+        'avatar',
+        'address',
+        'health_info',
     ];
 
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     protected $casts = [
@@ -24,112 +33,127 @@ class User extends Authenticatable
         'birth_date' => 'date',
     ];
 
-    // Связи
+    // =========== ОТНОШЕНИЯ ===========
+
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
-    
-    public function userSubscriptions()
-    {
-        return $this->hasMany(UserSubscription::class);
-    }
-    
-    public function activeSubscription()
-    {
-        return $this->hasOne(UserSubscription::class)
-            ->where('status', 'active')
-            ->where(function($query) {
-                $query->where('end_date', '>=', now())
-                      ->orWhereNull('end_date');
-            })
-            ->latest();
-    }
 
-    public function subscriptions() 
-    {
-    return $this->belongsToMany(Subscription::class, 'user_subscriptions')
-                ->withPivot('purchase_date', 'expiry_date', 'remaining_sessions');
-    }
-    
     public function bookings()
     {
         return $this->hasMany(Booking::class);
     }
-    
-    public function upcomingBookings()
-    {
-    return $this->hasMany(Booking::class)
-        ->whereHas('schedule', function($query) {
-            $query->where('date', '>=', now()->toDateString())
-                  ->where('status', 'scheduled');
-        })
-        ->with(['schedule.workout', 'schedule.trainer'])
-        ->orderBy('created_at', 'desc');
-    }
 
-// Добавьте также метод для истории бронирований
-    public function bookingHistory()
-    {
-    return $this->hasMany(Booking::class)
-        ->whereHas('schedule', function($query) {
-            $query->where('date', '<', now()->toDateString());
-        })
-        ->with(['schedule.workout', 'schedule.trainer'])
-        ->latest();
-    }
-    
     public function attendances()
     {
-        return $this->hasManyThrough(Attendance::class, Booking::class);
+        return $this->hasMany(Attendance::class);
     }
-    
-    // Для тренера
-    public function scheduledTrainings()
+
+    public function subscriptions()
+    {
+    return $this->belongsToMany(Subscription::class, 'user_subscriptions')
+                ->using(UserSubscription::class)
+                ->withPivot([
+                    'start_date',
+                    'end_date', 
+                    'remaining_workouts',
+                    'status',
+                    'activated_by',
+                    'activated_at'
+                ]);
+    }
+
+    // Тренер проводит занятия
+    public function trainings()
     {
         return $this->hasMany(Schedule::class, 'trainer_id');
     }
-    
-    // Scope'ы для фильтрации
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    // =========== ПРОВЕРКИ РОЛЕЙ ===========
+
+    public function isAdmin()
+    {
+        return $this->role->name === 'admin' || $this->role->name === 'owner';
+    }
+
+    public function isOwner()
+    {
+        return $this->role->name === 'owner';
+    }
+
+    public function isClient()
+    {
+        return $this->role->name === 'client';
+    }
+
+    public function isTrainer()
+    {
+        return $this->role->name === 'trainer';
+    }
+
+    // =========== SCOPE ===========
+
     public function scopeClients($query)
     {
         return $query->whereHas('role', function($q) {
             $q->where('name', 'client');
         });
     }
-    
+
     public function scopeTrainers($query)
     {
         return $query->whereHas('role', function($q) {
             $q->where('name', 'trainer');
         });
     }
-    
-    public function scopeAdmins($query)
+
+    // =========== HELPERS ===========
+
+    public function hasActiveSubscription()
     {
-        return $query->whereHas('role', function($q) {
-            $q->where('name', 'admin');
-        });
+    return $this->subscriptions()
+        ->wherePivot('end_date', '>=', now()->toDateString())
+        ->wherePivot('remaining_workouts', '>', 0)
+        ->wherePivot('status', 'active')
+        ->exists();
     }
-    
-    // Проверка ролей
-    public function isAdmin()
+
+    public function activeSubscription()
     {
-        return $this->role->name === 'admin';
+    return $this->subscriptions()
+        ->wherePivot('end_date', '>=', now()->toDateString())
+        ->wherePivot('remaining_workouts', '>', 0)
+        ->wherePivot('status', 'active')
+        ->first();
     }
-    
-    public function isClient()
+
+    public function upcomingBookings()
     {
-        return $this->role->name === 'client';
+        return $this->bookings()
+            ->whereHas('schedule', function($q) {
+                $q->where('date', '>=', now()->toDateString())
+                  ->orWhere(function($query) {
+                      $query->where('date', now()->toDateString())
+                            ->where('start_time', '>', now()->format('H:i:s'));
+                  });
+            })
+            ->with('schedule.workout', 'schedule.trainer')
+            ->orderBy('created_at', 'desc');
     }
-    
-    public function isTrainer()
-    {
-        return $this->role->name === 'trainer';
+
+    public function useWorkoutSession()
+    {  
+    $activeSubscription = $this->activeSubscription();
+    if ($activeSubscription) {
+        $activeSubscription->pivot->decrement('remaining_workouts');
+        return true;
     }
-    
-    public function isOwner()
-    {
-        return $this->role->name === 'owner';
+    return false;
     }
 }
