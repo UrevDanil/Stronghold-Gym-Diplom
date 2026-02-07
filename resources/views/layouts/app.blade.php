@@ -118,5 +118,36 @@
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @yield('scripts')
+    <script>
+// Глобальная функция для переключения видимости пароля
+document.addEventListener('DOMContentLoaded', function() {
+    // Ищем все кнопки переключения пароля
+    document.querySelectorAll('[id^="toggle"]').forEach(function(button) {
+        if (button.id.includes('Password')) {
+            const inputId = button.id.replace('toggle', '').replace('Password', '')
+                .toLowerCase();
+            const input = document.getElementById(inputId) || 
+                         document.getElementById('password') || 
+                         document.getElementById('password-confirm') ||
+                         document.getElementById('current_password');
+            
+            if (input) {
+                button.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            }
+        }
+    });
+});
+</script>
 </body>
 </html>

@@ -114,27 +114,42 @@
                                 
                                 <div class="mb-3">
                                     <label for="current_password" class="form-label">Текущий пароль *</label>
-                                    <input type="password" class="form-control @error('current_password') is-invalid @enderror" 
-                                           id="current_password" name="current_password" required>
-                                    @error('current_password')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="input-group">
+                                        <input type="password" class="form-control @error('current_password') is-invalid @enderror" 
+                                            id="current_password" name="current_password" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="toggleCurrentPassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        @error('current_password')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="password" class="form-label">Новый пароль *</label>
-                                    <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                                           id="password" name="password" required>
-                                    @error('password')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="input-group">
+                                        <input type="password" class="form-control @error('password') is-invalid @enderror" 
+                                            id="password" name="password" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        @error('password')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                     <div class="form-text">Минимум 8 символов</div>
                                 </div>
 
                                 <div class="mb-4">
                                     <label for="password_confirmation" class="form-label">Подтверждение пароля *</label>
-                                    <input type="password" class="form-control" 
-                                           id="password_confirmation" name="password_confirmation" required>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" 
+                                            id="password_confirmation" name="password_confirmation" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePasswordConfirmation">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">
@@ -309,5 +324,35 @@
             });
         });
     });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Функция для переключения видимости пароля
+    function togglePasswordVisibility(inputId, buttonId) {
+        const passwordInput = document.getElementById(inputId);
+        const toggleButton = document.getElementById(buttonId);
+        const icon = toggleButton.querySelector('i');
+        
+        toggleButton.addEventListener('click', function() {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                toggleButton.setAttribute('title', 'Скрыть пароль');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                toggleButton.setAttribute('title', 'Показать пароль');
+            }
+        });
+    }
+    
+    // Применяем ко всем полям пароля
+    togglePasswordVisibility('current_password', 'toggleCurrentPassword');
+    togglePasswordVisibility('password', 'togglePassword');
+    togglePasswordVisibility('password_confirmation', 'togglePasswordConfirmation');
+});
 </script>
 @endsection
