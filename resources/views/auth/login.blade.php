@@ -117,17 +117,6 @@
                                 </div>
                             </div>
                             
-                            <div class="mb-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" 
-                                           name="remember" id="remember" 
-                                           {{ old('remember') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="remember">
-                                        Запомнить меня
-                                    </label>
-                                </div>
-                            </div>
-                            
                             <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
                                 <i class="fas fa-sign-in-alt me-2"></i>Войти
                             </button>

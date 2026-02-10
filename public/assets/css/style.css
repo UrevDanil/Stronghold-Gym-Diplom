@@ -57,7 +57,7 @@ body {
   width: 60px;
   height: 7px;
   border-radius: 10px;
-  background-color: #30d5c8;
+  background-color: #0e2778;
   -webkit-transform: translateX(-50%);
           transform: translateX(-50%);
 }
@@ -120,20 +120,20 @@ body {
 
 .custom_nav2 .custom_nav-container {
   padding: 5px 0;
-  background-color: #30d5c8;
+  background-color: #0e2778;
   -webkit-clip-path: polygon(0 0, 100% 0%, 95% 100%, 5% 100%);
           clip-path: polygon(0 0, 100% 0%, 95% 100%, 5% 100%);
 }
 
 .custom_nav2 .navbar-expand-lg .navbar-nav .nav-item .nav-link {
   padding: 10px 30px;
-  color: #070101;
+  color: #ffffff;
   text-align: center;
   position: relative;
 }
 
 .custom_nav2 .navbar-expand-lg .navbar-nav .nav-item.active .nav-link, .custom_nav2 .navbar-expand-lg .navbar-nav .nav-item:hover .nav-link {
-  color: #ffffff;
+  color: #fd2eb8;
 }
 
 .custom_nav2 #navbarSupportedContent {
@@ -238,7 +238,7 @@ a:focus {
 }
 
 .slider_section .detail-box h2 {
-  color: #30d5c8;
+  color: #fd9e2e;
 }
 
 .slider_section .detail-box h1 {
@@ -271,14 +271,14 @@ a:focus {
 .slider_section .detail-box .btn-box .btn-1 {
   display: inline-block;
   padding: 7px 0;
-  background-color: #30d5c8;
-  border: 1px solid #30d5c8;
+  background-color: #fd9e2e;
+  border: 1px solid #fd9e2e;
   color: #ffffff;
 }
 
 .slider_section .detail-box .btn-box .btn-1:hover {
   background-color: transparent;
-  color: #30d5c8;
+  color: #ffffff;
 }
 
 .slider_section .detail-box .btn-box .btn-2 {
@@ -313,14 +313,14 @@ a:focus {
   height: 14px;
   opacity: 1;
   background-color: transparent;
-  border: 2px solid #30d5c8;
+  border: 2px solid #fd9e2e;
   border-radius: 100%;
 }
 
 .slider_section .carousel-indicators li.active {
   width: 18px;
   height: 18px;
-  border: 3px solid #30d5c8;
+  border: 3px solid #0e2778;
 }
 
 .slider_section .number_box {
@@ -338,7 +338,7 @@ a:focus {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  color: #30d5c8;
+  color: #0e2778;
   -webkit-transform: translateY(-50%);
           transform: translateY(-50%);
 }
@@ -347,7 +347,7 @@ a:focus {
   border: none;
   width: 1px;
   height: 200px;
-  background-color: #30d5c8;
+  background-color: #0e2778;
   margin: 2rem 0;
 }
 
@@ -474,7 +474,7 @@ a:focus {
   width: 45px;
   height: 45px;
   border-radius: 100%;
-  background-color: #30d5c8;
+  background-color: #0e2778;
 }
 
 .service_section .service_container .box .link_box a img {
@@ -604,7 +604,7 @@ a:focus {
   width: 40px;
   height: 4px;
   border-radius: 10px;
-  background-color: #30d5c8;
+  background-color: #0e2778;
   -webkit-transform: translateX(-50%);
           transform: translateX(-50%);
 }
@@ -619,7 +619,7 @@ a:focus {
 
 .client_section .carousel-indicators li {
   opacity: 1;
-  background-color: #000000;
+  background-color: #7e7878;
   width: 40px;
   height: 10px;
   border-radius: 10px;
@@ -628,7 +628,7 @@ a:focus {
 }
 
 .client_section .carousel-indicators li.active {
-  background-color: #30d5c8;
+  background-color: #0e2778;
 }
 
 .result_section {
@@ -665,7 +665,7 @@ a:focus {
   width: 40px;
   height: 7px;
   border-radius: 10px;
-  background-color: #30d5c8;
+  background-color: #0e2778;
 }
 
 .result_section .detail-box p {
@@ -675,15 +675,15 @@ a:focus {
 .result_section .detail-box a {
   display: inline-block;
   padding: 10px 45px;
-  background-color: #30d5c8;
-  border: 1px solid #30d5c8;
+  background-color: #0e2778;
+  border: 1px solid #0e2778;
   color: #ffffff;
   margin-top: 25px;
 }
 
 .result_section .detail-box a:hover {
   background-color: transparent;
-  color: #30d5c8;
+  color: #0e2778;
 }
 
 /* contact section */
@@ -838,19 +838,18 @@ a:focus {
 }
 
 .info_section .info_form form button {
-  background-color: #30d5c8;
-  display: inline-block;
+  background-color: #0e2778;
   padding: 9px 30px;
-  background-color: #30d5c8;
-  border: 1px solid #30d5c8;
-  color: #000000;
+  background-color: #0e2778;
+  border: 1px solid #0e2778;
+  color: #ffffff;
   font-size: 15px;
   text-transform: uppercase;
 }
 
 .info_section .info_form form button:hover {
   background-color: transparent;
-  color: #30d5c8;
+  color: #0e2778;
 }
 
 .info_section h6 {

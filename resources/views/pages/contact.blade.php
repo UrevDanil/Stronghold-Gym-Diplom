@@ -82,17 +82,20 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <div class="d-flex  flex-column flex-lg-row align-items-center">
                 <ul class="navbar-nav  ">
-                  <li class="nav-item active">
+                  <li class="nav-item">
                     <a class="nav-link" href="{{ route('home') }}">Главная <span class="sr-only">(current)</span></a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="{{ route('about') }}">О нас </a>
                   </li>
-                  <li class="nav-item active">
+                  <li class="nav-item">
                     <a class="nav-link" href="{{ route('service') }}">Услуги </a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="{{ route('contact') }}">Связаться с нами</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ route('login') }}">Войти</a>
                   </li>
                 </ul>
                 <form class="form-inline my-2 my-lg-0 ml-0 ml-lg-4 mb-3 mb-lg-0">

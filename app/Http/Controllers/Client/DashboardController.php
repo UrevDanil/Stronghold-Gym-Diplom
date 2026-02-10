@@ -157,15 +157,16 @@ class DashboardController extends Controller
 
     public function subscriptions()
     {
-        $subscriptions = Subscription::where('is_active', true)->get();
-        $userSubscriptions = Auth::user()->subscriptions()
-            ->orderBy('pivot_purchase_date', 'desc')
-            ->get();
+    $subscriptions = Subscription::where('is_active', true)->get();
+    $userSubscriptions = Auth::user()->subscriptions()
+        ->orderBy('pivot_start_date', 'desc') // ИЗМЕНИЛ: purchase_date → start_date
+        ->get();
 
-        return view('client.subscriptions', [
-            'subscriptions' => $subscriptions,
-            'userSubscriptions' => $userSubscriptions,
-        ]);
+    return view('client.subscriptions', [
+        'subscriptions' => $subscriptions,
+        'userSubscriptions' => $userSubscriptions,
+        'user' => Auth::user(), // Добавил, если нужно в шаблоне
+    ]);
     }
 
     public function purchaseSubscription(Subscription $subscription)
@@ -173,17 +174,19 @@ class DashboardController extends Controller
         // Здесь должна быть интеграция с платежной системой
         // Пока просто создаем запись
         
-        $user = Auth::user();
-        
-        $user->subscriptions()->attach($subscription->id, [
-            'purchase_date' => now(),
-            'expiry_date' => now()->addDays($subscription->duration_days),
-            'remaining_sessions' => $subscription->session_count,
-            'status' => 'active',
-        ]);
+    $user = Auth::user();
+    
+    $user->subscriptions()->attach($subscription->id, [
+        'start_date' => now(),
+        'end_date' => now()->addDays($subscription->duration_days),
+        'remaining_workouts' => $subscription->workouts_count, // Изменили
+        'status' => 'active',
+        'activated_by' => $user->id,
+        'activated_at' => now(),
+    ]);
 
-        return back()->with('success', "Абонемент '{$subscription->name}' успешно приобретен!");
-    }
+    return back()->with('success', "Абонемент '{$subscription->name}' успешно приобретен!");
+}
 
     // Показ профиля пользователя
 public function profile()

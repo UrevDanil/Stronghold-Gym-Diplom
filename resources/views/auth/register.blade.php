@@ -108,7 +108,7 @@
                                     <input type="email" class="form-control @error('email') is-invalid @enderror" 
                                            id="email" name="email" 
                                            value="{{ old('email') }}" 
-                                           placeholder="example@mail.ru" 
+                                           placeholder="Ваша почта" 
                                            required>
                                     @error('email')
                                         <div class="invalid-feedback">
@@ -128,7 +128,7 @@
                                     <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
                                            id="phone" name="phone" 
                                            value="{{ old('phone') }}" 
-                                           
+                                           placeholder="+7 (___) ___-__-__" 
                                            required>
                                     @error('phone')
                                         <div class="invalid-feedback">
@@ -190,7 +190,6 @@
                                 <small class="form-text text-muted">
                                     Пароли должны совпадать
                                 </small>
-                                
                             </div>         
                             <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
                                 <i class="fas fa-user-plus me-2"></i>Зарегистрироваться
