@@ -5,9 +5,15 @@ use App\Http\Controllers\{
     Admin\DashboardController as AdminDashboardController,
     Client\DashboardController as ClientDashboardController,
     Trainer\DashboardController as TrainerDashboardController,
-    ScheduleController,
+    AdminController,
+    AuthController,
     BookingController,
-    AuthController
+    ClientController,
+    Controller,
+    ScheduleController,
+    SubscriptionController,
+    TrainerController,
+    WorkoutController
 };
 
 // ====================
@@ -70,6 +76,17 @@ Route::middleware(['auth', 'role:admin,owner'])->prefix('admin')->name('admin.')
 });
 
 // ====================
+// ТРЕНЕР
+// ====================
+
+Route::middleware(['auth', 'role:trainer'])->prefix('trainer')->name('trainer.')->group(function () {
+    Route::get('/dashboard', [TrainerDashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/schedule', [TrainerDashboardController::class, 'schedule'])->name('schedule');
+    Route::post('/schedule/{schedule}/attendance', [TrainerDashboardController::class, 'markAttendance'])->name('attendance.mark');
+    Route::get('/clients', [TrainerDashboardController::class, 'clients'])->name('clients');
+});
+
+// ====================
 // КЛИЕНТ
 // ====================
 
@@ -92,19 +109,6 @@ Route::middleware(['auth', 'role:client'])->prefix('client')->name('client.')->g
     // Абонементы
     Route::get('/subscriptions', [ClientDashboardController::class, 'subscriptions'])->name('subscriptions');
     Route::post('/subscriptions/{subscription}/purchase', [ClientDashboardController::class, 'purchaseSubscription'])->name('subscriptions.purchase');
-});
-
-
-
-// ====================
-// ТРЕНЕР
-// ====================
-
-Route::middleware(['auth', 'role:trainer'])->prefix('trainer')->name('trainer.')->group(function () {
-    Route::get('/dashboard', [TrainerDashboardController::class, 'dashboard'])->name('dashboard');
-    Route::get('/schedule', [TrainerDashboardController::class, 'schedule'])->name('schedule');
-    Route::post('/schedule/{schedule}/attendance', [TrainerDashboardController::class, 'markAttendance'])->name('attendance.mark');
-    Route::get('/clients', [TrainerDashboardController::class, 'clients'])->name('clients');
 });
 
 // Публичные маршруты
