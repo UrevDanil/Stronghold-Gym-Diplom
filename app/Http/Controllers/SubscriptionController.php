@@ -1,109 +1,189 @@
 <?php
 
-namespace App\Models; // Изменил namespace на Models
+namespace App\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Subscription;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class Subscription extends Model
+class SubscriptionController extends Controller
 {
-    protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'duration_days',
-        'workouts_count', // ИЗМЕНИЛ: session_count → workouts_count
-        'is_active',
-        'type', // Добавил поле type из вашей БД
-        // 'features' убрал, так как нет в вашей БД
-    ];
-
-    protected $casts = [
-        'price' => 'decimal:2',
-        'duration_days' => 'integer',
-        'workouts_count' => 'integer', // ИЗМЕНИЛ: session_count → workouts_count
-        'is_active' => 'boolean',
-        // 'features' => 'array' убрал
-    ];
-
-    public function users()
+    /**
+     * Display a listing of the subscriptions.
+     */
+    public function index()
     {
-        return $this->belongsToMany(User::class, 'user_subscriptions')
-                    ->withPivot([
-                        'start_date',
-                        'end_date',
-                        'remaining_workouts',
-                        'status',
-                        'activated_by',
-                        'activated_at'
-                    ])
-                    ->withTimestamps();
+        $subscriptions = Subscription::where('is_active', true)
+            ->orderBy('price')
+            ->get();
+            
+        return view('subscriptions.index', compact('subscriptions'));
     }
 
-    // Метод для активации абонемента пользователю
-    public function activateForUser(User $user, $activatedBy = null)
+    /**
+     * Purchase a subscription.
+     */
+    public function purchase(Subscription $subscription, Request $request)
     {
-        return $this->users()->attach($user->id, [
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')
+                ->with('error', 'Для покупки абонемента необходимо войти в систему');
+        }
+        
+        if (!$user->isClient()) {
+            return back()->with('error', 'Только клиенты могут приобретать абонементы');
+        }
+        
+        // Проверяем активный абонемент
+        if ($user->hasActiveSubscription()) {
+            return back()->with('warning', 'У вас уже есть активный абонемент');
+        }
+        
+        // Прикрепляем абонемент к пользователю
+        $user->subscriptions()->attach($subscription->id, [
             'start_date' => now(),
-            'end_date' => now()->addDays($this->duration_days),
-            'remaining_workouts' => $this->workouts_count, // ИЗМЕНИЛ
+            'end_date' => now()->addDays($subscription->duration_days),
+            'remaining_workouts' => $subscription->workouts_count,
             'status' => 'active',
-            'activated_by' => $activatedBy,
+            'activated_by' => $user->id,
             'activated_at' => now(),
         ]);
-    }
-    
-    // Дополнительные методы для работы с типом абонемента
-    public function isTimeBased()
-    {
-        return $this->type === 'time';
-    }
-    
-    public function isCountBased()
-    {
-        return $this->type === 'count';
-    }
-    
-    // Метод для получения цены с форматированием
-    public function getFormattedPriceAttribute()
-    {
-        return number_format($this->price, 0, ',', ' ') . ' ₽';
-    }
-    
-    // Метод для получения продолжительности с правильным склонением
-    public function getFormattedDurationAttribute()
-    {
-        $days = $this->duration_days;
         
-        if ($days == 30) {
-            return '1 месяц';
-        } elseif ($days == 60) {
-            return '2 месяца';
-        } elseif ($days == 90) {
-            return '3 месяца';
-        } elseif ($days == 180) {
-            return '6 месяцев';
-        } elseif ($days == 365) {
-            return '1 год';
-        } else {
-            return $days . ' ' . $this->getDaysWord($days);
-        }
+        return redirect()->route('client.dashboard')
+            ->with('success', "Абонемент '{$subscription->name}' успешно приобретен!");
     }
-    
-    private function getDaysWord($number)
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
     {
-        $lastDigit = $number % 10;
-        $lastTwoDigits = $number % 100;
-        
-        if ($lastTwoDigits >= 11 && $lastTwoDigits <= 19) {
-            return 'дней';
+        // Только для администраторов
+        if (!Auth::user()->isAdmin()) {
+            abort(403);
         }
         
-        switch ($lastDigit) {
-            case 1: return 'день';
-            case 2:
-            case 3:
-            case 4: return 'дня';
-            default: return 'дней';
+        return view('admin.subscriptions.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        if (!Auth::user()->isAdmin()) {
+            abort(403);
         }
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'duration_days' => 'required|integer|min:1',
+            'workouts_count' => 'required|integer|min:1',
+            'type' => 'required|in:time,count',
+            'is_active' => 'boolean',
+        ]);
+        
+        Subscription::create($validated);
+        
+        return redirect()->route('admin.subscriptions')
+            ->with('success', 'Абонемент успешно создан');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Subscription $subscription)
+    {
+        return view('subscriptions.show', compact('subscription'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Subscription $subscription)
+    {
+        if (!Auth::user()->isAdmin()) {
+            abort(403);
+        }
+        
+        return view('admin.subscriptions.edit', compact('subscription'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Subscription $subscription)
+    {
+        if (!Auth::user()->isAdmin()) {
+            abort(403);
+        }
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'duration_days' => 'required|integer|min:1',
+            'workouts_count' => 'required|integer|min:1',
+            'type' => 'required|in:time,count',
+            'is_active' => 'boolean',
+        ]);
+        
+        $subscription->update($validated);
+        
+        return redirect()->route('admin.subscriptions')
+            ->with('success', 'Абонемент успешно обновлен');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Subscription $subscription)
+    {
+        if (!Auth::user()->isAdmin()) {
+            abort(403);
+        }
+        
+        $subscription->delete();
+        
+        return redirect()->route('admin.subscriptions')
+            ->with('success', 'Абонемент успешно удален');
+    }
+
+    /**
+     * Renew subscription.
+     */
+    public function renew(Subscription $subscription)
+    {
+        $user = Auth::user();
+        
+        if (!$user || !$user->isClient()) {
+            abort(403);
+        }
+        
+        // Деактивируем старый активный абонемент
+        $activeSubscription = $user->activeSubscription();
+        if ($activeSubscription) {
+            $user->subscriptions()
+                ->updateExistingPivot($activeSubscription->id, [
+                    'status' => 'expired'
+                ]);
+        }
+        
+        // Создаем новый
+        $user->subscriptions()->attach($subscription->id, [
+            'start_date' => now(),
+            'end_date' => now()->addDays($subscription->duration_days),
+            'remaining_workouts' => $subscription->workouts_count,
+            'status' => 'active',
+            'activated_by' => $user->id,
+            'activated_at' => now(),
+        ]);
+        
+        return redirect()->route('client.dashboard')
+            ->with('success', "Абонемент '{$subscription->name}' успешно продлен!");
     }
 }

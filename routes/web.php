@@ -107,10 +107,9 @@ Route::middleware(['auth', 'role:trainer'])->prefix('trainer')->name('trainer.')
     Route::get('/clients', [TrainerDashboardController::class, 'clients'])->name('clients');
 });
 
-// Добавьте в существующие маршруты:
-
-// Публичные абонементы (для всех)
+// Публичные маршруты
 Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
+Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
 
 // Аутентифицированные маршруты
 Route::middleware(['auth'])->group(function () {
@@ -123,11 +122,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/subscriptions/{subscription}/renew', 
                [SubscriptionController::class, 'renew'])
            ->name('subscriptions.renew');
-    
-    // Активация абонемента (админ)
-    Route::middleware(['role:admin'])->post('/users/{user}/subscriptions/{subscription}/activate', 
-               [SubscriptionController::class, 'activate'])
-           ->name('subscriptions.activate');
+});
+
+// Админ маршруты
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('subscriptions', SubscriptionController::class)->except(['show']);
 });
 
 // ====================

@@ -615,7 +615,6 @@
       </div>
     </div>
   </section>
-
   <!-- end coach section -->
 
   <!-- contact section -->

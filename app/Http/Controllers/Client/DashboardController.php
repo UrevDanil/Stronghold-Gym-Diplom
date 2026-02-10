@@ -169,19 +169,16 @@ class DashboardController extends Controller
     ]);
     }
 
-    public function purchaseSubscription(Subscription $subscription)
-    {
-        // Здесь должна быть интеграция с платежной системой
-        // Пока просто создаем запись
-        
+public function purchaseSubscription(Subscription $subscription)
+{
     $user = Auth::user();
     
     $user->subscriptions()->attach($subscription->id, [
-        'start_date' => now(),
+        'start_date' => now(), // Используем start_date
         'end_date' => now()->addDays($subscription->duration_days),
-        'remaining_workouts' => $subscription->workouts_count, // Изменили
+        'remaining_workouts' => $subscription->workouts_count,
         'status' => 'active',
-        'activated_by' => $user->id,
+        'activated_by' => $user->id, // или Auth::id()
         'activated_at' => now(),
     ]);
 
