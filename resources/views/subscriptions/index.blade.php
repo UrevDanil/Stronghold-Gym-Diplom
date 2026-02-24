@@ -25,7 +25,7 @@
             <div class="col-md-4 mb-4">
                 <div class="card h-100 subscription-card shadow">
                     <div class="card-header text-white text-center py-3" 
-                         style="background: linear-gradient(135deg, #FF8C00, #FF4500);">
+                         style="background: linear-gradient(135deg, #1b3caa, #0E2778);">
                         <h4 class="mb-0">{{ $subscription->name }}</h4>
                     </div>
                     <div class="card-body d-flex flex-column">
@@ -39,7 +39,7 @@
                             <ul class="list-unstyled">
                                 <li class="mb-2">
                                     <i class="fas fa-dumbbell text-success me-2"></i>
-                                    {{ $subscription->workouts_count }} тренировок <!-- ИЗМЕНИЛ: session_count → workouts_count -->
+                                    {{ $subscription->workouts_count }} тренировок
                                 </li>
                                 <li class="mb-2">
                                     <i class="fas fa-calendar-alt text-info me-2"></i>
@@ -49,10 +49,13 @@
                                     <i class="fas fa-clock text-warning me-2"></i>
                                     Доступ ко всем тренажерам
                                 </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-user-friends text-primary me-2"></i>
-                                    Консультация тренера
-                                </li>
+                                
+                                @if(in_array($subscription->id, [6, 7, 8]))
+                                    <li class="mb-2">
+                                        <i class="fas fa-user-friends text-primary me-2"></i>
+                                        Консультация тренера
+                                    </li>
+                                @endif
                             </ul>
                         </div>
                         
