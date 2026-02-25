@@ -20,7 +20,7 @@
                         <div>
                             <h6 class="card-title mb-0">Активный абонемент</h6>
                             @if($activeSubscription)
-                                <p class="mb-0">{{ $activeSubscription->name }}</p>
+                                <p class="mb-0">{{ $activeSubscription->subscription->name ?? 'Абонемент' }}</p>
                             @else
                                 <p class="mb-0">Нет</p>
                             @endif
@@ -39,7 +39,7 @@
                             <h6 class="card-title mb-0">Осталось тренировок</h6>
                             <p class="mb-0">
                                 @if($activeSubscription)
-                                    {{ $activeSubscription->pivot->remaining_workouts }}
+                                    {{ $activeSubscription->remaining_workouts }}
                                 @else
                                     0
                                 @endif
@@ -73,7 +73,7 @@
                             <h6 class="card-title mb-0">Абонемент до</h6>
                             <p class="mb-0">
                                 @if($activeSubscription)
-                                    {{ \Carbon\Carbon::parse($activeSubscription->pivot->end_date)->format('d.m.Y') }}
+                                    {{ \Carbon\Carbon::parse($activeSubscription->end_date)->format('d.m.Y') }}
                                 @else
                                     Нет
                                 @endif
@@ -205,19 +205,19 @@
                 </div>
                 <div class="card-body">
                     @if($activeSubscription)
-                        <div class="text-center mb-3">
-                            <i class="fas fa-id-card fa-3x text-primary mb-3"></i>
-                            <h4>{{ $activeSubscription->name }}</h4>
-                            <p class="text-muted">{{ $activeSubscription->description }}</p>
-                        </div>
-                        
                         @php
-                            // Получаем общее количество тренировок из абонемента
-                            $totalWorkouts = $activeSubscription->session_count ?? 0;
-                            $remaining = $activeSubscription->pivot->remaining_workouts ?? 0;
+                            $subscription = $activeSubscription->subscription;
+                            $totalWorkouts = $subscription->workouts_count ?? 0;
+                            $remaining = $activeSubscription->remaining_workouts;
                             $used = max(0, $totalWorkouts - $remaining);
                             $percentage = $totalWorkouts > 0 ? min(100, ($used / $totalWorkouts) * 100) : 0;
                         @endphp
+                    
+                        <div class="text-center mb-3">
+                            <i class="fas fa-id-card fa-3x text-primary mb-3"></i>
+                            <h4>{{ $subscription->name ?? 'Абонемент' }}</h4>
+                            <p class="text-muted">{{ $subscription->description ?? '' }}</p>
+                        </div>
                         
                         <div class="progress mb-3" style="height: 20px;">
                             <div class="progress-bar bg-success" role="progressbar" 
@@ -236,36 +236,36 @@
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span>Дата начала:</span>
-                                <strong>{{ \Carbon\Carbon::parse($activeSubscription->pivot->start_date)->format('d.m.Y') }}</strong>
+                                <strong>{{ \Carbon\Carbon::parse($activeSubscription->start_date)->format('d.m.Y') }}</strong>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span>Действует до:</span>
-                                <strong>{{ \Carbon\Carbon::parse($activeSubscription->pivot->end_date)->format('d.m.Y') }}</strong>
+                                <strong>{{ \Carbon\Carbon::parse($activeSubscription->end_date)->format('d.m.Y') }}</strong>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span>Статус:</span>
                                 <strong>
-                                    @if($activeSubscription->pivot->status === 'active')
+                                    @if($activeSubscription->status === 'active')
                                         <span class="badge bg-success">Активен</span>
-                                    @elseif($activeSubscription->pivot->status === 'expired')
+                                    @elseif($activeSubscription->status === 'expired')
                                         <span class="badge bg-danger">Истек</span>
-                                    @elseif($activeSubscription->pivot->status === 'frozen')
+                                    @elseif($activeSubscription->status === 'frozen')
                                         <span class="badge bg-warning">Заморожен</span>
-                                    @elseif($activeSubscription->pivot->status === 'canceled')
+                                    @elseif($activeSubscription->status === 'canceled')
                                         <span class="badge bg-secondary">Отменен</span>
                                     @else
-                                        {{ $activeSubscription->pivot->status }}
+                                        {{ $activeSubscription->status }}
                                     @endif
                                 </strong>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span>Цена:</span>
-                                <strong>{{ number_format($activeSubscription->price, 0, ',', ' ') }} ₽</strong>
+                                <strong>{{ number_format($subscription->price ?? 0, 0, ',', ' ') }} ₽</strong>
                             </li>
                         </ul>
                         
                         <div class="mt-3">
-                            <a href="{{ route('client.subscriptions') }}" class="btn btn-outline-primary btn-block">
+                            <a href="{{ route('client.subscriptions') }}" class="btn btn-outline-primary btn-block w-100">
                                 Продлить или купить новый
                             </a>
                         </div>

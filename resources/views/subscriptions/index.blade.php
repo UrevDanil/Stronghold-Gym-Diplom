@@ -124,7 +124,7 @@
                             </h2>
                             <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    Вы можете продлить абонемент в любое время. При продлении неиспользованные тренировки сгорают.
+                                    Вы можете продлить абонемент в любое время. После того как старый абонемент закончится.
                                 </div>
                             </div>
                         </div>
@@ -179,12 +179,12 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #FF8C00, #FF4500);
+    background: linear-gradient(135deg, #fd2eb8, #0E2778);
     border: none;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #FF4500, #FF8C00);
+    background: linear-gradient(135deg, #0E2778, #fd2eb8);
     transform: scale(1.02);
 }
 </style>

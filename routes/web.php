@@ -114,6 +114,7 @@ Route::middleware(['auth', 'role:client'])->prefix('client')->name('client.')->g
 // Публичные маршруты
 Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
 Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
+Route::post('/freeze-subscription', [ClientDashboardController::class, 'freezeSubscription'])->name('freeze-subscription');
 
 // Аутентифицированные маршруты
 Route::middleware(['auth'])->group(function () {

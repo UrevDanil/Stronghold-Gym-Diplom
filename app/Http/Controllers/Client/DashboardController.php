@@ -1,6 +1,5 @@
 <?php
 
-// app/Http/Controllers/Client/DashboardController.php
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
@@ -10,33 +9,34 @@ use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function dashboard()
     {
-    $user = Auth::user();
-    
-    $data = [
-        'user' => $user,
-        'upcomingBookings' => $user->upcomingBookings()->limit(5)->get(),
-        'pastBookings' => Booking::where('user_id', $user->id)
-            ->whereHas('schedule', function($q) {
-                $q->where('date', '<', now()->toDateString())
-                  ->orWhere(function($query) {
-                      $query->where('date', now()->toDateString())
-                            ->where('end_time', '<', now()->format('H:i:s'));
-                  });
-            })
-            ->with('schedule.workout', 'schedule.trainer')
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get(),
-        'activeSubscription' => $user->activeSubscription(),
-        'availableSubscriptions' => Subscription::where('is_active', true)->get(),
-    ];
-
-    return view('client.dashboard', $data);
+        $user = Auth::user();
+        
+        $data = [
+            'user' => $user,
+            'upcomingBookings' => $user->upcomingBookings()->limit(5)->get(),
+            'pastBookings' => Booking::where('user_id', $user->id)
+                ->whereHas('schedule', function($q) {
+                    $q->where('date', '<', now()->toDateString())
+                      ->orWhere(function($query) {
+                          $query->where('date', now()->toDateString())
+                                ->where('end_time', '<', now()->format('H:i:s'));
+                      });
+                })
+                ->with('schedule.workout', 'schedule.trainer')
+                ->orderBy('created_at', 'desc')
+                ->limit(5)
+                ->get(),
+            'activeSubscription' => $user->activeSubscription(),
+            'availableSubscriptions' => Subscription::where('is_active', true)->get(),
+        ];
+        
+        return view('client.dashboard', $data);
     }
 
     public function schedule(Request $request)
@@ -58,14 +58,12 @@ class DashboardController extends Controller
         if ($date) {
             $query->where('date', $date);
         } else {
-            // Показываем на неделю вперед по умолчанию
             $query->where('date', '<=', now()->addDays(7)->toDateString());
         }
 
         $schedules = $query->orderBy('date')->orderBy('start_time')->get();
         $workouts = \App\Models\Workout::where('is_active', true)->get();
         
-        // Проверяем, какие занятия уже забронированы пользователем
         $userBookings = Auth::user()->bookings()
             ->whereIn('schedule_id', $schedules->pluck('id'))
             ->pluck('schedule_id')
@@ -82,147 +80,180 @@ class DashboardController extends Controller
 
     public function book(Schedule $schedule, Request $request)
     {
-    $user = Auth::user();
+        $user = Auth::user();
 
-    // Проверки
-    if (!$user->hasActiveSubscription()) {
-        return back()->with('error', 'У вас нет активного абонемента');
+        if (!$user->hasActiveSubscription()) {
+            return back()->with('error', 'У вас нет активного абонемента');
+        }
+
+        if (!$schedule->canBook()) {
+            return back()->with('error', 'Это занятие нельзя забронировать');
+        }
+
+        $existingBooking = Booking::where('user_id', $user->id)
+            ->where('schedule_id', $schedule->id)
+            ->where('status', '!=', Booking::STATUS_CANCELLED)
+            ->first();
+
+        if ($existingBooking) {
+            return back()->with('error', 'Вы уже забронировали это занятие');
+        }
+
+        $booking = Booking::create([
+            'user_id' => $user->id,
+            'schedule_id' => $schedule->id,
+            'status' => Booking::STATUS_BOOKED,
+        ]);
+
+        $schedule->increment('booked_count');
+
+        $subscription = $user->activeSubscription();
+        if ($subscription && $subscription->pivot->remaining_workouts > 0) {
+            $subscription->pivot->decrement('remaining_workouts');
+        }
+        
+        \App\Models\Notification::create([
+            'user_id' => $user->id,
+            'title' => 'Бронирование создано',
+            'message' => "Вы забронировали занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+            'type' => 'booking',
+            'is_read' => false,
+        ]);
+
+        return back()->with('success', 'Занятие успешно забронировано!');
     }
 
-    if (!$schedule->canBook()) {
-        return back()->with('error', 'Это занятие нельзя забронировать');
-    }
-
-    // Проверяем, не забронировал ли уже пользователь это занятие
-    $existingBooking = Booking::where('user_id', $user->id)
-        ->where('schedule_id', $schedule->id)
-        ->where('status', '!=', Booking::STATUS_CANCELLED)
-        ->first();
-
-    if ($existingBooking) {
-        return back()->with('error', 'Вы уже забронировали это занятие');
-    }
-
-    // Создаем бронирование
-    $booking = Booking::create([
-        'user_id' => $user->id,
-        'schedule_id' => $schedule->id,
-        'status' => Booking::STATUS_BOOKED,
-    ]);
-
-    // Увеличиваем счетчик бронирований
-    $schedule->increment('booked_count');
-
-    // Используем тренировку из абонемента
-    $subscription = $user->activeSubscription();
-    if ($subscription && $subscription->pivot->remaining_workouts > 0) {
-        $subscription->pivot->decrement('remaining_workouts');
-    }
-    
-    // Создаем уведомление
-    \App\Models\Notification::create([
-        'user_id' => $user->id,
-        'title' => 'Бронирование создано',
-        'message' => "Вы забронировали занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
-        'type' => 'booking',
-        'is_read' => false,
-    ]);
-
-    return back()->with('success', 'Занятие успешно забронировано!');
-    }
-
-    
     public function cancelBooking(Booking $booking, Request $request)
     {
-    if ($booking->user_id !== Auth::id()) {
-        abort(403);
-    }
-
-    if (!$booking->canCancel()) {
-        return back()->with('error', 'Это бронирование нельзя отменить');
-    }
-
-    $booking->cancel($request->cancellation_reason);
-
-    // Возвращаем тренировку в абонемент (если отмена не в день занятия)
-    if ($booking->schedule->date > now()->toDateString()) {
-        $subscription = Auth::user()->activeSubscription();
-        if ($subscription) {
-            $subscription->pivot->increment('remaining_workouts');
+        if ($booking->user_id !== Auth::id()) {
+            abort(403);
         }
+
+        if (!$booking->canCancel()) {
+            return back()->with('error', 'Это бронирование нельзя отменить');
+        }
+
+        $booking->cancel($request->cancellation_reason);
+
+        if ($booking->schedule->date > now()->toDateString()) {
+            $subscription = Auth::user()->activeSubscription();
+            if ($subscription) {
+                $subscription->pivot->increment('remaining_workouts');
+            }
+        }
+
+        return back()->with('success', 'Бронирование отменено');
     }
 
-    return back()->with('success', 'Бронирование отменено');
-    }
-
+    /**
+     * ИСПРАВЛЕННЫЙ МЕТОД subscriptions - теперь с часами и минутами
+     */
     public function subscriptions()
     {
-    $subscriptions = Subscription::where('is_active', true)->get();
-    $userSubscriptions = Auth::user()->subscriptions()
-        ->orderBy('pivot_start_date', 'desc') // ИЗМЕНИЛ: purchase_date → start_date
-        ->get();
+        $subscriptions = Subscription::where('is_active', true)->get();
+        $userSubscriptions = Auth::user()->subscriptions()
+            ->orderBy('pivot_start_date', 'desc')
+            ->get();
 
-    return view('client.subscriptions', [
-        'subscriptions' => $subscriptions,
-        'userSubscriptions' => $userSubscriptions,
-        'user' => Auth::user(), // Добавил, если нужно в шаблоне
-    ]);
+        return view('client.subscriptions', [
+            'subscriptions' => $subscriptions,
+            'userSubscriptions' => $userSubscriptions,
+            'user' => Auth::user(),
+        ]);
     }
 
-public function purchaseSubscription(Subscription $subscription)
-{
-    $user = Auth::user();
-    
-    $user->subscriptions()->attach($subscription->id, [
-        'start_date' => now(), // Используем start_date
-        'end_date' => now()->addDays($subscription->duration_days),
-        'remaining_workouts' => $subscription->workouts_count,
-        'status' => 'active',
-        'activated_by' => $user->id, // или Auth::id()
-        'activated_at' => now(),
-    ]);
+    public function purchaseSubscription(Subscription $subscription)
+    {
+        $user = Auth::user();
+        
+        $user->subscriptions()->attach($subscription->id, [
+            'start_date' => now(),
+            'end_date' => now()->addDays($subscription->duration_days),
+            'remaining_workouts' => $subscription->workouts_count,
+            'status' => 'active',
+            'activated_by' => $user->id,
+            'activated_at' => now(),
+        ]);
 
-    return back()->with('success', "Абонемент '{$subscription->name}' успешно приобретен!");
-}
+        return back()->with('success', "Абонемент '{$subscription->name}' успешно приобретен!");
+    }
 
-    // Показ профиля пользователя
-public function profile()
-{
-    $user = Auth::user();
-    return view('client.profile', compact('user'));
-}
+    public function profile()
+    {
+        $user = Auth::user();
+        return view('client.profile', compact('user'));
+    }
 
-    //Обновление пользователя
-public function updateProfile(Request $request)
-{
-    $user = Auth::user();
-    
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-        'phone' => 'nullable|string|max:20',
-        'birth_date' => 'nullable|date|before:today',
-    ]);
-    
-    $user->update($validated);
-    
-    return redirect()->route('client.profile')
-        ->with('success', 'Профиль успешно обновлен');
-}
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20',
+            'birth_date' => 'nullable|date|before:today',
+        ]);
+        
+        $user->update($validated);
+        
+        return redirect()->route('client.profile')
+            ->with('success', 'Профиль успешно обновлен');
+    }
 
-public function updatePassword(Request $request)
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|current_password',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+        
+        $user = Auth::user();
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+        
+        return redirect()->route('client.profile')
+            ->with('success', 'Пароль успешно изменен');
+    }
+
+/**
+ * Заморозка абонемента*/
+
+public function freezeSubscription(Request $request)
 {
     $request->validate([
-        'current_password' => 'required|current_password',
-        'password' => 'required|string|min:8|confirmed',
+        'reason' => 'required|string|max:255',
+        'days' => 'required|integer|min:1|max:14',
     ]);
     
     $user = Auth::user();
-    $user->update([
-        'password' => Hash::make($request->password)
-    ]);
     
-    return redirect()->route('client.profile')
-        ->with('success', 'Пароль успешно изменен');
+    // Получаем активную запись user_subscriptions
+    $userSubscription = $user->activeSubscription();
+    
+    if (!$userSubscription) {
+        return back()->with('error', 'У вас нет активного абонемента');
+    }
+    
+    // Проверяем, не заморожен ли уже
+    if ($userSubscription->isPaused()) {
+        return back()->with('error', 'Абонемент уже заморожен');
+    }
+    
+    try {
+        // Используем метод pause из модели UserSubscription
+        $userSubscription->pause($request->days);
+        
+        // Сохраняем причину (можно добавить поле в таблицу)
+        $userSubscription->pause_reason = $request->reason;
+        $userSubscription->save();
+        
+        return back()->with('success', "Абонемент успешно заморожен на {$request->days} дней");
+        
+    } catch (\Exception $e) {
+        return back()->with('error', 'Ошибка при заморозке: ' . $e->getMessage());
+    }
 }
+
 }

@@ -159,98 +159,134 @@
                         </div>
 
                         <!-- Вкладка 3: Абонемент -->
-                        <div class="tab-pane fade" id="subscription" role="tabpanel">
-                            @if($user->activeSubscription())
-                                @php
-                                    $subscription = $user->activeSubscription();
-                                    $remaining = $subscription->pivot->remaining_workouts;
-                                    $totalWorkouts = $subscription->session_count;
-                                    $used = max(0, $totalWorkouts - $remaining);
-                                    $percentage = $totalWorkouts > 0 ? min(100, ($used / $totalWorkouts) * 100) : 0;
-                                @endphp
-                                
-                                <div class="text-center mb-4">
-                                    <i class="fas fa-id-card fa-4x text-primary mb-3"></i>
-                                    <h4>{{ $subscription->name }}</h4>
-                                    <p class="text-muted">{{ $subscription->description }}</p>
-                                </div>
-                                
-                                <div class="progress mb-4" style="height: 25px;">
-                                    <div class="progress-bar bg-success" role="progressbar" 
-                                         style="width: {{ $percentage }}%"
-                                         aria-valuenow="{{ $percentage }}">
-                                        {{ $used }}/{{ $totalWorkouts }} тренировок
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="card mb-3">
-                                            <div class="card-body">
-                                                <h6 class="card-title">Статистика</h6>
-                                                <ul class="list-unstyled">
-                                                    <li class="mb-2">
-                                                        <i class="fas fa-dumbbell text-success me-2"></i>
-                                                        Осталось: <strong>{{ $remaining }}</strong>
-                                                    </li>
-                                                    <li class="mb-2">
-                                                        <i class="fas fa-calendar-check text-info me-2"></i>
-                                                        Использовано: <strong>{{ $used }}</strong>
-                                                    </li>
-                                                    <li class="mb-2">
-                                                        <i class="fas fa-percentage text-primary me-2"></i>
-                                                        Прогресс: <strong>{{ round($percentage, 1) }}%</strong>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <div class="card mb-3">
-                                            <div class="card-body">
-                                                <h6 class="card-title">Срок действия</h6>
-                                                <ul class="list-unstyled">
-                                                    <li class="mb-2">
-                                                        <i class="fas fa-calendar-plus text-success me-2"></i>
-                                                        Начало: 
-                                                        <strong>{{ \Carbon\Carbon::parse($subscription->pivot->start_date)->format('d.m.Y') }}</strong>
-                                                    </li>
-                                                    <li class="mb-2">
-                                                        <i class="fas fa-calendar-minus text-danger me-2"></i>
-                                                        Окончание: 
-                                                        <strong>{{ \Carbon\Carbon::parse($subscription->pivot->end_date)->format('d.m.Y') }}</strong>
-                                                    </li>
-                                                    <li class="mb-2">
-                                                        <i class="fas fa-clock text-warning me-2"></i>
-                                                        Осталось дней: 
-                                                        <strong>{{ \Carbon\Carbon::parse($subscription->pivot->end_date)->diffInDays(now()) }}</strong>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="text-center mt-4">
-                                    <a href="{{ route('client.subscriptions') }}" class="btn btn-primary">
-                                        <i class="fas fa-sync-alt me-2"></i>Продлить абонемент
-                                    </a>
-                                </div>
-                            @else
-                                <div class="text-center py-5">
-                                    <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3"></i>
-                                    <h4>У вас нет активного абонемента</h4>
-                                    <p class="text-muted mb-4">Приобретите абонемент, чтобы начать тренировки</p>
-                                    <a href="{{ route('client.subscriptions') }}" class="btn btn-primary btn-lg">
-                                        <i class="fas fa-shopping-cart me-2"></i>Купить абонемент
-                                    </a>
-                                </div>
+                        <!-- Вкладка 3: Абонемент -->
+<div class="tab-pane fade" id="subscription" role="tabpanel">
+    @if($user->activeSubscription())
+        @php
+            $activeUserSub = $user->activeSubscription(); // Это UserSubscription
+            $subscription = $activeUserSub->subscription; // Это Subscription
+            
+            $remaining = $activeUserSub->remaining_workouts;
+            $totalWorkouts = $subscription->workouts_count ?? 0;
+            $used = max(0, $totalWorkouts - $remaining);
+            $percentage = $totalWorkouts > 0 ? min(100, ($used / $totalWorkouts) * 100) : 0;
+            
+            $startDate = \Carbon\Carbon::parse($activeUserSub->start_date);
+            $endDate = \Carbon\Carbon::parse($activeUserSub->end_date);
+            $daysLeft = $endDate->diffInDays(now(), false);
+            $daysLeft = max(0, $daysLeft);
+        @endphp
+        
+        <div class="text-center mb-4">
+            <i class="fas fa-id-card fa-4x text-primary mb-3"></i>
+            <h4>{{ $subscription->name ?? 'Абонемент' }}</h4>
+            <p class="text-muted">{{ $subscription->description ?? '' }}</p>
+            
+            @if($activeUserSub->isPaused())
+                <div class="alert alert-warning d-inline-block">
+                    <i class="fas fa-snowflake me-2"></i>
+                    Абонемент заморожен до {{ $activeUserSub->paused_until->format('d.m.Y H:i') }}
+                </div>
+            @endif
+        </div>
+        
+        <div class="progress mb-4" style="height: 25px;">
+            <div class="progress-bar bg-success" role="progressbar" 
+                 style="width: {{ $percentage }}%"
+                 aria-valuenow="{{ $percentage }}">
+                {{ $used }}/{{ $totalWorkouts }} тренировок
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="card-title">Статистика</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-dumbbell text-success me-2"></i>
+                                Осталось: <strong>{{ $remaining }}</strong>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-calendar-check text-info me-2"></i>
+                                Использовано: <strong>{{ $used }}</strong>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-percentage text-primary me-2"></i>
+                                Прогресс: <strong>{{ round($percentage, 1) }}%</strong>
+                            </li>
+                            @if($activeUserSub->isPaused())
+                            <li class="mb-2">
+                                <i class="fas fa-pause text-warning me-2"></i>
+                                Причина заморозки: <strong>{{ $activeUserSub->pause_reason ?? 'Не указана' }}</strong>
+                            </li>
                             @endif
-                        </div>
+                        </ul>
                     </div>
                 </div>
             </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="card-title">Срок действия</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-calendar-plus text-success me-2"></i>
+                                Начало: 
+                                <strong>{{ $startDate->format('d.m.Y') }}</strong>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-calendar-minus text-danger me-2"></i>
+                                Окончание: 
+                                <strong>{{ $endDate->format('d.m.Y') }}</strong>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-clock text-warning me-2"></i>
+                                Осталось дней: 
+                                <strong>{{ $daysLeft }}</strong>
+                            </li>
+                            @if($activeUserSub->original_end_date)
+                            <li class="mb-2 text-muted small">
+                                <i class="fas fa-history me-2"></i>
+                                Исходная дата: {{ \Carbon\Carbon::parse($activeUserSub->original_end_date)->format('d.m.Y') }}
+                            </li>
+                            @endif
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            @if($activeUserSub->isPaused())
+                <form action="{{ route('client.subscriptions.resume') }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-play me-2"></i>Разморозить абонемент
+                    </button>
+                </form>
+            @else
+                <a href="{{ route('client.subscriptions') }}" class="btn btn-primary">
+                    <i class="fas fa-sync-alt me-2"></i>Продлить абонемент
+                </a>
+                <button class="btn btn-outline-warning ms-2" data-bs-toggle="modal" data-bs-target="#freezeModal">
+                    <i class="fas fa-snowflake me-2"></i>Заморозить
+                </button>
+            @endif
+        </div>
+    @else
+        <div class="text-center py-5">
+            <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3"></i>
+            <h4>У вас нет активного абонемента</h4>
+            <p class="text-muted mb-4">Приобретите абонемент, чтобы начать тренировки</p>
+            <a href="{{ route('client.subscriptions') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-shopping-cart me-2"></i>Купить абонемент
+            </a>
+        </div>
+    @endif
+</div>
             
             <!-- Информация об аккаунте -->
             <div class="card mt-4">
@@ -356,3 +392,48 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
+
+<!-- Модальное окно заморозки -->
+<div class="modal fade" id="freezeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('freeze-subscription') }}" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Заморозка абонемента</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Вы можете заморозить абонемент на срок до 14 дней.</p>
+                    <p>Причины заморозки:</p>
+                    <ul>
+                        <li>Болезнь</li>
+                        <li>Командировка</li>
+                        <li>Отпуск</li>
+                    </ul>
+                    
+                    <div class="mb-3">
+                        <label for="reason" class="form-label">Причина заморозки</label>
+                        <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="days" class="form-label">Количество дней (макс. 14)</label>
+                        <input type="number" class="form-control" id="days" name="days" min="1" max="14" value="7" required>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-2"></i>
+                        После заморозки срок действия абонемента будет продлен на указанное количество дней.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-snowflake me-2"></i>Заморозить
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
