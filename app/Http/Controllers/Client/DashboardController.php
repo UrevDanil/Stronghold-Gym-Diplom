@@ -46,31 +46,38 @@ public function schedule(Request $request)
     
     $query = Schedule::with(['workout', 'trainer'])
         ->where('date', '>=', now()->toDateString())
-        ->where('status', Schedule::STATUS_SCHEDULED) // ИСПРАВЛЕНО: вместо is_active
+        ->where('status', 'scheduled') // Используем status = scheduled
         ->whereHas('workout', function($q) {
             $q->where('is_active', true);
         });
 
-    if ($workoutId) {
+    // Фильтр по типу тренировки
+    if ($workoutId && $workoutId != '') {
         $query->where('workout_id', $workoutId);
     }
 
-    if ($date) {
+    // Фильтр по дате
+    if ($date && $date != '') {
         $query->where('date', $date);
     } else {
+        // Если дата не выбрана, показываем на 7 дней вперед
         $query->where('date', '<=', now()->addDays(7)->toDateString());
     }
 
     $schedules = $query->orderBy('date')->orderBy('start_time')->get();
     
-    // ИСПРАВЛЕНО: добавляем проверку на существование workouts_count
+    // Получаем все активные тренировки для фильтра
     $workouts = \App\Models\Workout::where('is_active', true)->get();
     
+    // Получаем ID забронированных тренировок текущего пользователя
     $userBookings = Auth::user()->bookings()
         ->whereIn('schedule_id', $schedules->pluck('id'))
-        ->where('status', '!=', 'cancelled') // Только активные бронирования
+        ->where('status', '!=', 'cancelled')
         ->pluck('schedule_id')
         ->toArray();
+
+    // Для отладки - раскомментируй если нужно проверить данные
+    // dd($schedules, $workouts, $userBookings);
 
     return view('client.schedule', [
         'schedules' => $schedules,
@@ -121,13 +128,19 @@ public function schedule(Request $request)
         }
         
         // Создаем уведомление
-        \App\Models\Notification::create([
-            'user_id' => $user->id,
-            'title' => 'Бронирование создано',
-            'message' => "Вы забронировали занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
-            'type' => 'booking',
-            'is_read' => false,
-        ]);
+\App\Models\Notification::create([
+    'user_id' => $user->id,
+    'type' => 'booking', // Вместо title используем type
+    'message' => "Вы забронировали занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+    'is_read' => false,
+    // data можно не заполнять или добавить информацию
+    'data' => json_encode([
+        'schedule_id' => $schedule->id,
+        'workout_name' => $schedule->workout->name,
+        'date' => $schedule->date->format('d.m.Y'),
+        'time' => $schedule->start_time
+    ])
+]);
 
         return back()->with('success', 'Занятие успешно забронировано!');
     }
@@ -135,33 +148,44 @@ public function schedule(Request $request)
     /**
      * Отмена бронирования
      */
-    public function cancelBooking(Booking $booking, Request $request)
-    {
-        if ($booking->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        if (!$booking->canCancel()) {
-            return back()->with('error', 'Это бронирование нельзя отменить');
-        }
-
-        // Сохраняем причину отмены, если есть
-        $booking->cancel($request->cancellation_reason);
-
-        // Возвращаем тренировку в абонемент, если это будущее занятие
-        if ($booking->schedule->date > now()->toDateString()) {
-            $activeSubscription = Auth::user()->activeSubscription();
-            if ($activeSubscription) {
-                // ИСПРАВЛЕНО: используем прямые свойства UserSubscription
-                $activeSubscription->increment('remaining_workouts');
-            }
-        }
-
-        // Уменьшаем счетчик занятых мест в расписании
-        $booking->schedule->decrement('current_participants');
-
-        return back()->with('success', 'Бронирование отменено');
+public function cancelBooking(Booking $booking, Request $request)
+{
+    if ($booking->user_id !== Auth::id()) {
+        abort(403);
     }
+
+    if (!$booking->canCancel()) {
+        return back()->with('error', 'Это бронирование нельзя отменить');
+    }
+
+    // Сохраняем данные до отмены
+    $scheduleDate = $booking->schedule->date;
+    $user = Auth::user();
+
+    // Отменяем бронирование
+    $booking->cancel();
+
+    // ВОЗВРАЩАЕМ ТРЕНИРОВКУ В АБОНЕМЕНТ (только для будущих занятий)
+    if ($scheduleDate > now()->toDateString()) {
+        $activeSubscription = $user->activeSubscription();
+        if ($activeSubscription) {
+            $activeSubscription->increment('remaining_workouts');
+            
+            // Для отладки - добавим сообщение в лог
+            \Log::info('Тренировка возвращена', [
+                'user_id' => $user->id,
+                'subscription_id' => $activeSubscription->id,
+                'new_remaining' => $activeSubscription->remaining_workouts
+            ]);
+        } else {
+            \Log::warning('Активный абонемент не найден при отмене', [
+                'user_id' => $user->id
+            ]);
+        }
+    }
+
+    return back()->with('success', 'Бронирование отменено, тренировка возвращена в абонемент');
+}
 
     /**
      * ИСПРАВЛЕННЫЙ МЕТОД subscriptions - теперь с часами и минутами

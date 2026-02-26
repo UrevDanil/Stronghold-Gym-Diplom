@@ -147,20 +147,19 @@ class User extends Authenticatable
     }
 
     // ИСПРАВЛЕНО: теперь используем UserSubscription
-    public function activeSubscription(): ?UserSubscription
-    {
-        return $this->userSubscriptions()
-            ->where('status', UserSubscription::STATUS_ACTIVE)
-            ->whereDate('start_date', '<=', Carbon::today())
-            ->whereDate('end_date', '>=', Carbon::today())
-            ->where('remaining_workouts', '>', 0)
-            ->where(function($q) {
-                $q->whereNull('paused_at')
-                  ->orWhereDate('paused_until', '<', Carbon::today());
-            })
-            ->latest()
-            ->first();
-    }
+public function activeSubscription()
+{
+    return $this->userSubscriptions()
+        ->where('status', UserSubscription::STATUS_ACTIVE)
+        ->whereDate('start_date', '<=', Carbon::today())
+        ->whereDate('end_date', '>=', Carbon::today())
+        ->where('remaining_workouts', '>', 0)
+        ->where(function($q) {
+            $q->whereNull('paused_at')
+              ->orWhereDate('paused_until', '<', Carbon::today());
+        })
+        ->first(); // Важно: first(), а не get()
+}
 
     // НОВОЕ: получить замороженный абонемент
     public function frozenSubscription(): ?UserSubscription
@@ -184,19 +183,20 @@ class User extends Authenticatable
             ->get();
     }
 
-    public function upcomingBookings()
-    {
-        return $this->bookings()
-            ->whereHas('schedule', function($q) {
-                $q->where('date', '>=', now()->toDateString())
-                  ->orWhere(function($query) {
-                      $query->where('date', now()->toDateString())
-                            ->where('start_time', '>', now()->format('H:i:s'));
-                  });
-            })
-            ->with('schedule.workout', 'schedule.trainer')
-            ->orderBy('created_at', 'desc');
-    }
+public function upcomingBookings()
+{
+    return $this->bookings()
+        ->where('status', '!=', 'cancelled') // НЕ показывать отмененные
+        ->whereHas('schedule', function($q) {
+            $q->where('date', '>=', now()->toDateString())
+              ->orWhere(function($query) {
+                  $query->where('date', now()->toDateString())
+                        ->where('start_time', '>', now()->format('H:i:s'));
+              });
+        })
+        ->with('schedule.workout', 'schedule.trainer')
+        ->orderBy('created_at', 'desc');
+}
 
     // ИСПРАВЛЕНО: использование сессии тренировки
     public function useWorkoutSession(): bool

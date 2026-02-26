@@ -145,6 +145,27 @@
                 </div>
             </div>
 
+            <!--  оставшихся тренировок-->
+            <div class="col-md-3 mb-4">
+    <div class="card text-white bg-success">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="card-title mb-0">Осталось тренировок</h6>
+                    <p class="mb-0">
+                        @if($activeSubscription)
+                            <span class="h4">{{ $activeSubscription->remaining_workouts }}</span>
+                        @else
+                            0
+                        @endif
+                    </p>
+                </div>
+                <i class="fas fa-dumbbell fa-2x"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
             <!-- История тренировок -->
             <div class="card mt-4">
                 <div class="card-header">

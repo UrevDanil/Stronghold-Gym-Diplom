@@ -105,6 +105,7 @@ Route::middleware(['auth', 'role:client'])->prefix('client')->name('client.')->g
     
     // Бронирования
     Route::post('/bookings/{booking}/cancel', [ClientDashboardController::class, 'cancelBooking'])->name('bookings.cancel');
+    Route::delete('/bookings/{booking}/cancel', [ClientDashboardController::class, 'cancelBooking'])->name('bookings.cancel.delete');
     
     // Абонементы
     Route::get('/subscriptions', [ClientDashboardController::class, 'subscriptions'])->name('subscriptions');

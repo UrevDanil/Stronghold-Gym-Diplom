@@ -128,32 +128,36 @@
                                                     @else
                                                         <span class="badge bg-success">Доступно</span>
                                                     @endif
-                                                </td>
-                                                <td>
-                                                    @if($canBook)
-                                                        <form action="{{ route('client.schedule.book', $schedule) }}" 
-                                                              method="POST" class="d-inline">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-sm btn-primary">
-                                                                <i class="fas fa-calendar-check me-1"></i>Забронировать
-                                                            </button>
-                                                        </form>
-                                                    @elseif($isBooked)
-                                                        <form action="{{ route('client.bookings.cancel', ['booking' => $schedule->bookings->where('user_id', Auth::id())->first()->id]) }}" 
-                                                              method="POST" class="d-inline"
-                                                              onsubmit="return confirm('Отменить бронирование?');">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                                <i class="fas fa-times me-1"></i>Отменить
-                                                            </button>
-                                                        </form>
-                                                    @else
-                                                        <button class="btn btn-sm btn-secondary" disabled>
-                                                            Недоступно
-                                                        </button>
-                                                    @endif
-                                                </td>
+<td>
+    @if($canBook)
+        <form action="{{ route('client.schedule.book', $schedule) }}" method="POST" class="d-inline">
+            @csrf
+            <button type="submit" class="btn btn-sm btn-primary">
+                <i class="fas fa-calendar-check me-1"></i>Забронировать
+            </button>
+        </form>
+    @elseif($isBooked)
+        @php
+            $userBooking = $schedule->bookings->where('user_id', Auth::id())->first();
+        @endphp
+        @if($userBooking)
+            <form action="{{ route('client.bookings.cancel', $userBooking->id) }}" 
+                  method="POST" class="d-inline"
+                  onsubmit="return confirm('Отменить бронирование?');">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-times me-1"></i>Отменить
+                </button>
+            </form>
+        @else
+            <span class="badge bg-secondary">Забронировано</span>
+        @endif
+    @else
+        <button class="btn btn-sm btn-secondary" disabled>
+            Недоступно
+        </button>
+    @endif
+</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
