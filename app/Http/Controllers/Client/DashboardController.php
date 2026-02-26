@@ -39,45 +39,51 @@ class DashboardController extends Controller
         return view('client.dashboard', $data);
     }
 
-    public function schedule(Request $request)
-    {
-        $workoutId = $request->get('workout_id');
-        $date = $request->get('date');
-        
-        $query = Schedule::with(['workout', 'trainer'])
-            ->where('date', '>=', now()->toDateString())
-            ->where('is_active', true)
-            ->whereHas('workout', function($q) {
-                $q->where('is_active', true);
-            });
+public function schedule(Request $request)
+{
+    $workoutId = $request->get('workout_id');
+    $date = $request->get('date');
+    
+    $query = Schedule::with(['workout', 'trainer'])
+        ->where('date', '>=', now()->toDateString())
+        ->where('status', Schedule::STATUS_SCHEDULED) // ИСПРАВЛЕНО: вместо is_active
+        ->whereHas('workout', function($q) {
+            $q->where('is_active', true);
+        });
 
-        if ($workoutId) {
-            $query->where('workout_id', $workoutId);
-        }
-
-        if ($date) {
-            $query->where('date', $date);
-        } else {
-            $query->where('date', '<=', now()->addDays(7)->toDateString());
-        }
-
-        $schedules = $query->orderBy('date')->orderBy('start_time')->get();
-        $workouts = \App\Models\Workout::where('is_active', true)->get();
-        
-        $userBookings = Auth::user()->bookings()
-            ->whereIn('schedule_id', $schedules->pluck('id'))
-            ->pluck('schedule_id')
-            ->toArray();
-
-        return view('client.schedule', [
-            'schedules' => $schedules,
-            'workouts' => $workouts,
-            'userBookings' => $userBookings,
-            'selectedWorkout' => $workoutId,
-            'selectedDate' => $date,
-        ]);
+    if ($workoutId) {
+        $query->where('workout_id', $workoutId);
     }
 
+    if ($date) {
+        $query->where('date', $date);
+    } else {
+        $query->where('date', '<=', now()->addDays(7)->toDateString());
+    }
+
+    $schedules = $query->orderBy('date')->orderBy('start_time')->get();
+    
+    // ИСПРАВЛЕНО: добавляем проверку на существование workouts_count
+    $workouts = \App\Models\Workout::where('is_active', true)->get();
+    
+    $userBookings = Auth::user()->bookings()
+        ->whereIn('schedule_id', $schedules->pluck('id'))
+        ->where('status', '!=', 'cancelled') // Только активные бронирования
+        ->pluck('schedule_id')
+        ->toArray();
+
+    return view('client.schedule', [
+        'schedules' => $schedules,
+        'workouts' => $workouts,
+        'userBookings' => $userBookings,
+        'selectedWorkout' => $workoutId,
+        'selectedDate' => $date,
+    ]);
+}
+
+    /**
+     * Бронирование тренировки
+     */
     public function book(Schedule $schedule, Request $request)
     {
         $user = Auth::user();
@@ -105,13 +111,16 @@ class DashboardController extends Controller
             'status' => Booking::STATUS_BOOKED,
         ]);
 
-        $schedule->increment('booked_count');
+        // Увеличиваем счетчик занятых мест
+        $schedule->increment('current_participants');
 
-        $subscription = $user->activeSubscription();
-        if ($subscription && $subscription->pivot->remaining_workouts > 0) {
-            $subscription->pivot->decrement('remaining_workouts');
+        // ИСПРАВЛЕНО: используем прямые свойства UserSubscription
+        $activeSubscription = $user->activeSubscription();
+        if ($activeSubscription && $activeSubscription->remaining_workouts > 0) {
+            $activeSubscription->decrement('remaining_workouts');
         }
         
+        // Создаем уведомление
         \App\Models\Notification::create([
             'user_id' => $user->id,
             'title' => 'Бронирование создано',
@@ -123,6 +132,9 @@ class DashboardController extends Controller
         return back()->with('success', 'Занятие успешно забронировано!');
     }
 
+    /**
+     * Отмена бронирования
+     */
     public function cancelBooking(Booking $booking, Request $request)
     {
         if ($booking->user_id !== Auth::id()) {
@@ -133,14 +145,20 @@ class DashboardController extends Controller
             return back()->with('error', 'Это бронирование нельзя отменить');
         }
 
+        // Сохраняем причину отмены, если есть
         $booking->cancel($request->cancellation_reason);
 
+        // Возвращаем тренировку в абонемент, если это будущее занятие
         if ($booking->schedule->date > now()->toDateString()) {
-            $subscription = Auth::user()->activeSubscription();
-            if ($subscription) {
-                $subscription->pivot->increment('remaining_workouts');
+            $activeSubscription = Auth::user()->activeSubscription();
+            if ($activeSubscription) {
+                // ИСПРАВЛЕНО: используем прямые свойства UserSubscription
+                $activeSubscription->increment('remaining_workouts');
             }
         }
+
+        // Уменьшаем счетчик занятых мест в расписании
+        $booking->schedule->decrement('current_participants');
 
         return back()->with('success', 'Бронирование отменено');
     }
