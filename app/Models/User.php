@@ -80,11 +80,11 @@ class User extends Authenticatable
         return $this->hasMany(UserSubscription::class);
     }
 
-    // Тренер проводит занятия
-    public function trainings()
-    {
-        return $this->hasMany(Schedule::class, 'trainer_id');
-    }
+// Тренер проводит занятия
+public function trainings()
+{
+    return $this->hasMany(Schedule::class, 'trainer_id');
+}
 
     public function notifications()
     {

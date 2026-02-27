@@ -80,10 +80,61 @@ Route::middleware(['auth', 'role:admin,owner'])->prefix('admin')->name('admin.')
 // ====================
 
 Route::middleware(['auth', 'role:trainer'])->prefix('trainer')->name('trainer.')->group(function () {
+    // Основные страницы
     Route::get('/dashboard', [TrainerDashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/schedule', [TrainerDashboardController::class, 'schedule'])->name('schedule');
-    Route::post('/schedule/{schedule}/attendance', [TrainerDashboardController::class, 'markAttendance'])->name('attendance.mark');
     Route::get('/clients', [TrainerDashboardController::class, 'clients'])->name('clients');
+    Route::get('/attendance', [TrainerDashboardController::class, 'attendance'])->name('attendance');
+    
+    // Детальная информация о клиенте
+    Route::get('/clients/{id}', [TrainerDashboardController::class, 'clientDetails'])->name('client-details');
+    
+    // История клиента
+    Route::get('/clients/{id}/history', [TrainerDashboardController::class, 'clientHistory'])->name('client.history');
+    
+    // Отметка посещаемости
+    Route::post('/schedule/{schedule}/attendance', [TrainerDashboardController::class, 'markAttendance'])->name('attendance.mark');
+    
+    // Массовая отметка посещаемости
+    Route::post('/attendance/bulk', [TrainerDashboardController::class, 'bulkAttendance'])->name('attendance.bulk');
+    
+    // Статистика тренировок
+    Route::get('/statistics', [TrainerDashboardController::class, 'statistics'])->name('statistics');
+    Route::get('/statistics/export', [TrainerDashboardController::class, 'exportStatistics'])->name('statistics.export');
+    
+    // Работа с расписанием
+    Route::get('/schedule/week', [TrainerDashboardController::class, 'weekSchedule'])->name('schedule.week');
+    Route::get('/schedule/month', [TrainerDashboardController::class, 'monthSchedule'])->name('schedule.month');
+    
+    // Заметки о клиентах
+    Route::post('/clients/{id}/notes', [TrainerDashboardController::class, 'addClientNote'])->name('client.notes.add');
+    Route::delete('/notes/{note}', [TrainerDashboardController::class, 'deleteNote'])->name('notes.delete');
+    
+    // Прогресс клиента
+    Route::get('/clients/{id}/progress', [TrainerDashboardController::class, 'clientProgress'])->name('client.progress');
+    Route::post('/clients/{id}/progress', [TrainerDashboardController::class, 'updateProgress'])->name('client.progress.update');
+    
+    // Профиль тренера
+    Route::get('/profile', [TrainerDashboardController::class, 'profile'])->name('profile');
+    Route::post('/profile', [TrainerDashboardController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/qualification', [TrainerDashboardController::class, 'updateQualification'])->name('profile.qualification');
+    
+    // Уведомления
+    Route::get('/notifications', [TrainerDashboardController::class, 'notifications'])->name('notifications');
+    Route::post('/notifications/{id}/read', [TrainerDashboardController::class, 'markNotificationRead'])->name('notifications.read');
+    
+    // API для AJAX запросов (если нужны)
+    Route::prefix('api')->name('api.')->group(function () {
+        Route::get('/clients/search', [TrainerDashboardController::class, 'apiSearchClients'])->name('search-clients');
+        Route::get('/schedule/today', [TrainerDashboardController::class, 'apiTodaySchedule'])->name('today-schedule');
+        Route::get('/attendance/today', [TrainerDashboardController::class, 'apiTodayAttendance'])->name('today-attendance');
+    });
+
+    // Маршруты для посещаемости (доступны тренеру)
+Route::middleware(['auth', 'role:trainer'])->group(function () {
+    Route::get('/attendance', [TrainerDashboardController::class, 'attendance'])->name('attendance');
+    Route::post('/attendance/mark', [TrainerDashboardController::class, 'markAttendance'])->name('attendance.mark.simple');
+});
 });
 
 // ====================

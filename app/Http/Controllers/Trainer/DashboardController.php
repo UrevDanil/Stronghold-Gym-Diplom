@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Trainer;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\Schedule;
-use App\Models\Booking;
+use App\Models\Attendance;
+use App\Models\Workout;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -13,83 +17,396 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         
-        $todaySchedules = $user->scheduledTrainings()
+        // ИСПРАВЛЕНО: используем trainings() вместо scheduledTrainings()
+        $todaySchedules = $user->trainings()  // <-- ИЗМЕНЕНО
             ->with(['workout', 'bookings.user'])
-            ->where('date', today())
+            ->whereDate('date', Carbon::today())
             ->orderBy('start_time')
             ->get();
             
-        $upcomingSchedules = $user->scheduledTrainings()
-            ->with('workout')
-            ->where('date', '>', today())
+        $upcomingSchedules = $user->trainings()  // <-- ИЗМЕНЕНО
+            ->with(['workout', 'bookings.user'])
+            ->whereDate('date', '>', Carbon::today())
             ->orderBy('date')
             ->orderBy('start_time')
             ->limit(10)
             ->get();
             
-        return view('trainer.dashboard', compact('todaySchedules', 'upcomingSchedules'));
+        // Статистика для тренера
+        $totalTrainings = $user->trainings()->count();
+        $totalAttendances = Attendance::whereHas('booking.schedule', function($q) use ($user) {
+            $q->where('trainer_id', $user->id);
+        })->count();
+        
+        $uniqueClients = \App\Models\Booking::whereHas('schedule', function($q) use ($user) {
+                $q->where('trainer_id', $user->id);
+            })
+            ->distinct('user_id')
+            ->count('user_id');
+        
+        return view('trainer.dashboard', [
+            'user' => $user,
+            'todaySchedules' => $todaySchedules,
+            'upcomingSchedules' => $upcomingSchedules,
+            'totalTrainings' => $totalTrainings,
+            'totalAttendances' => $totalAttendances,
+            'uniqueClients' => $uniqueClients
+        ]);
     }
-    
-    public function schedule()
+
+    public function schedule(Request $request)
     {
         $user = auth()->user();
-        $schedules = $user->scheduledTrainings()
+        
+        $date = $request->get('date', now()->toDateString());
+        
+        // Тренировки на выбранный день
+        $schedules = $user->trainings()
             ->with(['workout', 'bookings.user'])
-            ->where('date', '>=', today())
+            ->whereDate('date', $date)
+            ->orderBy('start_time')
+            ->get();
+        
+        // Тренировки на неделю для краткого обзора
+        $weekSchedules = $user->trainings()
+            ->with('workout')
+            ->whereDate('date', '>=', now()->toDateString())
+            ->whereDate('date', '<=', now()->addDays(7)->toDateString())
             ->orderBy('date')
             ->orderBy('start_time')
-            ->paginate(15);
-            
-        return view('trainer.schedule.index', compact('schedules'));
+            ->get();
+        
+        return view('trainer.schedule', [
+            'user' => $user,
+            'schedules' => $schedules,
+            'weekSchedules' => $weekSchedules,
+            'currentDate' => $date
+        ]);
+    }
+
+public function clients(Request $request)
+{
+    $user = auth()->user();
+    
+    // Получаем уникальных клиентов, которые посещали тренировки тренера
+    $query = User::whereHas('bookings.schedule', function($q) use ($user) {
+            $q->where('trainer_id', $user->id);
+        })
+        ->with(['bookings' => function($q) use ($user) {
+            $q->whereHas('schedule', function($sq) use ($user) {
+                $sq->where('trainer_id', $user->id);
+            })
+            ->with('schedule.workout')
+            ->latest();
+        }]);
+
+    // Поиск по имени или телефону
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%")
+              ->orWhere('phone', 'like', "%{$search}%");
+        });
+    }
+
+    // Фильтр по типу тренировки
+    if ($request->filled('workout_id')) {
+        $query->whereHas('bookings.schedule', function($q) use ($request) {
+            $q->where('workout_id', $request->workout_id);
+        });
+    }
+
+    // Получаем клиентов
+    $clients = $query->get();
+
+    // Добавляем дополнительную информацию
+    foreach ($clients as $client) {
+        // Количество тренировок у этого тренера
+        $client->trainings_count = $client->bookings()
+            ->whereHas('schedule', function($q) use ($user) {
+                $q->where('trainer_id', $user->id);
+            })
+            ->count();
+        
+        // Последняя тренировка
+        $client->last_booking = $client->bookings()
+            ->whereHas('schedule', function($q) use ($user) {
+                $q->where('trainer_id', $user->id);
+            })
+            ->with('schedule.workout')
+            ->latest()
+            ->first();
+        
+        // Прогресс (посещаемость)
+        $total = $client->bookings()
+            ->whereHas('schedule', function($q) use ($user) {
+                $q->where('trainer_id', $user->id);
+            })
+            ->count();
+        
+        $attended = $client->bookings()
+            ->whereHas('schedule', function($q) use ($user) {
+                $q->where('trainer_id', $user->id);
+            })
+            ->where('status', 'attended')
+            ->count();
+        
+        $client->progress = $total > 0 ? round(($attended / $total) * 100) : 0;
+    }
+
+    // Сортировка
+    if ($request->filled('sort')) {
+        switch ($request->sort) {
+            case 'name_asc':
+                $clients = $clients->sortBy('name');
+                break;
+            case 'name_desc':
+                $clients = $clients->sortByDesc('name');
+                break;
+            case 'trainings_desc':
+                $clients = $clients->sortByDesc('trainings_count');
+                break;
+            case 'trainings_asc':
+                $clients = $clients->sortBy('trainings_count');
+                break;
+            case 'recent':
+                $clients = $clients->sortByDesc(function($client) {
+                    return $client->last_booking->schedule->date ?? null;
+                });
+                break;
+        }
+    }
+
+    // Получаем все тренировки для фильтра
+    $workouts = Workout::whereHas('schedules', function($q) use ($user) {
+        $q->where('trainer_id', $user->id);
+    })->get();
+
+    // Пагинация
+    $perPage = 12;
+    $page = $request->get('page', 1);
+    $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+        $clients->forPage($page, $perPage),
+        $clients->count(),
+        $perPage,
+        $page,
+        ['path' => $request->url(), 'query' => $request->query()]
+    );
+
+    return view('trainer.clients', [
+        'user' => $user,
+        'clients' => $paginated,
+        'workouts' => $workouts
+    ]);
+}
+
+/**
+ * Детальная информация о клиенте
+ */
+public function clientDetails($id)
+{
+    $user = auth()->user();
+    
+    // Находим клиента
+    $client = User::where('role_id', 4) // role_id = 4 для клиентов
+        ->with(['bookings' => function($q) use ($user) {
+            $q->whereHas('schedule', function($sq) use ($user) {
+                $sq->where('trainer_id', $user->id);
+            })
+            ->with('schedule.workout')
+            ->latest();
+        }])
+        ->findOrFail($id);
+    
+    // Проверяем, что этот клиент действительно посещал тренировки этого тренера
+    $hasTrainings = $client->bookings()
+        ->whereHas('schedule', function($q) use ($user) {
+            $q->where('trainer_id', $user->id);
+        })
+        ->exists();
+    
+    if (!$hasTrainings) {
+        abort(404, 'Клиент не найден или не посещал ваши тренировки');
     }
     
+    // Статистика по клиенту
+    $totalTrainings = $client->bookings()
+        ->whereHas('schedule', function($q) use ($user) {
+            $q->where('trainer_id', $user->id);
+        })
+        ->count();
+    
+    $attendedTrainings = $client->bookings()
+        ->whereHas('schedule', function($q) use ($user) {
+            $q->where('trainer_id', $user->id);
+        })
+        ->where('status', 'attended')
+        ->count();
+    
+    $missedTrainings = $client->bookings()
+        ->whereHas('schedule', function($q) use ($user) {
+            $q->where('trainer_id', $user->id);
+        })
+        ->where('status', 'missed')
+        ->count();
+    
+    $cancelledTrainings = $client->bookings()
+        ->whereHas('schedule', function($q) use ($user) {
+            $q->where('trainer_id', $user->id);
+        })
+        ->where('status', 'cancelled')
+        ->count();
+    
+    $attendanceRate = $totalTrainings > 0 
+        ? round(($attendedTrainings / $totalTrainings) * 100, 1) 
+        : 0;
+    
+    // Последние 10 тренировок
+    $recentBookings = $client->bookings()
+        ->whereHas('schedule', function($q) use ($user) {
+            $q->where('trainer_id', $user->id);
+        })
+        ->with('schedule.workout')
+        ->latest()
+        ->limit(10)
+        ->get();
+    
+    return view('trainer.client-details', [
+        'user' => $user,
+        'client' => $client,
+        'totalTrainings' => $totalTrainings,
+        'attendedTrainings' => $attendedTrainings,
+        'missedTrainings' => $missedTrainings,
+        'cancelledTrainings' => $cancelledTrainings,
+        'attendanceRate' => $attendanceRate,
+        'recentBookings' => $recentBookings
+    ]);
+}
+
     public function markAttendance(Request $request, Schedule $schedule)
     {
-        $booking = Booking::findOrFail($request->booking_id);
-        
-        // Проверка что тренировка ведет этот тренер
+        // Проверяем, что тренировка принадлежит этому тренеру
         if ($schedule->trainer_id !== auth()->id()) {
             abort(403);
         }
         
-        // Создание записи о посещении
-        \App\Models\Attendance::create([
-            'booking_id' => $booking->id,
-            'marked_by' => auth()->id(),
-            'attendance_type' => $request->type,
-            'comment' => $request->comment,
+        $validated = $request->validate([
+            'booking_id' => 'required|exists:bookings,id',
+            'status' => 'required|in:attended,missed'
         ]);
         
-        // Обновление статуса записи
-        $booking->update(['status' => 'attended']);
+        $booking = \App\Models\Booking::find($validated['booking_id']);
         
-        // Списание занятия с абонемента
-        if ($booking->user_subscription_id) {
-            $userSubscription = \App\Models\UserSubscription::find($booking->user_subscription_id);
-            if ($userSubscription && $userSubscription->remaining_workouts > 0) {
-                $userSubscription->decrement('remaining_workouts');
-            }
+        if ($validated['status'] === 'attended') {
+            $booking->markAttended();
+            
+            Attendance::create([
+                'booking_id' => $booking->id,
+                'marked_by' => auth()->id(),
+                'attended_at' => now(),
+                'attendance_type' => 'attended'
+            ]);
+        } else {
+            $booking->markMissed();
         }
         
-        return back()->with('success', 'Посещение отмечено');
+        return back()->with('success', 'Посещаемость отмечена');
+    }
+
+    public function attendance(Request $request)
+{
+    $user = auth()->user();
+    
+    $date = $request->get('date', now()->toDateString());
+    $scheduleId = $request->get('schedule_id');
+    
+    // Получаем все тренировки тренера на выбранную дату
+    $query = Schedule::with(['workout', 'bookings.user'])
+        ->where('trainer_id', $user->id)
+        ->whereDate('date', $date);
+    
+    if ($scheduleId) {
+        $query->where('id', $scheduleId);
     }
     
-    public function clients()
-    {
-        $user = auth()->user();
-        
-        // Клиенты которые записаны на тренировки этого тренера
-        $clients = User::whereHas('bookings.schedule', function($q) use ($user) {
-            $q->where('trainer_id', $user->id);
-        })
-        ->with(['activeSubscription', 'bookings' => function($q) use ($user) {
-            $q->whereHas('schedule', function($q2) use ($user) {
-                $q2->where('trainer_id', $user->id);
-            });
-        }])
-        ->distinct()
-        ->paginate(15);
-        
-        return view('trainer.clients.index', compact('clients'));
+    $schedules = $query->get();
+    
+    // Собираем все бронирования
+    $bookings = collect();
+    foreach ($schedules as $schedule) {
+        $bookings = $bookings->merge($schedule->bookings);
     }
+    
+    // Сортируем по времени
+    $bookings = $bookings->sortBy(function($booking) {
+        return $booking->schedule->start_time;
+    });
+    
+    // Получаем все тренировки для фильтра
+    $allSchedules = Schedule::where('trainer_id', $user->id)
+        ->whereDate('date', '>=', now()->subDays(7))
+        ->with('workout')
+        ->get();
+    
+    return view('trainer.attendance', [
+        'user' => $user,
+        'bookings' => $bookings,
+        'schedules' => $allSchedules
+    ]);
+}
+
+/**
+ * Показать профиль тренера
+ */
+public function profile()
+{
+    $user = auth()->user();
+    
+    return view('trainer.profile', [
+        'user' => $user
+    ]);
+}
+
+/**
+ * Обновление профиля тренера
+ */
+public function updateProfile(Request $request)
+{
+    $user = auth()->user();
+    
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $user->id,
+        'phone' => 'nullable|string|max:20',
+        'qualification' => 'nullable|string|max:255',
+        'specialization' => 'nullable|string|max:255',
+        'bio' => 'nullable|string',
+    ]);
+    
+    $user->update($validated);
+    
+    return redirect()->route('trainer.profile')
+        ->with('success', 'Профиль успешно обновлен');
+}
+
+/**
+ * Обновление квалификации
+ */
+public function updateQualification(Request $request)
+{
+    $user = auth()->user();
+    
+    $validated = $request->validate([
+        'qualification' => 'required|string|max:255',
+        'specialization' => 'nullable|string|max:255',
+    ]);
+    
+    $user->qualification = $validated['qualification'];
+    $user->specialization = $validated['specialization'] ?? $user->specialization;
+    $user->save();
+    
+    return back()->with('success', 'Квалификация обновлена');
+}
+
 }
