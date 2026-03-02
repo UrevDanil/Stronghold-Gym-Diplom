@@ -53,16 +53,7 @@
                                 💪 Тренеры
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.schedules') }}">
-                                📅 Расписание
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.bookings') }}">
-                                🎫 Записи
-                            </a>
-                        </li>
+
                         @endif
                         
                         @if(auth()->user()->isClient())

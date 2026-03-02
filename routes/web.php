@@ -69,10 +69,62 @@ Route::get('/dashboard', function () {
 // ====================
 
 Route::middleware(['auth', 'role:admin,owner'])->prefix('admin')->name('admin.')->group(function () {
+    // Дашборд
     Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('dashboard');
     
+    // Управление пользователями
+    Route::get('/users', [AdminDashboardController::class, 'users'])->name('users.index');
+    Route::get('/users/create', [AdminDashboardController::class, 'createUser'])->name('users.create');
+    Route::post('/users', [AdminDashboardController::class, 'storeUser'])->name('users.store');
+    Route::get('/users/{id}', [AdminDashboardController::class, 'showUser'])->name('users.show');
+    Route::get('/users/{id}/edit', [AdminDashboardController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{id}', [AdminDashboardController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{id}', [AdminDashboardController::class, 'deleteUser'])->name('users.delete');
+
+    // Удаление пользователя
+    Route::delete('/users/{id}', [AdminDashboardController::class, 'deleteUser'])->name('users.destroy');
+    Route::delete('/users/{id}/delete', [AdminDashboardController::class, 'deleteUser'])->name('users.delete'); // Для обратной совместимости
+
+    Route::get('/clients', [AdminDashboardController::class, 'clients'])->name('clients');
+    Route::get('/trainers', [AdminDashboardController::class, 'trainers'])->name('trainers');
+    
+    // Управление расписанием
+    Route::get('/schedule', [AdminDashboardController::class, 'schedule'])->name('schedule.index');
+    Route::get('/schedule/create', [AdminDashboardController::class, 'createSchedule'])->name('schedule.create');
+    Route::post('/schedule', [AdminDashboardController::class, 'storeSchedule'])->name('schedule.store');
+    Route::get('/schedule/{id}/edit', [AdminDashboardController::class, 'editSchedule'])->name('schedule.edit');
+    Route::put('/schedule/{id}', [AdminDashboardController::class, 'updateSchedule'])->name('schedule.update');
+    Route::delete('/schedule/{id}', [AdminDashboardController::class, 'deleteSchedule'])->name('schedule.delete');
+    
+    // Управление абонементами
+    Route::get('/subscriptions', [AdminDashboardController::class, 'subscriptions'])->name('subscriptions.index');
+    Route::get('/subscriptions/create', [AdminDashboardController::class, 'createSubscription'])->name('subscriptions.create');
+    Route::post('/subscriptions', [AdminDashboardController::class, 'storeSubscription'])->name('subscriptions.store');
+    Route::get('/subscriptions/{id}/edit', [AdminDashboardController::class, 'editSubscription'])->name('subscriptions.edit');
+    Route::put('/subscriptions/{id}', [AdminDashboardController::class, 'updateSubscription'])->name('subscriptions.update');
+    Route::delete('/subscriptions/{id}', [AdminDashboardController::class, 'deleteSubscription'])->name('subscriptions.delete');
+    
+    // Управление бронированиями
+    Route::get('/bookings', [AdminDashboardController::class, 'bookings'])->name('bookings.index');
+    Route::get('/bookings/{id}', [AdminDashboardController::class, 'showBooking'])->name('bookings.show');
+    Route::post('/bookings/{id}/cancel', [AdminDashboardController::class, 'cancelBooking'])->name('bookings.cancel');
+    Route::post('/bookings/{id}/mark-attended', [AdminDashboardController::class, 'markAttended'])->name('bookings.mark-attended');
+    
+    // Отчеты
+    Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');
+    Route::get('/reports/attendance', [AdminDashboardController::class, 'attendanceReport'])->name('reports.attendance');
+    Route::get('/reports/financial', [AdminDashboardController::class, 'financialReport'])->name('reports.financial');
+    Route::get('/reports/export', [AdminDashboardController::class, 'exportReports'])->name('reports.export');
+    
+    // Статистика
+    Route::get('/statistics', [AdminDashboardController::class, 'statistics'])->name('statistics');
+    
+    // Настройки
+    Route::get('/settings', [AdminDashboardController::class, 'settings'])->name('settings');
+    Route::post('/settings', [AdminDashboardController::class, 'updateSettings'])->name('settings.update');
+    
     // Для теста
-    Route::get('/test', function () {return 'Панель администратора работает!';});
+    Route::get('/test', function () {return 'Панель администратора работает!';})->name('test');
 });
 
 // ====================
