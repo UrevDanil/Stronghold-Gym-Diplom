@@ -88,6 +88,56 @@ class DashboardController extends Controller
     }
 
     /**
+ * Удаление (блокировка) пользователя
+ */
+public function deleteUser($id)
+{
+    // Не даем удалить самого себя
+    if ($id == auth()->id()) {
+        return redirect()->route('admin.users.index')
+            ->with('error', 'Вы не можете заблокировать самого себя');
+    }
+    
+    $user = User::findOrFail($id);
+    
+    // Мягкое удаление (поле deleted_at заполняется)
+    $user->delete();
+    
+    return redirect()->route('admin.users.index')
+        ->with('success', "Пользователь {$user->name} успешно заблокирован");
+}
+
+/**
+ * Восстановление пользователя
+ */
+public function restoreUser($id)
+{
+    $user = User::withTrashed()->findOrFail($id);
+    $user->restore();
+    
+    return redirect()->route('admin.users.index')
+        ->with('success', "Пользователь {$user->name} успешно восстановлен");
+}
+
+/**
+ * Полное удаление пользователя из БД (осторожно!)
+ */
+public function forceDeleteUser($id)
+{
+    // Только для админов с особыми правами
+    if (!auth()->user()->isOwner()) {
+        abort(403, 'Только владелец может полностью удалять пользователей');
+    }
+    
+    $user = User::withTrashed()->findOrFail($id);
+    $userName = $user->name;
+    $user->forceDelete();
+    
+    return redirect()->route('admin.users.index')
+        ->with('success', "Пользователь {$userName} полностью удален из системы");
+}
+
+    /**
      * Список пользователей
      */
     public function users(Request $request)
@@ -154,15 +204,16 @@ public function storeUser(Request $request)
         'birth_date' => 'nullable|date',
         'qualification' => 'nullable|string|max:255',
         'specialization' => 'nullable|string|max:255',
-        'health_info' => 'nullable|string', // Будет сохранено в notes
+        'health_info' => 'nullable|string',
     ]);
     
     // Хэшируем пароль
     $validated['password'] = Hash::make($validated['password']);
     
-    if ($request->has('email_verified')) {
-        $validated['email_verified_at'] = now();
-    }
+    // ИСПРАВЛЕНО: проверяем чекбокс email_verified
+if ($request->input('email_verified') == '1') {
+    $validated['email_verified_at'] = now();
+}
     
     // Сохраняем health_info в notes для клиентов
     $healthInfo = $validated['health_info'] ?? null;
@@ -193,5 +244,271 @@ public function storeUser(Request $request)
     return redirect()->route('admin.users.index')
         ->with('success', 'Пользователь успешно создан');
 }
+   
+/**
+ * Управление расписанием
+ */
+public function schedule(Request $request)
+{
+    $date = $request->get('date', now()->toDateString());
+    $workoutId = $request->get('workout_id');
+    $trainerId = $request->get('trainer_id');
     
+    $query = Schedule::with(['workout', 'trainer', 'bookings.user']);
+    
+    // Фильтр по дате
+    if ($date) {
+        $query->whereDate('date', $date);
+    }
+    
+    // Фильтр по тренировке
+    if ($workoutId) {
+        $query->where('workout_id', $workoutId);
+    }
+    
+    // Фильтр по тренеру
+    if ($trainerId) {
+        $query->where('trainer_id', $trainerId);
+    }
+    
+    $schedules = $query->orderBy('start_time')->get();
+    
+    // Для фильтров
+    $workouts = Workout::where('is_active', true)->get();
+    $trainers = User::whereHas('role', function($q) {
+        $q->where('name', 'trainer');
+    })->get();
+    
+    return view('admin.schedule', [
+        'schedules' => $schedules,
+        'workouts' => $workouts,
+        'trainers' => $trainers,
+        'selectedDate' => $date,
+        'selectedWorkout' => $workoutId,
+        'selectedTrainer' => $trainerId
+    ]);
+}
+
+/**
+ * Создание нового занятия в расписании
+ */
+public function createSchedule()
+{
+    $workouts = Workout::where('is_active', true)->get();
+    $trainers = User::whereHas('role', function($q) {
+        $q->where('name', 'trainer');
+    })->get();
+    
+    return view('admin.schedule-create', [
+        'workouts' => $workouts,
+        'trainers' => $trainers
+    ]);
+}
+
+/**
+ * Сохранение нового занятия
+ */
+public function storeSchedule(Request $request)
+{
+    $validated = $request->validate([
+        'workout_id' => 'required|exists:workouts,id',
+        'trainer_id' => 'required|exists:users,id',
+        'date' => 'required|date|after_or_equal:today',
+        'start_time' => 'required',
+        'end_time' => 'required|after:start_time',
+        'room' => 'nullable|string|max:255',
+        // Убираем capacity и notes - их нет в таблице
+    ]);
+    
+    Schedule::create([
+        'workout_id' => $validated['workout_id'],
+        'trainer_id' => $validated['trainer_id'],
+        'date' => $validated['date'],
+        'start_time' => $validated['start_time'],
+        'end_time' => $validated['end_time'],
+        'room' => $validated['room'] ?? null,
+        'status' => 'scheduled',
+        'current_participants' => 0,
+    ]);
+    
+    return redirect()->route('admin.schedule.index')
+        ->with('success', 'Занятие успешно добавлено в расписание');
+}
+/**
+ * Редактирование занятия
+ */
+public function editSchedule($id)
+{
+    $schedule = Schedule::findOrFail($id);
+    $workouts = Workout::where('is_active', true)->get();
+    $trainers = User::whereHas('role', function($q) {
+        $q->where('name', 'trainer');
+    })->get();
+    
+    return view('admin.schedule-edit', [
+        'schedule' => $schedule,
+        'workouts' => $workouts,
+        'trainers' => $trainers
+    ]);
+}
+
+/**
+ * Обновление занятия
+ */
+public function updateSchedule(Request $request, $id)
+{
+    $schedule = Schedule::findOrFail($id);
+    
+    $validated = $request->validate([
+        'workout_id' => 'required|exists:workouts,id',
+        'trainer_id' => 'required|exists:users,id',
+        'date' => 'required|date',
+        'start_time' => 'required',
+        'end_time' => 'required|after:start_time',
+        'room' => 'nullable|string|max:255',
+        'status' => 'required|in:scheduled,cancelled,completed',
+    ]);
+    
+    $schedule->update($validated);
+    
+    return redirect()->route('admin.schedule.index')
+        ->with('success', 'Расписание обновлено');
+}
+
+/**
+ * Удаление занятия
+ */
+public function deleteSchedule($id)
+{
+    $schedule = Schedule::findOrFail($id);
+    
+    // Проверяем, есть ли бронирования
+    if ($schedule->bookings()->where('status', '!=', 'cancelled')->count() > 0) {
+        return back()->with('error', 'Нельзя удалить занятие, на которое есть записи');
+    }
+    
+    $schedule->delete();
+    
+    return redirect()->route('admin.schedule.index')
+        ->with('success', 'Занятие удалено из расписания');
+}
+
+/**
+ * Управление абонементами
+ */
+public function subscriptions(Request $request)
+{
+    $query = Subscription::query();
+    
+    // Поиск
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%");
+        });
+    }
+    
+    // Фильтр по статусу
+    if ($request->filled('status')) {
+        if ($request->status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($request->status === 'inactive') {
+            $query->where('is_active', false);
+        }
+    }
+    
+    // Сортировка по умолчанию - по ID (новые сверху)
+    $subscriptions = $query->orderBy('id', 'desc')->paginate(10);
+    
+    return view('admin.subscriptions', compact('subscriptions'));
+}
+
+/**
+ * Форма создания абонемента
+ */
+public function createSubscription()
+{
+    return view('admin.subscriptions-create');
+}
+
+/**
+ * Сохранение нового абонемента
+ */
+public function storeSubscription(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'duration_days' => 'required|integer|min:1',
+        'workouts_count' => 'required|integer|min:1',
+        'price' => 'required|numeric|min:0',
+        'type' => 'required|in:time,count',
+        'is_active' => 'boolean',
+    ]);
+    
+    $validated['is_active'] = $request->has('is_active');
+    
+    Subscription::create($validated);
+    
+    return redirect()->route('admin.subscriptions.index')
+        ->with('success', 'Абонемент успешно создан');
+}
+
+/**
+ * Форма редактирования абонемента
+ */
+public function editSubscription($id)
+{
+    $subscription = Subscription::findOrFail($id);
+    return view('admin.subscriptions-edit', compact('subscription'));
+}
+
+/**
+ * Обновление абонемента
+ */
+public function updateSubscription(Request $request, $id)
+{
+    $subscription = Subscription::findOrFail($id);
+    
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'duration_days' => 'required|integer|min:1',
+        'workouts_count' => 'required|integer|min:1',
+        'price' => 'required|numeric|min:0',
+        'type' => 'required|in:time,count',
+        'is_active' => 'boolean',
+    ]);
+    
+    $validated['is_active'] = $request->has('is_active');
+    
+    $subscription->update($validated);
+    
+    return redirect()->route('admin.subscriptions.index')
+        ->with('success', 'Абонемент обновлен');
+}
+
+/**
+ * Удаление абонемента
+ */
+public function deleteSubscription($id)
+{
+    $subscription = Subscription::findOrFail($id);
+    
+    // Проверяем, есть ли активные подписки на этот абонемент
+    $activeSubscriptions = UserSubscription::where('subscription_id', $id)
+        ->where('status', 'active')
+        ->count();
+    
+    if ($activeSubscriptions > 0) {
+        return back()->with('error', 'Нельзя удалить абонемент, на который есть активные подписки');
+    }
+    
+    $subscription->delete();
+    
+    return redirect()->route('admin.subscriptions.index')
+        ->with('success', 'Абонемент удален');
+}
+
 }

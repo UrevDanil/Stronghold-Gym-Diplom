@@ -181,8 +181,8 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                                title="Заблокировать"
-                                                                onclick="return confirm('Заблокировать пользователя?')">
+                                                                title="Удалить"
+                                                                onclick="return confirm('Удалить пользователя?')">
                                                             <i class="fas fa-ban"></i>
                                                         </button>
                                                     </form>

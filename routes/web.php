@@ -84,6 +84,8 @@ Route::middleware(['auth', 'role:admin,owner'])->prefix('admin')->name('admin.')
     // Удаление пользователя
     Route::delete('/users/{id}', [AdminDashboardController::class, 'deleteUser'])->name('users.destroy');
     Route::delete('/users/{id}/delete', [AdminDashboardController::class, 'deleteUser'])->name('users.delete'); // Для обратной совместимости
+    Route::post('/users/{id}/restore', [AdminDashboardController::class, 'restoreUser'])->name('users.restore');
+    Route::delete('/users/{id}/force', [AdminDashboardController::class, 'forceDeleteUser'])->name('users.force-delete');
 
     Route::get('/clients', [AdminDashboardController::class, 'clients'])->name('clients');
     Route::get('/trainers', [AdminDashboardController::class, 'trainers'])->name('trainers');
@@ -236,6 +238,9 @@ Route::middleware(['auth'])->group(function () {
 // Админ маршруты
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('subscriptions', SubscriptionController::class)->except(['show']);
+        Route::get('/subscriptions', [AdminDashboardController::class, 'subscriptions'])->name('subscriptions.index');
+    Route::get('/subscriptions/create', [AdminDashboardController::class, 'createSubscription'])->name('subscriptions.create');
+    Route::post('/subscriptions', [AdminDashboardController::class, 'storeSubscription'])->name('subscriptions.store');
 });
 
 // ====================

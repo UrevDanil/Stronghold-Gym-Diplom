@@ -55,43 +55,48 @@ class SubscriptionController extends Controller
             ->with('success', "Абонемент '{$subscription->name}' успешно приобретен!");
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        // Только для администраторов
-        if (!Auth::user()->isAdmin()) {
-            abort(403);
-        }
-        
-        return view('admin.subscriptions.create');
+ /**
+ * Show the form for creating a new resource.
+ */
+public function create()
+{
+    // Только для администраторов
+    if (!Auth::user()->isAdmin()) {
+        abort(403);
     }
+    
+    // ИСПРАВЛЕНО: путь к шаблону
+    return view('admin.subscriptions-create'); // Без точки, с дефисом
+}
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        if (!Auth::user()->isAdmin()) {
-            abort(403);
-        }
-        
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'duration_days' => 'required|integer|min:1',
-            'workouts_count' => 'required|integer|min:1',
-            'type' => 'required|in:time,count',
-            'is_active' => 'boolean',
-        ]);
-        
-        Subscription::create($validated);
-        
-        return redirect()->route('admin.subscriptions')
-            ->with('success', 'Абонемент успешно создан');
+/**
+ * Store a newly created resource in storage.
+ */
+public function store(Request $request)
+{
+    if (!Auth::user()->isAdmin()) {
+        abort(403);
     }
+    
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'duration_days' => 'required|integer|min:1',
+        'workouts_count' => 'required|integer|min:1',
+        'price' => 'required|numeric|min:0',
+        'is_active' => 'boolean',
+        'sort_order' => 'nullable|integer',
+        'color' => 'nullable|string|max:7',
+    ]);
+    
+    $validated['is_active'] = $request->has('is_active');
+    $validated['sort_order'] = $validated['sort_order'] ?? 0;
+    
+    Subscription::create($validated);
+    
+    return redirect()->route('admin.subscriptions.index')
+        ->with('success', 'Абонемент успешно создан');
+}
 
     /**
      * Display the specified resource.
