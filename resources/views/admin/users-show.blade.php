@@ -64,15 +64,15 @@
                             <strong>{{ $profile->created_at->format('d.m.Y H:i') }}</strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
-                            <span>Статус:</span>
-                            @if($profile->deleted_at)
-                                <span class="badge bg-danger">Заблокирован</span>
-                            @elseif($profile->email_verified_at)
-                                <span class="badge bg-success">Активен</span>
-                            @else
-                                <span class="badge bg-warning">Не подтвержден</span>
-                            @endif
-                        </li>
+                        <span>Статус:</span>
+                        @if($profile->deleted_at)
+                            <span class="badge bg-danger">Заблокирован</span>
+                        @elseif($profile->is_active)
+                            <span class="badge bg-success">Активен</span>
+                        @else
+                            <span class="badge bg-warning">Неактивен</span>
+                        @endif
+                    </li>
                     </ul>
 
                     <!-- КВАЛИФИКАЦИЯ ТРЕНЕРА (ИСПРАВЛЕНО) -->
@@ -294,7 +294,16 @@
                                                         <td>{{ \Carbon\Carbon::parse($training->date)->format('d.m.Y') }}</td>
                                                         <td>{{ substr($training->start_time, 0, 5) }}</td>
                                                         <td>{{ $training->workout->name }}</td>
-                                                        <td>{{ $training->bookings_count }}/{{ $training->capacity() }}</td>
+                                                        @php
+                                                        // Получаем вместимость из тренировки
+                                                        $capacity = $training->workout->capacity ?? 10;
+                                                        $booked = $training->bookings_count ?? 0;
+                                                    @endphp
+                                                    <td>
+                                                        <span class="badge bg-{{ $booked >= $capacity ? 'danger' : 'success' }}">
+                                                            {{ $booked }}/{{ $capacity }}
+                                                        </span>
+                                                    </td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>

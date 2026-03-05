@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', 'Добавление пользователя')
@@ -77,28 +76,19 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="password" class="form-label">Пароль *</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                                   id="password" name="password" required>
-                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-text">Минимум 8 символов</div>
+                        <input type="text" class="form-control @error('password') is-invalid @enderror" 
+                               id="password" name="password" value="{{ old('password') }}" required>
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div class="form-text">Минимум 8 символов. Пароль отображается в открытом виде для удобства.</div>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="password_confirmation" class="form-label">Подтверждение пароля *</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" 
-                                   id="password_confirmation" name="password_confirmation" required>
-                            <button class="btn btn-outline-secondary" type="button" id="togglePasswordConfirm">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
+                        <input type="text" class="form-control" 
+                               id="password_confirmation" name="password_confirmation" 
+                               value="{{ old('password_confirmation') }}" required>
                     </div>
                 </div>
 
@@ -130,14 +120,17 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="email_verified" class="form-label">Подтверждение email</label>
+                        <label for="is_active" class="form-label">Статус пользователя</label>
                         <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" id="email_verified" 
-                                   name="email_verified" value="1" {{ old('email_verified') ? 'checked' : '' }}>
-                            <label class="form-check-label" for="email_verified">
-                                Подтвердить email сразу
+                            <input class="form-check-input" type="checkbox" id="is_active" 
+                                   name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_active">
+                                Пользователь активен
                             </label>
                         </div>
+                        <small class="text-muted">
+                            Если отмечено - пользователь может входить в систему
+                        </small>
                     </div>
                 </div>
 
@@ -161,21 +154,6 @@
                     </div>
                 </div>
 
-                <!-- Дополнительные поля для клиента -->
-                <div class="client-fields" style="display: none;">
-                    <hr>
-                    <h5 class="mb-3">Информация для клиента</h5>
-                    
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label for="notes" class="form-label">Информация о здоровье</label>
-                            <textarea class="form-control" id="notes" name="notes" 
-                                      rows="3">{{ old('notes') }}</textarea>
-                            <div class="form-text">Аллергии, травмы, противопоказания</div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save me-2"></i>Создать пользователя
@@ -190,63 +168,33 @@
 </div>
 
 <script>
-    // Показ/скрытие пароля
-    document.getElementById('togglePassword').addEventListener('click', function() {
-        const password = document.getElementById('password');
-        const icon = this.querySelector('i');
-        
-        if (password.type === 'password') {
-            password.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            password.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    });
-
-    document.getElementById('togglePasswordConfirm').addEventListener('click', function() {
-        const password = document.getElementById('password_confirmation');
-        const icon = this.querySelector('i');
-        
-        if (password.type === 'password') {
-            password.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            password.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    });
-
-    // Показ дополнительных полей в зависимости от роли
-    document.getElementById('role_id').addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const roleName = selectedOption.text.toLowerCase();
-        
-        document.querySelector('.trainer-fields').style.display = 'none';
-        document.querySelector('.client-fields').style.display = 'none';
-        
-        if (roleName.includes('тренер')) {
-            document.querySelector('.trainer-fields').style.display = 'block';
-        } else if (roleName.includes('клиент')) {
-            document.querySelector('.client-fields').style.display = 'block';
-        }
-    });
-
-    // При загрузке страницы проверяем выбранную роль
-    window.addEventListener('load', function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Показ дополнительных полей в зависимости от роли
         const roleSelect = document.getElementById('role_id');
-        if (roleSelect.value) {
-            const selectedOption = roleSelect.options[roleSelect.selectedIndex];
-            const roleName = selectedOption.text.toLowerCase();
-            
-            if (roleName.includes('тренер')) {
-                document.querySelector('.trainer-fields').style.display = 'block';
-            } else if (roleName.includes('клиент')) {
-                document.querySelector('.client-fields').style.display = 'block';
+        if (roleSelect) {
+            roleSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const roleText = selectedOption.text.toLowerCase();
+                
+                document.querySelector('.trainer-fields').style.display = 'none';
+                document.querySelector('.client-fields').style.display = 'none';
+                
+                if (roleText.includes('тренер')) {
+                    document.querySelector('.trainer-fields').style.display = 'block';
+                } else if (roleText.includes('клиент')) {
+                    document.querySelector('.client-fields').style.display = 'block';
+                }
+            });
+
+            if (roleSelect.value) {
+                const selectedOption = roleSelect.options[roleSelect.selectedIndex];
+                const roleText = selectedOption.text.toLowerCase();
+                
+                if (roleText.includes('тренер')) {
+                    document.querySelector('.trainer-fields').style.display = 'block';
+                } else if (roleText.includes('клиент')) {
+                    document.querySelector('.client-fields').style.display = 'block';
+                }
             }
         }
     });
@@ -259,9 +207,6 @@
     }
     .form-label {
         font-weight: 500;
-    }
-    .input-group .btn {
-        border-color: #ced4da;
     }
 </style>
 @endsection

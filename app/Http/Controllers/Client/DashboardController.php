@@ -233,21 +233,22 @@ public function cancelBooking(Booking $booking, Request $request)
     }
 
     public function updateProfile(Request $request)
-    {
-        $user = Auth::user();
-        
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:20',
-            'birth_date' => 'nullable|date|before:today',
-        ]);
-        
-        $user->update($validated);
-        
-        return redirect()->route('client.profile')
-            ->with('success', 'Профиль успешно обновлен');
-    }
+{
+    $user = Auth::user();
+    
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+        'phone' => 'nullable|string|max:20',
+        'birth_date' => 'nullable|date|before:today',
+        'notes' => 'nullable|string|max:1000', // ДОБАВЛЕНО
+    ]);
+    
+    $user->update($validated);
+    
+    return redirect()->route('client.profile')
+        ->with('success', 'Профиль успешно обновлен');
+}
 
     public function updatePassword(Request $request)
     {

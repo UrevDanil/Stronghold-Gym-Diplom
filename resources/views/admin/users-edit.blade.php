@@ -98,48 +98,50 @@
                         @enderror
                     </div>
 
-<div class="col-md-6 mb-3">
-    <label for="is_active" class="form-label">Статус пользователя</label>
-    <div class="form-check mt-2">
-        <input class="form-check-input" type="checkbox" id="is_active" 
-               name="is_active" value="1" {{ $user->is_active ? 'checked' : '' }}>
-        <label class="form-check-label" for="is_active">
-            Пользователь активен
-        </label>
-    </div>
-    <small class="text-muted">
-        Если отмечено - пользователь может входить в систему и пользоваться сервисом
-    </small>
-</div>
+                    <div class="col-md-6 mb-3">
+                        <label for="is_active" class="form-label">Статус пользователя</label>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="is_active" 
+                                   name="is_active" value="1" {{ $user->is_active ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_active">
+                                Пользователь активен
+                            </label>
+                        </div>
+                        <small class="text-muted">
+                            Если отмечено - пользователь может входить в систему и пользоваться сервисом
+                        </small>
+                    </div>
+                </div>
 
                 <!-- Поля для пароля (оставить пустыми, если не нужно менять) -->
-<hr>
-<h5 class="mb-3">Смена пароля</h5>
-<p class="text-muted small">Заполните только если хотите изменить пароль. Минимум 8 символов.</p>
+                <hr>
+                <h5 class="mb-3">Смена пароля</h5>
+                <p class="text-muted small">Заполните только если хотите изменить пароль. Минимум 8 символов.</p>
 
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <label for="password" class="form-label">Новый пароль</label>
-        <input type="password" class="form-control @error('password') is-invalid @enderror" 
-               id="password" name="password" 
-               placeholder="Оставьте пустым, если не нужно менять"
-               autocomplete="off">  <!-- ДОБАВЬ ЭТО -->
-        @error('password')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="password" class="form-label">Новый пароль</label>
+                        <input type="text" class="form-control @error('password') is-invalid @enderror" 
+                               id="password" name="password" 
+                               placeholder="Оставьте пустым, если не нужно менять"
+                               autocomplete="off">
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted">Пароль отображается в открытом виде для удобства</small>
+                    </div>
 
-    <div class="col-md-6 mb-3">
-        <label for="password_confirmation" class="form-label">Подтверждение пароля</label>
-        <input type="password" class="form-control @error('password') is-invalid @enderror" 
-               id="password_confirmation" name="password_confirmation" 
-               placeholder="Повторите новый пароль"
-               autocomplete="off">  <!-- ДОБАВЬ ЭТО -->
-        @error('password')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
-</div>
+                    <div class="col-md-6 mb-3">
+                        <label for="password_confirmation" class="form-label">Подтверждение пароля</label>
+                        <input type="text" class="form-control @error('password') is-invalid @enderror" 
+                               id="password_confirmation" name="password_confirmation" 
+                               placeholder="Повторите новый пароль"
+                               autocomplete="off">
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
 
                 <!-- Дополнительные поля для тренера -->
                 <div class="trainer-fields" style="{{ $user->role->name == 'trainer' ? 'display:block' : 'display:none' }}">
@@ -161,18 +163,19 @@
                     </div>
                 </div>
 
-                <!-- Дополнительные поля для клиента -->
-                <div class="client-fields" style="{{ $user->role->name == 'client' ? 'display:block' : 'display:none' }}">
-                    <hr>
-                    <h5 class="mb-3">Информация для клиента</h5>
-                    
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label for="notes" class="form-label">Заметки / Информация о здоровье</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ old('notes', $user->notes) }}</textarea>
+                    <!-- Дополнительные поля для клиента -->
+                    <div class="client-fields" style="{{ $user->role->name == 'client' ? 'display:block' : 'display:none' }}">
+                        <hr>
+                        <h5 class="mb-3">Информация для клиента</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="notes" class="form-label">Заметки / Информация о здоровье</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3">{{ old('notes', $user->notes) }}</textarea>
+                                <small class="form-text text-muted">Аллергии, травмы, противопоказания, цели тренировок</small>
+                            </div>
                         </div>
                     </div>
-                </div>
 
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary">

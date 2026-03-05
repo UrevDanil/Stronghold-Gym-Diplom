@@ -250,7 +250,7 @@ if ($request->input('email_verified') == '1') {
  */
 public function showUser($id)
 {
-    $user = User::with(['role', 'subscriptions.subscription'])
+    $user = User::with(['role', 'subscriptions'])
         ->withCount(['bookings as total_bookings', 
                      'bookings as attended_bookings' => function($q) {
                          $q->where('status', 'attended');
@@ -270,9 +270,10 @@ public function showUser($id)
             })
             ->distinct('user_id')
             ->count('user_id');
-        
-        // Ближайшие тренировки тренера
+            
+    // Ближайшие тренировки тренера с количеством бронирований
         $upcomingTrainings = Schedule::with('workout')
+            ->withCount('bookings') // ЭТО ВАЖНО!
             ->where('trainer_id', $user->id)
             ->where('date', '>=', now())
             ->where('status', 'scheduled')

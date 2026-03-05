@@ -100,6 +100,21 @@
                                         @enderror
                                     </div>
                                 </div>
+
+                                        <!-- НОВЫЙ БЛОК: Заметки пользователя -->
+        <div class="mb-3">
+            <label for="notes" class="form-label">Информация для тренера</label>
+            <textarea class="form-control @error('notes') is-invalid @enderror" 
+                      id="notes" name="notes" rows="4" 
+                      placeholder="Здесь вы можете указать информацию, которую хотите сообщить тренеру: аллергии, травмы, противопоказания, цели тренировок и т.д.">{{ old('notes', $user->notes) }}</textarea>
+            @error('notes')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+            <small class="form-text text-muted">
+                Эта информация будет доступна вашим тренерам для безопасности и эффективности тренировок.
+            </small>
+        </div>
+
                                 
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save me-2"></i>Сохранить изменения
