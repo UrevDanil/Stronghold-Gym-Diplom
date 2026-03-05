@@ -17,24 +17,44 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    // Обработка входа
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+/**
+ * Обработка входа
+ */
+public function login(Request $request)
+{
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        if (Auth::attempt($credentials, $request->remember)) {
-            $request->session()->regenerate();
-            
-            return redirect()->intended('dashboard');
+    if (Auth::attempt($credentials, $request->remember)) {
+        $request->session()->regenerate();
+        
+        $user = Auth::user();
+        
+        // ПРОВЕРКА: активен ли пользователь
+        if (property_exists($user, 'is_active') && !$user->is_active) {
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Ваш аккаунт деактивирован. Обратитесь к администратору.',
+            ])->onlyInput('email');
         }
-
-        return back()->withErrors([
-            'email' => 'Неверные учетные данные.',
-        ])->onlyInput('email');
+        
+        // Проверка на удаленного (заблокированного)
+        if (method_exists($user, 'trashed') && $user->trashed()) {
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Ваш аккаунт заблокирован. Обратитесь к администратору.',
+            ])->onlyInput('email');
+        }
+        
+        return redirect()->intended('dashboard');
     }
+
+    return back()->withErrors([
+        'email' => 'Неверные учетные данные.',
+    ])->onlyInput('email');
+}
 
     // Показ формы регистрации
     public function showRegister()

@@ -143,15 +143,15 @@
                                         @endif
                                     </td>
                                     <td>{{ $user->created_at->format('d.m.Y') }}</td>
-                                    <td>
-                                        @if($user->deleted_at)
-                                            <span class="badge bg-danger">Заблокирован</span>
-                                        @elseif($user->email_verified_at)
-                                            <span class="badge bg-success">Активен</span>
-                                        @else
-                                            <span class="badge bg-warning">Не подтвержден</span>
-                                        @endif
-                                    </td>
+<td>
+    @if($user->deleted_at)
+        <span class="badge bg-danger">Заблокирован</span>
+    @elseif($user->is_active)
+        <span class="badge bg-success">Активен</span>
+    @else
+        <span class="badge bg-warning">Неактивен</span>
+    @endif
+</td>
                                     <td>
                                         <div class="btn-group" role="group">
                                             <a href="{{ route('admin.users.show', $user->id) }}" 

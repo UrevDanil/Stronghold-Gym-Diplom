@@ -68,7 +68,7 @@ Route::get('/dashboard', function () {
 // АДМИНИСТРАТОР
 // ====================
 
-Route::middleware(['auth', 'role:admin,owner'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'active', 'role:admin,owner'])->prefix('admin')->name('admin.')->group(function () {
     // Дашборд
     Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('dashboard');
     
@@ -133,7 +133,7 @@ Route::middleware(['auth', 'role:admin,owner'])->prefix('admin')->name('admin.')
 // ТРЕНЕР
 // ====================
 
-Route::middleware(['auth', 'role:trainer'])->prefix('trainer')->name('trainer.')->group(function () {
+Route::middleware(['auth', 'active', 'role:trainer'])->prefix('trainer')->name('trainer.')->group(function () {
     // Основные страницы
     Route::get('/dashboard', [TrainerDashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/schedule', [TrainerDashboardController::class, 'schedule'])->name('schedule');
@@ -195,7 +195,7 @@ Route::middleware(['auth', 'role:trainer'])->group(function () {
 // КЛИЕНТ
 // ====================
 
-Route::middleware(['auth', 'role:client'])->prefix('client')->name('client.')->group(function () {
+    Route::middleware(['auth', 'active', 'role:client'])->prefix('client')->name('client.')->group(function () {
     // Дашборд
     Route::get('/dashboard', [ClientDashboardController::class, 'dashboard'])->name('dashboard');
     

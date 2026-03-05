@@ -23,6 +23,7 @@ class User extends Authenticatable
         'avatar',
         'qualification',  // Для тренеров
         'specialization', // Для тренеров
+        'is_active',
     ];
 
     protected $hidden = [
@@ -80,6 +81,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserSubscription::class);
     }
+
+/**
+ * Проверка, активен ли пользователь
+ */
+public function isActive(): bool
+{
+    return $this->is_active && !$this->deleted_at;
+}
 
 // Тренер проводит занятия
 public function trainings()

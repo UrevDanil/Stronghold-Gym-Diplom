@@ -244,7 +244,141 @@ if ($request->input('email_verified') == '1') {
     return redirect()->route('admin.users.index')
         ->with('success', 'Пользователь успешно создан');
 }
-   
+
+/**
+ * Просмотр профиля пользователя
+ */
+public function showUser($id)
+{
+    $user = User::with(['role', 'subscriptions.subscription'])
+        ->withCount(['bookings as total_bookings', 
+                     'bookings as attended_bookings' => function($q) {
+                         $q->where('status', 'attended');
+                     }])
+        ->findOrFail($id);
+    
+    // Для тренера - дополнительные данные
+    if ($user->role->name == 'trainer') {
+        // Количество проведенных тренировок
+        $user->trainings_count = Schedule::where('trainer_id', $user->id)
+            ->where('status', 'completed')
+            ->count();
+        
+        // Количество уникальных клиентов
+        $user->clients_count = Booking::whereHas('schedule', function($q) use ($user) {
+                $q->where('trainer_id', $user->id);
+            })
+            ->distinct('user_id')
+            ->count('user_id');
+        
+        // Ближайшие тренировки тренера
+        $upcomingTrainings = Schedule::with('workout')
+            ->where('trainer_id', $user->id)
+            ->where('date', '>=', now())
+            ->where('status', 'scheduled')
+            ->orderBy('date')
+            ->orderBy('start_time')
+            ->limit(5)
+            ->get();
+    }
+    
+    // Для клиента - получаем последние бронирования и абонементы
+    if ($user->role->name == 'client') {
+        $recentBookings = Booking::with(['schedule.workout', 'schedule.trainer'])
+            ->where('user_id', $user->id)
+            ->latest()
+            ->limit(10)
+            ->get();
+        
+        $subscriptions = UserSubscription::with('subscription')
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        $attendanceStats = [
+            'total' => $user->bookings()->count(),
+            'attended' => $user->bookings()->where('status', 'attended')->count(),
+            'missed' => $user->bookings()->where('status', 'missed')->count(),
+            'cancelled' => $user->bookings()->where('status', 'cancelled')->count(),
+        ];
+        
+        $attendanceRate = $attendanceStats['total'] > 0 
+            ? round(($attendanceStats['attended'] / $attendanceStats['total']) * 100, 1) 
+            : 0;
+    }
+    
+    return view('admin.users-show', [
+        'profile' => $user,
+        'recentBookings' => $recentBookings ?? collect(),
+        'subscriptions' => $subscriptions ?? collect(),
+        'attendanceStats' => $attendanceStats ?? ['total' => 0, 'attended' => 0, 'missed' => 0, 'cancelled' => 0],
+        'attendanceRate' => $attendanceRate ?? 0,
+        'upcomingTrainings' => $upcomingTrainings ?? collect()
+    ]);
+}
+ 
+/**
+ * Форма редактирования пользователя
+ */
+public function editUser($id)
+{
+    $user = User::findOrFail($id);
+    $roles = Role::all();
+    
+    // Не даем редактировать владельца обычным админам
+    if ($user->role->name == 'owner' && !auth()->user()->isOwner()) {
+        abort(403, 'Только владелец может редактировать владельца');
+    }
+    
+    return view('admin.users-edit', [
+        'user' => $user,
+        'roles' => $roles
+    ]);
+}
+
+/**
+ * Обновление пользователя
+ */
+public function updateUser(Request $request, $id)
+{
+    $user = User::findOrFail($id);
+    
+    // Не даем редактировать владельца обычным админам
+    if ($user->role->name == 'owner' && !auth()->user()->isOwner()) {
+        abort(403, 'Только владелец может редактировать владельца');
+    }
+    
+    $rules = [
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $id,
+        'phone' => 'nullable|string|max:20',
+        'role_id' => 'required|exists:roles,id',
+        'birth_date' => 'nullable|date',
+        'qualification' => 'nullable|string|max:255',
+        'specialization' => 'nullable|string|max:255',
+        'notes' => 'nullable|string',
+        'is_active' => 'boolean', // ДОБАВЛЕНО
+    ];
+    
+    if ($request->filled('password')) {
+        $rules['password'] = 'required|string|min:8|confirmed';
+    }
+    
+    $validated = $request->validate($rules);
+    
+    if ($request->filled('password')) {
+        $validated['password'] = Hash::make($validated['password']);
+    }
+    
+    // Явно устанавливаем is_active из чекбокса
+    $validated['is_active'] = $request->has('is_active');
+    
+    $user->update($validated);
+    
+    return redirect()->route('admin.users.index')
+        ->with('success', 'Пользователь успешно обновлен');
+}
+
 /**
  * Управление расписанием
  */

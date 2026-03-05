@@ -17,6 +17,12 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
+    if (!$user->is_active) {
+        Auth::logout();
+        return redirect()->route('login')
+            ->withErrors(['email' => 'Ваш аккаунт деактивирован.']);
+    }
+
         $data = [
             'user' => $user,
             'upcomingBookings' => $user->upcomingBookings()->limit(5)->get(),

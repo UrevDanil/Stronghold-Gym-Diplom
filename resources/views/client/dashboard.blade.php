@@ -324,4 +324,13 @@
         </div>
     </div>
 </div>
+
+@if(!auth()->user()->is_active)
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Внимание!</strong> Ваш аккаунт деактивирован. 
+        Некоторые функции могут быть недоступны. Обратитесь к администратору.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
 @endsection

@@ -16,6 +16,12 @@ class DashboardController extends Controller
     public function dashboard()
     {
         $user = auth()->user();
+
+        if (!$user->is_active) {
+        Auth::logout();
+        return redirect()->route('login')
+            ->withErrors(['email' => 'Ваш аккаунт деактивирован.']);
+    }
         
         // ИСПРАВЛЕНО: используем trainings() вместо scheduledTrainings()
         $todaySchedules = $user->trainings()  // <-- ИЗМЕНЕНО

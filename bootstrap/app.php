@@ -30,8 +30,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
             
-            // ↓↓↓ ВАШ MIDDLEWARE ↓↓↓
+            // Ваши middleware
             'role' => \App\Http\Middleware\CheckRole::class,
+            'active' => \App\Http\Middleware\CheckUserActive::class, // ✅ ДОБАВЛЕНО
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
