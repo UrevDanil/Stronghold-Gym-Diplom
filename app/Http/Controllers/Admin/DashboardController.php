@@ -518,14 +518,47 @@ public function deleteSchedule($id)
     $schedule = Schedule::findOrFail($id);
     
     // Проверяем, есть ли бронирования
-    if ($schedule->bookings()->where('status', '!=', 'cancelled')->count() > 0) {
-        return back()->with('error', 'Нельзя удалить занятие, на которое есть записи');
+    $bookingsCount = $schedule->bookings()->count();
+    
+    if ($bookingsCount > 0) {
+        return back()->with('error', 
+            "Нельзя удалить занятие, на которое есть записи (всего: $bookingsCount). Сначала отмените все бронирования.");
     }
     
     $schedule->delete();
     
     return redirect()->route('admin.schedule.index')
         ->with('success', 'Занятие удалено из расписания');
+}
+
+/**
+ * Отмена занятия (мягкое удаление)
+ */
+public function cancelSchedule($id)
+{
+    $schedule = Schedule::findOrFail($id);
+    
+    // Меняем статус на отменено
+    $schedule->status = 'cancelled';
+    $schedule->save();
+    
+    // Отменяем все активные бронирования
+    foreach ($schedule->bookings()->where('status', 'booked')->get() as $booking) {
+        $booking->status = 'cancelled';
+        $booking->cancelled_at = now();
+        $booking->save();
+        
+        // Возвращаем тренировку в абонемент
+        $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
+            ->where('status', 'active')
+            ->first();
+        if ($activeSubscription) {
+            $activeSubscription->increment('remaining_workouts');
+        }
+    }
+    
+    return redirect()->route('admin.schedule.index')
+        ->with('success', 'Занятие отменено, все бронирования отменены');
 }
 
 /**

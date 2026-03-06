@@ -1,5 +1,4 @@
-<!-- Управление расписанием -->
- @extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Управление расписанием')
 
@@ -20,6 +19,13 @@
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show">
             {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show">
+            {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
@@ -84,6 +90,11 @@
                         </thead>
                         <tbody>
                             @foreach($schedules as $schedule)
+                                @php
+                                    // Получаем вместимость из связанной тренировки
+                                    $capacity = $schedule->workout->capacity ?? 10;
+                                    $isFull = $schedule->current_participants >= $capacity;
+                                @endphp
                                 <tr>
                                     <td>{{ \Carbon\Carbon::parse($schedule->date)->format('d.m.Y') }}</td>
                                     <td>{{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }}</td>
@@ -91,8 +102,8 @@
                                     <td>{{ $schedule->trainer->name }}</td>
                                     <td>{{ $schedule->room ?? '—' }}</td>
                                     <td>
-                                        <span class="badge bg-{{ $schedule->current_participants >= $schedule->capacity() ? 'danger' : 'success' }}">
-                                            {{ $schedule->current_participants }}/{{ $schedule->capacity() }}
+                                        <span class="badge bg-{{ $isFull ? 'danger' : 'success' }}">
+                                            {{ $schedule->current_participants }}/{{ $capacity }}
                                         </span>
                                     </td>
                                     <td>
@@ -105,19 +116,28 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.schedule.edit', $schedule->id) }}" 
-                                           class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form action="{{ route('admin.schedule.delete', $schedule->id) }}" 
-                                              method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                    onclick="return confirm('Удалить занятие?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ route('admin.schedule.edit', $schedule->id) }}" 
+                                               class="btn btn-sm btn-outline-primary" title="Редактировать">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            
+                                            @if($schedule->status != 'cancelled')
+                                                <form action="{{ route('admin.schedule.cancel', $schedule->id) }}" 
+                                                      method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning" 
+                                                            title="Отменить занятие"
+                                                            onclick="return confirm('Отменить занятие? Все бронирования будут отменены, тренировки вернутся в абонементы.')">
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <span class="btn btn-sm btn-outline-secondary disabled" title="Занятие уже отменено">
+                                                    <i class="fas fa-check"></i>
+                                                </span>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -125,9 +145,29 @@
                     </table>
                 </div>
             @else
-                <p class="text-muted text-center py-4">Нет занятий в расписании</p>
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                    <h4>Нет занятий в расписании</h4>
+                    <p class="text-muted mb-4">На выбранные даты нет запланированных тренировок</p>
+                    <a href="{{ route('admin.schedule.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Добавить занятие
+                    </a>
+                </div>
             @endif
         </div>
     </div>
 </div>
+
+<style>
+    .table td, .table th {
+        vertical-align: middle;
+    }
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.35em 0.65em;
+    }
+</style>
 @endsection

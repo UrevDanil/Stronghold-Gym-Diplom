@@ -97,6 +97,7 @@ Route::middleware(['auth', 'active', 'role:admin,owner'])->prefix('admin')->name
     Route::get('/schedule/{id}/edit', [AdminDashboardController::class, 'editSchedule'])->name('schedule.edit');
     Route::put('/schedule/{id}', [AdminDashboardController::class, 'updateSchedule'])->name('schedule.update');
     Route::delete('/schedule/{id}', [AdminDashboardController::class, 'deleteSchedule'])->name('schedule.delete');
+    Route::post('/schedules/{id}/cancel', [AdminDashboardController::class, 'cancelSchedule'])->name('schedule.cancel');
     
     // Управление абонементами
     Route::get('/subscriptions', [AdminDashboardController::class, 'subscriptions'])->name('subscriptions.index');
