@@ -1,0 +1,141 @@
+/* ========================================
+   ОБЩИЕ СТИЛИ ДЛЯ ВСЕХ ДАШБОРДОВ
+   ======================================== */
+
+/* Карточки */
+.dashboard-card {
+    border: none;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.dashboard-card .card-body {
+    padding: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Градиенты */
+.bg-primary-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bg-success-gradient {
+    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+}
+
+.bg-info-gradient {
+    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+}
+
+.bg-warning-gradient {
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+}
+
+/* Таблицы */
+.dashboard-table {
+    margin-bottom: 0;
+}
+
+.dashboard-table thead th {
+    border-top: none;
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+}
+
+.dashboard-table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-color: #f0f0f0;
+}
+
+.dashboard-table tbody tr:hover {
+    background-color: rgba(102, 126, 234, 0.05);
+}
+
+/* Кнопки действий */
+.btn-action {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Пустые состояния */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .dashboard-card .card-body {
+        padding: 1rem;
+    }
+    
+    .dashboard-table thead th {
+        padding: 0.8rem;
+        font-size: 0.8rem;
+    }
+    
+    .dashboard-table tbody td {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-action {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}

@@ -1,0 +1,317 @@
+/* ========================================
+   СТИЛИ ДЛЯ КЛИЕНТСКОГО ДАШБОРДА
+   ======================================== */
+
+/* Статистика */
+.stat-card i {
+    opacity: 0.2;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    font-size: 5rem;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover i {
+    transform: scale(1.1);
+    opacity: 0.3;
+}
+
+.stat-card .card-title {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0;
+    line-height: 1.2;
+}
+
+.stat-card .stat-label {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+/* Бейджи статусов для клиента */
+.badge-custom {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.badge-attended {
+    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    color: #00573d;
+}
+
+.badge-missed {
+    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+    color: #9b1d1d;
+}
+
+.badge-cancelled {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    color: #9b4d1d;
+}
+
+/* Прогресс абонемента */
+.subscription-progress {
+    height: 12px;
+    border-radius: 20px;
+    background-color: #f0f0f0;
+    margin: 1rem 0;
+}
+
+.subscription-progress .progress-bar {
+    border-radius: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Список абонемента */
+.subscription-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.subscription-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.subscription-list li:last-child {
+    border-bottom: none;
+}
+
+.subscription-list li span:first-child {
+    color: #6c757d;
+    font-size: 0.95rem;
+}
+
+.subscription-list li strong {
+    color: #495057;
+    font-size: 1rem;
+}
+
+/* Мобильные карточки для клиента */
+.mobile-booking-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border-left: 4px solid;
+}
+
+.mobile-booking-card.attended {
+    border-left-color: #28a745;
+}
+
+.mobile-booking-card.missed {
+    border-left-color: #dc3545;
+}
+
+.mobile-booking-card.cancelled {
+    border-left-color: #ffc107;
+}
+
+.mobile-booking-card .booking-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.mobile-booking-card .booking-label {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.mobile-booking-card .booking-value {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.mobile-booking-card .booking-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+/* Адаптивность для клиента */
+@media (max-width: 992px) {
+    .stat-card .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card i {
+        font-size: 3.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .stat-card .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .stat-card i {
+        font-size: 3rem;
+    }
+    
+    .subscription-list li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .subscription-list li strong {
+        margin-top: 0.3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .desktop-table {
+        display: none;
+    }
+    
+    .mobile-friendly-table {
+        display: block;
+    }
+}
+
+@media (max-width: 480px) {
+    .stat-card .stat-value {
+        font-size: 1rem;
+    }
+    
+    .stat-card .card-title {
+        font-size: 0.8rem;
+    }
+    
+    .stat-card i {
+        font-size: 2.5rem;
+    }
+}
+
+/* Переключение между десктоп и мобильным видом */
+.desktop-view {
+    display: block;
+}
+
+.mobile-view {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .desktop-view {
+        display: none;
+    }
+    
+    .mobile-view {
+        display: block;
+    }
+}
+
+/* Улучшенная секция абонемента */
+.subscription-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.subscription-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+.subscription-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    background-color: #f8f9fa;
+    border-radius: 15px;
+    padding: 15px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.detail-item i {
+    font-size: 1.2rem;
+    min-width: 24px;
+}
+
+.detail-item div {
+    line-height: 1.3;
+}
+
+.detail-item small {
+    font-size: 0.7rem;
+}
+
+.detail-item strong {
+    font-size: 0.9rem;
+}
+
+.subscription-action {
+    margin-top: 20px;
+}
+
+.subscription-action .btn {
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.subscription-action .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .subscription-details-grid {
+        gap: 10px;
+        padding: 12px;
+    }
+    
+    .detail-item i {
+        font-size: 1rem;
+    }
+    
+    .detail-item strong {
+        font-size: 0.85rem;
+    }
+    
+    .subscription-action .btn {
+        padding: 12px !important;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .subscription-details-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .detail-item {
+        padding: 5px 0;
+    }
+}
