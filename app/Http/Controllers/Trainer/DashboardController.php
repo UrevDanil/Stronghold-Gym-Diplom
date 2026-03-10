@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Trainer;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Schedule;
-use App\Models\Attendance;
+use App\Models\Booking; // <-- ДОБАВЬ ЭТУ СТРОКУ
+use App\Models\Attendance; // <-- ДОБАВЬ ЭТУ СТРОКУ
 use App\Models\Workout;
+use App\Models\Notification; // <-- ДОБАВЬ ЭТУ СТРОКУ
+use App\Models\UserSubscription; // <-- ДОБАВЬ ЭТУ СТРОКУ
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -290,35 +293,86 @@ public function clientDetails($id)
     ]);
 }
 
-    public function markAttendance(Request $request, Schedule $schedule)
-    {
-        // Проверяем, что тренировка принадлежит этому тренеру
-        if ($schedule->trainer_id !== auth()->id()) {
-            abort(403);
-        }
+    /**
+ * Отметка посещаемости
+ */
+public function markAttendance(Request $request, Schedule $schedule)
+{
+    // Проверяем, что тренировка принадлежит этому тренеру
+    if ($schedule->trainer_id !== auth()->id()) {
+        abort(403);
+    }
+    
+    $validated = $request->validate([
+        'booking_id' => 'required|exists:bookings,id',
+        'status' => 'required|in:attended,missed'
+    ]);
+    
+    $booking = Booking::find($validated['booking_id']);
+    
+    if ($validated['status'] === 'attended') {
+    // Отмечаем как посещенное
+    $booking->markAttended();
+    
+    // Создаем запись о посещении - используем 'attended' (разрешено)
+    Attendance::create([
+        'booking_id' => $booking->id,
+        'marked_by' => auth()->id(),
+        'attended_at' => now(),
+        'attendance_type' => 'attended' // Допустимое значение
+    ]);
         
-        $validated = $request->validate([
-            'booking_id' => 'required|exists:bookings,id',
-            'status' => 'required|in:attended,missed'
+        // Уменьшаем количество тренировок в абонементе (если еще не уменьшено)
+        // Обычно это делается при бронировании, но на всякий случай проверим
+        $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
+            ->where('status', 'active')
+            ->first();
+        
+        // Отправляем уведомление клиенту
+        \App\Models\Notification::create([
+            'user_id' => $booking->user_id,
+            'type' => 'booking',
+            'message' => "Вы посетили тренировку '{$schedule->workout->name}' {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+            'is_read' => false,
+            'data' => json_encode([
+                'schedule_id' => $schedule->id,
+                'workout_name' => $schedule->workout->name,
+                'date' => $schedule->date->format('d.m.Y'),
+                'time' => $schedule->start_time,
+                'status' => 'attended'
+            ])
         ]);
         
-        $booking = \App\Models\Booking::find($validated['booking_id']);
+    } else {
+    // Отмечаем как пропущенное
+    $booking->markMissed();
+    
+    // ИСПРАВЛЕНО: для пропуска используем 'left_early' или другое допустимое значение
+    Attendance::create([
+        'booking_id' => $booking->id,
+        'marked_by' => auth()->id(),
+        'attended_at' => now(),
+        'attendance_type' => 'left_early' // или 'late' - одно из допустимых значений
+    ]);
         
-        if ($validated['status'] === 'attended') {
-            $booking->markAttended();
-            
-            Attendance::create([
-                'booking_id' => $booking->id,
-                'marked_by' => auth()->id(),
-                'attended_at' => now(),
-                'attendance_type' => 'attended'
-            ]);
-        } else {
-            $booking->markMissed();
-        }
-        
-        return back()->with('success', 'Посещаемость отмечена');
+        // Отправляем уведомление клиенту
+        \App\Models\Notification::create([
+            'user_id' => $booking->user_id,
+            'type' => 'booking',
+            'message' => "Вы пропустили тренировку '{$schedule->workout->name}' {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+            'is_read' => false,
+            'data' => json_encode([
+                'schedule_id' => $schedule->id,
+                'workout_name' => $schedule->workout->name,
+                'date' => $schedule->date->format('d.m.Y'),
+                'time' => $schedule->start_time,
+                'status' => 'missed'
+            ])
+        ]);
     }
+    
+    return back()->with('success', 'Посещаемость отмечена');
+}
 
     public function attendance(Request $request)
 {

@@ -118,13 +118,14 @@
                                     <td>
                                         <div class="btn-group" role="group">
                                             <a href="{{ route('admin.schedule.edit', $schedule->id) }}" 
-                                               class="btn btn-sm btn-outline-primary" title="Редактировать">
+                                            class="btn btn-sm btn-outline-primary" title="Редактировать">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             
-                                            @if($schedule->status != 'cancelled')
+                                            @if($schedule->status == 'scheduled')
+                                                {{-- Только для запланированных --}}
                                                 <form action="{{ route('admin.schedule.cancel', $schedule->id) }}" 
-                                                      method="POST" class="d-inline">
+                                                    method="POST" class="d-inline">
                                                     @csrf
                                                     <button type="submit" class="btn btn-sm btn-outline-warning" 
                                                             title="Отменить занятие"
@@ -132,14 +133,19 @@
                                                         <i class="fas fa-ban"></i>
                                                     </button>
                                                 </form>
-                                            @else
+                                            @elseif($schedule->status == 'cancelled')
+                                                {{-- Для отмененных --}}
                                                 <span class="btn btn-sm btn-outline-secondary disabled" title="Занятие уже отменено">
                                                     <i class="fas fa-check"></i>
+                                                </span>
+                                            @elseif($schedule->status == 'completed')
+                                                {{-- Для завершенных --}}
+                                                <span class="btn btn-sm btn-outline-secondary disabled" title="Занятие завершено">
+                                                    <i class="fas fa-check-circle"></i>
                                                 </span>
                                             @endif
                                         </div>
                                     </td>
-                                </tr>
                             @endforeach
                         </tbody>
                     </table>

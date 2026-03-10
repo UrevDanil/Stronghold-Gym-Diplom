@@ -190,19 +190,20 @@
                                         <td>
                                             @php
                                                 $badgeClass = match($booking->status) {
-                                                    'completed' => 'success',
-                                                    'cancelled' => 'danger',
-                                                    'absent' => 'warning',
+                                                    'attended' => 'success',
+                                                    'missed' => 'danger',
+                                                    'cancelled' => 'warning',
                                                     default => 'secondary'
+                                                };
+                                                $statusText = match($booking->status) {
+                                                    'attended' => 'Посещено',
+                                                    'missed' => 'Пропущено',
+                                                    'cancelled' => 'Отменено',
+                                                    default => $booking->status
                                                 };
                                             @endphp
                                             <span class="badge bg-{{ $badgeClass }}">
-                                                @if($booking->status === 'booked') забронировано
-                                                @elseif($booking->status === 'completed') посещено
-                                                @elseif($booking->status === 'cancelled') отменено
-                                                @elseif($booking->status === 'absent') неявка
-                                                @else {{ $booking->status }}
-                                                @endif
+                                                {{ $statusText }}
                                             </span>
                                         </td>
                                     </tr>

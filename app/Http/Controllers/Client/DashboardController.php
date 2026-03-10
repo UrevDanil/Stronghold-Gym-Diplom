@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Schedule;
 use App\Models\Subscription;
+use App\Models\Attendance; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -17,23 +18,18 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-    if (!$user->is_active) {
-        Auth::logout();
-        return redirect()->route('login')
-            ->withErrors(['email' => 'Ваш аккаунт деактивирован.']);
-    }
+        if (!$user->is_active) {
+            Auth::logout();
+            return redirect()->route('login')
+                ->withErrors(['email' => 'Ваш аккаунт деактивирован.']);
+        }
 
         $data = [
             'user' => $user,
             'upcomingBookings' => $user->upcomingBookings()->limit(5)->get(),
+            // ИСПРАВЛЕНО: используем статусы attended и missed для истории
             'pastBookings' => Booking::where('user_id', $user->id)
-                ->whereHas('schedule', function($q) {
-                    $q->where('date', '<', now()->toDateString())
-                      ->orWhere(function($query) {
-                          $query->where('date', now()->toDateString())
-                                ->where('end_time', '<', now()->format('H:i:s'));
-                      });
-                })
+                ->whereIn('status', ['attended', 'missed']) // Только посещенные и пропущенные
                 ->with('schedule.workout', 'schedule.trainer')
                 ->orderBy('created_at', 'desc')
                 ->limit(5)
@@ -119,25 +115,52 @@ public function book(Schedule $schedule, Request $request)
         return back()->with('error', 'Вы уже забронировали это занятие (статус: ' . $existingBooking->status . ')');
     }
 
-    // Проверяем, нет ли отмененных, но с таким же ID (для отладки)
+    // Проверяем, есть ли свободные места
+    if (!$schedule->hasAvailableSlots()) {
+        return back()->with('error', 'Нет свободных мест');
+    }
+
+    // Проверяем, есть ли отмененное бронирование, которое можно восстановить
     $cancelledBooking = Booking::where('user_id', $user->id)
         ->where('schedule_id', $schedule->id)
         ->where('status', 'cancelled')
         ->first();
         
     if ($cancelledBooking) {
-        // Если есть отмененное, удалим его или обновим
-        \Log::info('Найдено отмененное бронирование', ['id' => $cancelledBooking->id]);
-        // Можно удалить старое отмененное бронирование
-        $cancelledBooking->delete();
+        // Восстанавливаем отмененное бронирование
+        $cancelledBooking->status = Booking::STATUS_BOOKED;
+        $cancelledBooking->cancelled_at = null;
+        $cancelledBooking->save();
+        
+        $booking = $cancelledBooking;
+        
+        // Увеличиваем счетчик занятых мест
+        $schedule->increment('current_participants');
+        
+        // Уменьшаем количество тренировок в абонементе
+        $activeSubscription = $user->activeSubscription();
+        if ($activeSubscription && $activeSubscription->remaining_workouts > 0) {
+            $activeSubscription->decrement('remaining_workouts');
+        }
+        
+        // Создаем уведомление о восстановлении
+        \App\Models\Notification::create([
+            'user_id' => $user->id,
+            'type' => 'booking',
+            'message' => "Вы восстановили бронирование на занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+            'is_read' => false,
+            'data' => json_encode([
+                'schedule_id' => $schedule->id,
+                'workout_name' => $schedule->workout->name,
+                'date' => $schedule->date->format('d.m.Y'),
+                'time' => $schedule->start_time
+            ])
+        ]);
+        
+        return back()->with('success', 'Бронирование восстановлено!');
     }
 
-    // Проверяем, есть ли свободные места
-    if (!$schedule->hasAvailableSlots()) {
-        return back()->with('error', 'Нет свободных мест');
-    }
-
-    // Создаем бронирование
+    // Создаем новое бронирование
     $booking = Booking::create([
         'user_id' => $user->id,
         'schedule_id' => $schedule->id,
@@ -169,9 +192,10 @@ public function book(Schedule $schedule, Request $request)
 
     return back()->with('success', 'Занятие успешно забронировано!');
 }
+
     /**
-     * Отмена бронирования
-     */
+ * Отмена бронирования
+ */
 public function cancelBooking(Booking $booking, Request $request)
 {
     if ($booking->user_id !== Auth::id()) {
@@ -180,6 +204,12 @@ public function cancelBooking(Booking $booking, Request $request)
 
     if (!$booking->canCancel()) {
         return back()->with('error', 'Это бронирование нельзя отменить');
+    }
+
+    // Проверяем, не было ли уже посещение
+    $attendanceExists = Attendance::where('booking_id', $booking->id)->exists();
+    if ($attendanceExists) {
+        return back()->with('error', 'Нельзя отменить тренировку, которая уже была посещена');
     }
 
     // Сохраняем данные до отмены
@@ -194,17 +224,6 @@ public function cancelBooking(Booking $booking, Request $request)
         $activeSubscription = $user->activeSubscription();
         if ($activeSubscription) {
             $activeSubscription->increment('remaining_workouts');
-            
-            // Для отладки - добавим сообщение в лог
-            \Log::info('Тренировка возвращена', [
-                'user_id' => $user->id,
-                'subscription_id' => $activeSubscription->id,
-                'new_remaining' => $activeSubscription->remaining_workouts
-            ]);
-        } else {
-            \Log::warning('Активный абонемент не найден при отмене', [
-                'user_id' => $user->id
-            ]);
         }
     }
 

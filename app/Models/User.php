@@ -193,15 +193,36 @@ public function activeSubscription()
             ->get();
     }
 
+/**
+ * Предстоящие бронирования (только активные, не посещенные и не пропущенные)
+ */
 public function upcomingBookings()
 {
     return $this->bookings()
-        ->where('status', '!=', 'cancelled') // НЕ показывать отмененные
+        ->whereIn('status', ['booked']) // ТОЛЬКО забронированные (не attended, не missed, не cancelled)
         ->whereHas('schedule', function($q) {
             $q->where('date', '>=', now()->toDateString())
               ->orWhere(function($query) {
                   $query->where('date', now()->toDateString())
                         ->where('start_time', '>', now()->format('H:i:s'));
+              });
+        })
+        ->with('schedule.workout', 'schedule.trainer')
+        ->orderBy('created_at', 'desc');
+}
+
+/**
+ * История посещений (прошедшие тренировки)
+ */
+public function pastBookings()
+{
+    return $this->bookings()
+        ->whereIn('status', ['attended', 'missed', 'cancelled'])
+        ->whereHas('schedule', function($q) {
+            $q->where('date', '<', now()->toDateString())
+              ->orWhere(function($query) {
+                  $query->where('date', now()->toDateString())
+                        ->where('end_time', '<', now()->format('H:i:s'));
               });
         })
         ->with('schedule.workout', 'schedule.trainer')
