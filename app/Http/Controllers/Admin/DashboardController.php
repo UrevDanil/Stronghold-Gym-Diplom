@@ -10,6 +10,7 @@ use App\Models\UserSubscription;
 use App\Models\Booking;
 use App\Models\Schedule;
 use App\Models\Workout;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;  // <-- ДОБАВЬ ДЛЯ ХЭШИРОВАНИЯ ПАРОЛЕЙ
@@ -555,10 +556,78 @@ public function cancelSchedule($id)
         if ($activeSubscription) {
             $activeSubscription->increment('remaining_workouts');
         }
+        
+        // СОЗДАЕМ УВЕДОМЛЕНИЕ ДЛЯ КЛИЕНТА
+        \App\Models\Notification::create([ // <-- ИСПОЛЬЗУЕМ ПОЛНЫЙ ПУТЬ
+            'user_id' => $booking->user_id,
+            'type' => 'booking', // Используем строку вместо константы
+            'message' => "Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} отменено администратором. Тренировка возвращена в абонемент.",
+            'is_read' => false,
+            'data' => json_encode([
+                'schedule_id' => $schedule->id,
+                'workout_name' => $schedule->workout->name,
+                'date' => $schedule->date->format('d.m.Y'),
+                'time' => $schedule->start_time,
+                'cancelled_by' => 'admin'
+            ])
+        ]);
     }
     
     return redirect()->route('admin.schedule.index')
-        ->with('success', 'Занятие отменено, все бронирования отменены');
+        ->with('success', 'Занятие отменено, все бронирования отменены, клиенты оповещены');
+}
+
+/**
+ * Восстановление отмененного занятия
+ */
+public function restoreSchedule($id)
+{
+    $schedule = Schedule::findOrFail($id);
+    
+    // Меняем статус обратно на запланировано
+    $schedule->status = 'scheduled';
+    $schedule->save();
+    
+    // Восстанавливаем бронирования (опционально)
+    $bookingsToRestore = $schedule->bookings()
+        ->where('status', 'cancelled')
+        ->where('cancelled_at', '>', now()->subHours(24)) // Только за последние 24 часа
+        ->get();
+    
+    foreach ($bookingsToRestore as $booking) {
+        $booking->status = 'booked';
+        $booking->cancelled_at = null;
+        $booking->save();
+        
+        // Возвращаем счетчик мест
+        $schedule->increment('current_participants');
+        
+        // Забираем тренировку из абонемента
+        $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
+            ->where('status', 'active')
+            ->first();
+        if ($activeSubscription) {
+            $activeSubscription->decrement('remaining_workouts');
+        }
+        
+        // Уведомляем клиента о восстановлении
+        \App\Models\Notification::create([
+            'user_id' => $booking->user_id,
+            'type' => 'booking',
+            'message' => "Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} было восстановлено администратором.",
+            'is_read' => false,
+            'data' => json_encode([
+                'schedule_id' => $schedule->id,
+                'workout_name' => $schedule->workout->name,
+                'date' => $schedule->date->format('d.m.Y'),
+                'time' => $schedule->start_time,
+                'restored_by' => 'admin'
+            ])
+        ]);
+    }
+    
+    return redirect()->route('admin.schedule.index')
+        ->with('success', 'Занятие восстановлено. Восстановлено бронирований: ' . $bookingsToRestore->count());
 }
 
 /**

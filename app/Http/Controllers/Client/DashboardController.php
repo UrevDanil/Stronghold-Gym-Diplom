@@ -94,63 +94,81 @@ public function schedule(Request $request)
     ]);
 }
 
-    /**
-     * Бронирование тренировки
-     */
-    public function book(Schedule $schedule, Request $request)
-    {
-        $user = Auth::user();
+/**
+ * Бронирование тренировки
+ */
+public function book(Schedule $schedule, Request $request)
+{
+    $user = Auth::user();
 
-        if (!$user->hasActiveSubscription()) {
-            return back()->with('error', 'У вас нет активного абонемента');
-        }
-
-        if (!$schedule->canBook()) {
-            return back()->with('error', 'Это занятие нельзя забронировать');
-        }
-
-        $existingBooking = Booking::where('user_id', $user->id)
-            ->where('schedule_id', $schedule->id)
-            ->where('status', '!=', Booking::STATUS_CANCELLED)
-            ->first();
-
-        if ($existingBooking) {
-            return back()->with('error', 'Вы уже забронировали это занятие');
-        }
-
-        $booking = Booking::create([
-            'user_id' => $user->id,
-            'schedule_id' => $schedule->id,
-            'status' => Booking::STATUS_BOOKED,
-        ]);
-
-        // Увеличиваем счетчик занятых мест
-        $schedule->increment('current_participants');
-
-        // ИСПРАВЛЕНО: используем прямые свойства UserSubscription
-        $activeSubscription = $user->activeSubscription();
-        if ($activeSubscription && $activeSubscription->remaining_workouts > 0) {
-            $activeSubscription->decrement('remaining_workouts');
-        }
-        
-        // Создаем уведомление
-\App\Models\Notification::create([
-    'user_id' => $user->id,
-    'type' => 'booking', // Вместо title используем type
-    'message' => "Вы забронировали занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
-    'is_read' => false,
-    // data можно не заполнять или добавить информацию
-    'data' => json_encode([
-        'schedule_id' => $schedule->id,
-        'workout_name' => $schedule->workout->name,
-        'date' => $schedule->date->format('d.m.Y'),
-        'time' => $schedule->start_time
-    ])
-]);
-
-        return back()->with('success', 'Занятие успешно забронировано!');
+    if (!$user->hasActiveSubscription()) {
+        return back()->with('error', 'У вас нет активного абонемента');
     }
 
+    if (!$schedule->canBook()) {
+        return back()->with('error', 'Это занятие нельзя забронировать');
+    }
+
+    // ПРОВЕРЯЕМ СУЩЕСТВУЮЩИЕ БРОНИРОВАНИЯ
+    $existingBooking = Booking::where('user_id', $user->id)
+        ->where('schedule_id', $schedule->id)
+        ->whereIn('status', ['booked', 'attended']) // Только активные бронирования
+        ->first();
+
+    if ($existingBooking) {
+        return back()->with('error', 'Вы уже забронировали это занятие (статус: ' . $existingBooking->status . ')');
+    }
+
+    // Проверяем, нет ли отмененных, но с таким же ID (для отладки)
+    $cancelledBooking = Booking::where('user_id', $user->id)
+        ->where('schedule_id', $schedule->id)
+        ->where('status', 'cancelled')
+        ->first();
+        
+    if ($cancelledBooking) {
+        // Если есть отмененное, удалим его или обновим
+        \Log::info('Найдено отмененное бронирование', ['id' => $cancelledBooking->id]);
+        // Можно удалить старое отмененное бронирование
+        $cancelledBooking->delete();
+    }
+
+    // Проверяем, есть ли свободные места
+    if (!$schedule->hasAvailableSlots()) {
+        return back()->with('error', 'Нет свободных мест');
+    }
+
+    // Создаем бронирование
+    $booking = Booking::create([
+        'user_id' => $user->id,
+        'schedule_id' => $schedule->id,
+        'status' => Booking::STATUS_BOOKED,
+    ]);
+
+    // Увеличиваем счетчик занятых мест
+    $schedule->increment('current_participants');
+
+    // Уменьшаем количество тренировок в абонементе
+    $activeSubscription = $user->activeSubscription();
+    if ($activeSubscription && $activeSubscription->remaining_workouts > 0) {
+        $activeSubscription->decrement('remaining_workouts');
+    }
+    
+    // Создаем уведомление
+    \App\Models\Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => "Вы забронировали занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+        'is_read' => false,
+        'data' => json_encode([
+            'schedule_id' => $schedule->id,
+            'workout_name' => $schedule->workout->name,
+            'date' => $schedule->date->format('d.m.Y'),
+            'time' => $schedule->start_time
+        ])
+    ]);
+
+    return back()->with('success', 'Занятие успешно забронировано!');
+}
     /**
      * Отмена бронирования
      */

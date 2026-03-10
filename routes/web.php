@@ -98,7 +98,8 @@ Route::middleware(['auth', 'active', 'role:admin,owner'])->prefix('admin')->name
     Route::put('/schedule/{id}', [AdminDashboardController::class, 'updateSchedule'])->name('schedule.update');
     Route::delete('/schedule/{id}', [AdminDashboardController::class, 'deleteSchedule'])->name('schedule.delete');
     Route::post('/schedules/{id}/cancel', [AdminDashboardController::class, 'cancelSchedule'])->name('schedule.cancel');
-    
+    Route::post('/schedules/{id}/restore', [AdminDashboardController::class, 'restoreSchedule'])->name('schedule.restore');
+
     // Управление абонементами
     Route::get('/subscriptions', [AdminDashboardController::class, 'subscriptions'])->name('subscriptions.index');
     Route::get('/subscriptions/create', [AdminDashboardController::class, 'createSubscription'])->name('subscriptions.create');
@@ -242,6 +243,21 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/subscriptions', [AdminDashboardController::class, 'subscriptions'])->name('subscriptions.index');
     Route::get('/subscriptions/create', [AdminDashboardController::class, 'createSubscription'])->name('subscriptions.create');
     Route::post('/subscriptions', [AdminDashboardController::class, 'storeSubscription'])->name('subscriptions.store');
+});
+
+// Уведомления
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications', function () {
+        return view('notifications.index');
+    })->name('notifications');
+    
+    Route::post('/notifications/{id}/read', function ($id) {
+        $notification = App\Models\Notification::findOrFail($id);
+        if ($notification->user_id == auth()->id()) {
+            $notification->markAsRead();
+        }
+        return back();
+    })->name('notifications.read');
 });
 
 // ====================
