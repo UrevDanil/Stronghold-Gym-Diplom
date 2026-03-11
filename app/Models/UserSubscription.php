@@ -70,19 +70,20 @@ class UserSubscription extends Pivot
     // НОВЫЕ МЕТОДЫ ДЛЯ ЗАМОРОЗКИ (добавляем)
     
     /**
-     * Проверка, заморожен ли абонемент
-     */
-    public function isPaused(): bool
-    {
-        if (!$this->paused_at || !$this->paused_until) {
-            return false;
-        }
-        
-        $now = Carbon::now();
-        $pausedUntil = Carbon::parse($this->paused_until);
-        
-        return $now->lessThan($pausedUntil);
+ * Проверка, заморожен ли абонемент
+ */
+public function isPaused(): bool
+{
+    if (!$this->paused_at || !$this->paused_until) {
+        return false;
     }
+    
+    $now = Carbon::now();
+    $pausedUntil = Carbon::parse($this->paused_until);
+    
+    // Возвращаем true, если текущая дата меньше даты окончания заморозки
+    return $now->lessThan($pausedUntil);
+}
 
     /**
      * Заморозка абонемента
@@ -149,6 +150,18 @@ class UserSubscription extends Pivot
         
         return $this;
     }
+
+    /**
+ * Проверка и автоматическое восстановление, если заморозка закончилась
+ */
+public function checkAndResumeIfExpired()
+{
+    if ($this->status === self::STATUS_FROZEN && !$this->isPaused()) {
+        $this->resume();
+        return true;
+    }
+    return false;
+}
 
     /**
      * Отмена абонемента

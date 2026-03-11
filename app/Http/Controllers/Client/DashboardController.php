@@ -7,6 +7,8 @@ use App\Models\Booking;
 use App\Models\Schedule;
 use App\Models\Subscription;
 use App\Models\Attendance; 
+use App\Models\UserSubscription; // <-- ДОБАВЬ ЭТУ СТРОКУ
+use App\Models\Notification; // <-- И ЭТУ, ЕСЛИ ЕЩЕ НЕТ
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -230,22 +232,25 @@ public function cancelBooking(Booking $booking, Request $request)
     return back()->with('success', 'Бронирование отменено, тренировка возвращена в абонемент');
 }
 
-    /**
-     * ИСПРАВЛЕННЫЙ МЕТОД subscriptions - теперь с часами и минутами
-     */
-    public function subscriptions()
-    {
-        $subscriptions = Subscription::where('is_active', true)->get();
-        $userSubscriptions = Auth::user()->subscriptions()
-            ->orderBy('pivot_start_date', 'desc')
-            ->get();
+/**
+ * ИСПРАВЛЕННЫЙ МЕТОД subscriptions
+ */
+public function subscriptions()
+{
+    $subscriptions = Subscription::where('is_active', true)->get();
+    
+    // ИСПРАВЛЕНО: используем userSubscriptions() вместо subscriptions()
+    $userSubscriptions = Auth::user()->userSubscriptions()
+        ->with('subscription')
+        ->orderBy('created_at', 'desc')
+        ->get();
 
-        return view('client.subscriptions', [
-            'subscriptions' => $subscriptions,
-            'userSubscriptions' => $userSubscriptions,
-            'user' => Auth::user(),
-        ]);
-    }
+    return view('client.subscriptions', [
+        'subscriptions' => $subscriptions,
+        'userSubscriptions' => $userSubscriptions,
+        'user' => Auth::user(),
+    ]);
+}
 
     public function purchaseSubscription(Subscription $subscription)
     {
@@ -339,6 +344,49 @@ public function freezeSubscription(Request $request)
         
     } catch (\Exception $e) {
         return back()->with('error', 'Ошибка при заморозке: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Разморозка абонемента
+ */
+public function resumeSubscription(Request $request)
+{
+    $user = Auth::user();
+    
+    // Получаем замороженный абонемент
+    $userSubscription = $user->userSubscriptions()
+        ->where('status', UserSubscription::STATUS_FROZEN)
+        ->whereNotNull('paused_at')
+        ->whereNotNull('paused_until')
+        ->whereDate('paused_until', '>=', Carbon::today())
+        ->first();
+    
+    if (!$userSubscription) {
+        return back()->with('error', 'У вас нет замороженного абонемента');
+    }
+    
+    try {
+        // Используем метод resume из модели UserSubscription
+        $userSubscription->resume();
+        
+        // Создаем уведомление
+        \App\Models\Notification::create([
+            'user_id' => $user->id,
+            'type' => 'subscription',
+            'message' => 'Ваш абонемент успешно разморожен. Срок действия обновлен.',
+            'is_read' => false,
+            'data' => json_encode([
+                'subscription_id' => $userSubscription->subscription_id,
+                'subscription_name' => $userSubscription->subscription->name ?? 'Абонемент',
+                'new_end_date' => $userSubscription->end_date->format('d.m.Y')
+            ])
+        ]);
+        
+        return back()->with('success', 'Абонемент успешно разморожен');
+        
+    } catch (\Exception $e) {
+        return back()->with('error', 'Ошибка при разморозке: ' . $e->getMessage());
     }
 }
 

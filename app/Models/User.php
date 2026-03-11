@@ -156,7 +156,9 @@ public function trainings()
             ->exists();
     }
 
-    // ИСПРАВЛЕНО: теперь используем UserSubscription
+/**
+ * Получить активный абонемент
+ */
 public function activeSubscription()
 {
     return $this->userSubscriptions()
@@ -168,7 +170,8 @@ public function activeSubscription()
             $q->whereNull('paused_at')
               ->orWhereDate('paused_until', '<', Carbon::today());
         })
-        ->first(); // Важно: first(), а не get()
+        ->latest()
+        ->first();
 }
 
     // НОВОЕ: получить замороженный абонемент

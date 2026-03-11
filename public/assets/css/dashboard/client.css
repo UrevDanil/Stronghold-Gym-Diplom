@@ -921,3 +921,281 @@
         font-size: 0.9rem;
     }
 }
+
+/* ----------------------------------------
+   13. СТИЛИ ДЛЯ СТРАНИЦЫ "МОИ АБОНЕМЕНТЫ"
+   ---------------------------------------- */
+
+/* Карточка активного абонемента */
+.subscription-card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.subscription-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+/* Градиентные заголовки */
+.subscription-header {
+    padding: 1.5rem;
+    color: white;
+}
+
+.subscription-header.active {
+    background: linear-gradient(135deg, #54ca6f, #20c997);
+}
+
+.subscription-header.frozen {
+    background: linear-gradient(135deg, #0720ff, #14bbfd);
+}
+
+.subscription-header h4 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+/* Иконка абонемента */
+.subscription-icon-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(5px);
+}
+
+.subscription-icon-large i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+/* Название и описание */
+.subscription-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #333, #667eea);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subscription-description {
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+/* Прогресс бар для страницы абонементов */
+.subscription-progress-large {
+    height: 25px;
+    border-radius: 50px;
+    background-color: #e9ecef;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.subscription-progress-large .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    border-radius: 50px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.subscription-progress-large .progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: progress-shine 2s infinite;
+}
+
+/* Статистика в карточках */
+.subscription-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.stat-box {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 15px;
+    padding: 1.2rem;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.stat-box .stat-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.stat-box .stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #495057;
+    line-height: 1.2;
+}
+
+.stat-box .stat-number.success {
+    color: #28a745;
+}
+
+.stat-box .stat-number.info {
+    color: #17a2b8;
+}
+
+.stat-box .stat-number.warning {
+    color: #ffc107;
+}
+
+/* Информационный блок */
+.subscription-info {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 15px;
+    padding: 1.2rem;
+    margin: 1.5rem 0;
+    border-left: 4px solid #17a2b8;
+}
+
+.subscription-info i {
+    color: #17a2b8;
+}
+
+/* Кнопки действий */
+.subscription-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+/* Таблица истории */
+.subscription-history-table {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.subscription-history-table thead th {
+    background: linear-gradient(135deg, #0b34bb, #0e2778);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+    border: none;
+}
+
+.subscription-history-table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-color: #f0f0f0;
+}
+
+.subscription-history-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.subscription-history-table tbody tr:hover {
+    background-color: rgba(11, 52, 187, 0.05);
+}
+
+/* Пустое состояние */
+.empty-state-large {
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.empty-state-large i {
+    font-size: 5rem;
+    color: #dee2e6;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-large h4 {
+    color: #495057;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state-large p {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .subscription-title {
+        font-size: 1.5rem;
+    }
+    
+    .subscription-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stat-box .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .subscription-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .subscription-actions .btn {
+        width: 100%;
+        margin: 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .subscription-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .subscription-title {
+        font-size: 1.3rem;
+    }
+    
+    .subscription-icon-large {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .subscription-icon-large i {
+        font-size: 2rem;
+    }
+}

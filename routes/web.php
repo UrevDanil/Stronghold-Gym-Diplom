@@ -217,6 +217,7 @@ Route::middleware(['auth', 'role:trainer'])->group(function () {
     // Абонементы
     Route::get('/subscriptions', [ClientDashboardController::class, 'subscriptions'])->name('subscriptions');
     Route::post('/subscriptions/{subscription}/purchase', [ClientDashboardController::class, 'purchaseSubscription'])->name('subscriptions.purchase');
+    Route::post('/subscriptions/resume', [ClientDashboardController::class, 'resumeSubscription'])->name('subscriptions.resume');
 });
 
 // Публичные маршруты

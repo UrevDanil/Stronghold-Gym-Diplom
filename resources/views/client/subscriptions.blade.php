@@ -3,36 +3,68 @@
 
 @section('title', 'Мои абонементы')
 
+@section('styles')
+    <link href="{{ asset('assets/css/dashboard/common.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/dashboard/client.css') }}" rel="stylesheet">
+@endsection
+
 @section('content')
 <div class="container py-4">
-    <h1 class="mb-4">Мои абонементы</h1>
+    <h1 class="display-5 fw-bold greeting-title mb-2">Мои абонементы</h1>
     
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
     
     @if(session('warning'))
-        <div class="alert alert-warning alert-dismissible fade show">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
             {{ session('warning') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
     
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
     
-    <!-- Активный абонемент -->
-    @if($user->activeSubscription())
+    <!-- Определяем, есть ли замороженный абонемент для показа -->
+    @php
+        $subscriptionToShow = null;
+        $subscriptionType = '';
+        
+        // Сначала проверяем, есть ли замороженный абонемент
+        if(isset($userSubscriptions) && $userSubscriptions->count() > 0) {
+            $frozenSub = $userSubscriptions->first(function($sub) {
+                return $sub->status === 'frozen';
+            });
+            
+            if($frozenSub) {
+                $subscriptionToShow = $frozenSub;
+                $subscriptionType = 'frozen';
+            }
+        }
+        
+        // Если нет замороженного, проверяем активный
+        if(!$subscriptionToShow && $user->activeSubscription()) {
+            $subscriptionToShow = $user->activeSubscription();
+            $subscriptionType = 'active';
+        }
+    @endphp
+    
+    <!-- Блок с абонементом (активным или замороженным) -->
+    @if($subscriptionToShow)
         @php
-            $activeUserSub = $user->activeSubscription(); // Это UserSubscription
-            $subscription = $activeUserSub->subscription; // Это Subscription
+            $activeUserSub = $subscriptionToShow;
+            $subscription = $activeUserSub->subscription;
             
             $remaining = $activeUserSub->remaining_workouts;
             $total = $subscription->workouts_count ?? 0;
@@ -67,160 +99,116 @@
             $isFrozen = $activeUserSub->isPaused();
         @endphp
         
-        <div class="card mb-4 shadow {{ $isFrozen ? 'border-warning' : '' }}">
-            <div class="card-header text-white" style="background: linear-gradient(135deg, {{ $isFrozen ? '#ffc107' : '#28a745' }}, {{ $isFrozen ? '#fd7e14' : '#20c997' }});">
-                <h4 class="mb-0 d-flex justify-content-between align-items-center">
-                    <span>
-                        <i class="fas {{ $isFrozen ? 'fa-snowflake' : 'fa-crown' }} me-2"></i>
-                        {{ $isFrozen ? 'Замороженный абонемент' : 'Текущий абонемент' }}
-                    </span>
-                    @if($isFrozen)
+        <div class="subscription-card fade-in">
+            <div class="subscription-header {{ $subscriptionType === 'frozen' ? 'frozen' : 'active' }}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas {{ $subscriptionType === 'frozen' ? 'fa-snowflake' : 'fa-crown' }} me-2"></i>
+                        {{ $subscriptionType === 'frozen' ? 'Абонемент заморожен' : 'Текущий абонемент' }}
+                    </h4>
+                    @if($subscriptionType === 'frozen' && $activeUserSub->paused_until)
                         <span class="badge bg-light text-dark">
                             Заморожен до: {{ \Carbon\Carbon::parse($activeUserSub->paused_until)->format('d.m.Y H:i') }}
                         </span>
                     @endif
-                </h4>
+                </div>
             </div>
+            
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4 text-center">
-                        <div class="mb-3">
-                            <i class="fas fa-id-card fa-4x {{ $isFrozen ? 'text-warning' : 'text-success' }} mb-3"></i>
-                            <h3>{{ $subscription->name ?? 'Абонемент' }}</h3>
-                            <p class="text-muted">{{ $subscription->description ?? '' }}</p>
-                            @if($isFrozen && $activeUserSub->pause_reason)
-                                <p class="text-warning">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    Причина: {{ $activeUserSub->pause_reason }}
-                                </p>
-                            @endif
+                <div class="text-center mb-4">
+                    <div class="subscription-icon-large">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <h2 class="subscription-title">{{ $subscription->name ?? 'Абонемент' }}</h2>
+                    <p class="subscription-description">{{ $subscription->description ?? '' }}</p>
+                    @if($subscriptionType === 'frozen' && $activeUserSub->pause_reason)
+                        <div class="alert alert-warning d-inline-block mt-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Причина заморозки: {{ $activeUserSub->pause_reason }}
                         </div>
+                    @endif
+                </div>
+                
+                @if($subscriptionType !== 'frozen')
+                    <div class="mb-4">
+                        <div class="progress-label">
+                            <span>Прогресс абонемента</span>
+                            <span class="progress-percentage">{{ round($percentage, 1) }}%</span>
+                        </div>
+                        <div class="subscription-progress-large">
+                            <div class="progress-bar" style="width: {{ $percentage }}%">
+                                {{ $used }}/{{ $total }}
+                            </div>
+                        </div>
+                    </div>
+                @endif
+                
+                <div class="subscription-stats">
+                    @if($subscriptionType !== 'frozen')
+                        <div class="stat-box">
+                            <span class="stat-label">Осталось тренировок</span>
+                            <span class="stat-number success">{{ $remaining }}</span>
+                        </div>
+                    @endif
+                    
+                    <div class="stat-box">
+                        <span class="stat-label">Осталось дней</span>
+                        <span class="stat-number info">{{ $daysLeft }}</span>
                     </div>
                     
-                    <div class="col-md-8">
-                        @if(!$isFrozen)
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Использовано тренировок</span>
-                                    <span><strong>{{ $used }}/{{ $total }}</strong></span>
-                                </div>
-                                <div class="progress" style="height: 25px;">
-                                    <div class="progress-bar bg-success" role="progressbar" 
-                                        style="width: {{ $percentage }}%"
-                                        aria-valuenow="{{ $percentage }}">
-                                        {{ round($percentage, 1) }}%
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                        
-                        <div class="row">
-                            @if(!$isFrozen)
-                            <div class="col-md-4">
-                                <div class="card mb-3">
-                                    <div class="card-body text-center">
-                                        <h6 class="card-title">Осталось тренировок</h6>
-                                        <h2 class="text-success">{{ $remaining }}</h2>
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
-                            
-                            <div class="col-md-4">
-                                <div class="card mb-3">
-                                    <div class="card-body text-center">
-                                        <h6 class="card-title">Осталось дней</h6>
-                                        <h2 class="text-info">{{ $daysLeft }}</h2>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <div class="card mb-3">
-                                    <div class="card-body text-center">
-                                        <h6 class="card-title">Точное время</h6>
-                                        <h4 class="text-warning">{{ $hoursLeft }}:{{ str_pad($minutesLeft, 2, '0', STR_PAD_LEFT) }}:{{ str_pad($secondsLeft, 2, '0', STR_PAD_LEFT) }}</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="alert alert-info">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <i class="fas fa-calendar-plus me-2"></i>
-                                    <strong>Начало:</strong> 
-                                    {{ \Carbon\Carbon::parse($activeUserSub->start_date)->format('d.m.Y') }}
-                                </div>
-                                <div class="col-md-6">
-                                    <i class="fas fa-calendar-minus me-2"></i>
-                                    <strong>Окончание:</strong> 
-                                    {{ \Carbon\Carbon::parse($activeUserSub->end_date)->format('d.m.Y') }}
-                                </div>
-                            </div>
-                            @if($activeUserSub->original_end_date)
-                            <div class="row mt-2">
-                                <div class="col-12">
-                                    <small class="text-muted">
-                                        <i class="fas fa-history me-1"></i>
-                                        Исходная дата окончания: {{ \Carbon\Carbon::parse($activeUserSub->original_end_date)->format('d.m.Y') }}
-                                    </small>
-                                </div>
-                            </div>
-                            @endif
-                        </div>
-                        
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            @if(!$isFrozen)
-                                <button class="btn btn-outline-warning me-2" data-bs-toggle="modal" 
-                                        data-bs-target="#freezeModal" {{ $isExpired ? 'disabled' : '' }}>
-                                    <i class="fas fa-snowflake me-2"></i>Заморозить
-                                </button>
-                                <a href="{{ route('subscriptions.index') }}" class="btn btn-primary">
-                                    <i class="fas fa-sync-alt me-2"></i>Продлить
-                                </a>
-                            @else
-                                <form action="{{ route('client.subscriptions.resume') }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-play me-2"></i>Разморозить
-                                    </button>
-                                </form>
-                            @endif
-                        </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Точное время</span>
+                        <span class="stat-number warning">{{ $hoursLeft }}:{{ str_pad($minutesLeft, 2, '0', STR_PAD_LEFT) }}:{{ str_pad($secondsLeft, 2, '0', STR_PAD_LEFT) }}</span>
                     </div>
+                </div>
+                
+                <div class="subscription-actions">
+                    @if($subscriptionType === 'frozen')
+                        {{-- Абонемент заморожен - только кнопка разморозки --}}
+                        <form action="{{ route('client.subscriptions.resume') }}" method="POST" class="w-100">
+                            @csrf
+                            <button type="submit" class="btn-gradient btn-gradient-success w-100 py-3">
+                                <i class="fas fa-play me-2"></i>Разморозить абонемент
+                                <span class="btn-glow"></span>
+                            </button>
+                        </form>
+                    @elseif($subscriptionType === 'active')
+                        {{-- Абонемент активен - кнопки заморозки и продления --}}
+                        <div class="d-flex gap-2">
+                            <button class="btn-gradient btn-gradient-warning flex-grow-1" data-bs-toggle="modal" 
+                                    data-bs-target="#freezeModal" {{ $isExpired ? 'disabled' : '' }}>
+                                <i class="fas fa-snowflake me-2"></i>Заморозить
+                            </button>
+                            <a href="{{ route('subscriptions.index') }}" class="btn-gradient btn-gradient-primary flex-grow-1">
+                                <i class="fas fa-sync-alt me-2"></i>Продлить
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     @else
-        <div class="card mb-4 shadow">
-            <div class="card-header text-white bg-warning">
-                <h4 class="mb-0">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Нет активного абонемента
-                </h4>
-            </div>
-            <div class="card-body text-center py-5">
-                <i class="fas fa-id-card fa-5x text-warning mb-4"></i>
-                <h3 class="mb-3">У вас нет активного абонемента</h3>
-                <p class="text-muted mb-4">Приобретите абонемент, чтобы начать тренировки</p>
-                <a href="{{ route('subscriptions.index') }}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-shopping-cart me-2"></i>Выбрать абонемент
-                </a>
-            </div>
+        {{-- Нет абонемента вообще --}}
+        <div class="empty-state-large fade-in">
+            <i class="fas fa-id-card fa-4x text-muted mb-4"></i>
+            <h3 class="mb-3">Нет активного абонемента</h3>
+            <p class="text-muted mb-4">Приобретите абонемент, чтобы начать тренировки</p>
+            <a href="{{ route('subscriptions.index') }}" class="btn-gradient btn-gradient-primary btn-lg">
+                <i class="fas fa-shopping-cart me-2"></i>Выбрать абонемент
+                <span class="btn-glow"></span>
+            </a>
         </div>
     @endif
     
-    <!-- История абонементов -->
-    <div class="card shadow">
+    <!-- История абонементов (всегда показываем) -->
+    <div class="main-card mt-5 fade-in">
         <div class="card-header">
-            <h4 class="mb-0">
-                <i class="fas fa-history me-2"></i>История абонементов
-            </h4>
+            <i class="fas fa-history"></i> История абонементов
         </div>
         <div class="card-body">
             @if(isset($userSubscriptions) && $userSubscriptions->count() > 0)
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table subscription-history-table">
                         <thead>
                             <tr>
                                 <th>Абонемент</th>
@@ -234,13 +222,9 @@
                         <tbody>
                             @foreach($userSubscriptions as $userSub)
                                 @php
-                                    // Проверяем, что это за объект
                                     $isUserSubscription = method_exists($userSub, 'isActive');
                                     
                                     if ($isUserSubscription) {
-                                        // Это UserSubscription
-                                        $isActive = $userSub->isActive();
-                                        $isFrozen = $userSub->isPaused();
                                         $subscriptionName = $userSub->subscription->name ?? 'Абонемент';
                                         $workoutsCount = $userSub->subscription->workouts_count ?? 0;
                                         $remainingWorkouts = $userSub->remaining_workouts;
@@ -249,11 +233,6 @@
                                         $endDate = $userSub->end_date;
                                         $price = $userSub->subscription->price ?? 0;
                                     } else {
-                                        // Это Subscription с pivot (старая структура)
-                                        $isActive = $userSub->pivot->status === 'active' && 
-                                                   $userSub->pivot->end_date >= now()->toDateString() &&
-                                                   $userSub->pivot->remaining_workouts > 0;
-                                        $isFrozen = $userSub->pivot->status === 'frozen';
                                         $subscriptionName = $userSub->name;
                                         $workoutsCount = $userSub->workouts_count ?? 0;
                                         $remainingWorkouts = $userSub->pivot->remaining_workouts;
@@ -263,55 +242,54 @@
                                         $price = $userSub->price;
                                     }
                                 @endphp
-                                <tr class="{{ $isActive ? 'table-success' : ($isFrozen ? 'table-warning' : '') }}">
+                                <tr>
                                     <td>
                                         <strong>{{ $subscriptionName }}</strong>
-                                        @if($isActive)
-                                            <span class="badge bg-success ms-2">Активен</span>
-                                        @elseif($isFrozen)
-                                            <span class="badge bg-warning ms-2">Заморожен</span>
-                                        @endif
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($startDate)->format('d.m.Y') }}</td>
                                     <td>{{ \Carbon\Carbon::parse($endDate)->format('d.m.Y') }}</td>
                                     <td>
-                                        {{ $remainingWorkouts }}/{{ $workoutsCount }}
+                                        <span class="badge-custom {{ $remainingWorkouts > 0 ? 'badge-attended' : 'badge-missed' }}">
+                                            {{ $remainingWorkouts }}/{{ $workoutsCount }}
+                                        </span>
                                     </td>
                                     <td>
                                         @if($status === 'active')
                                             @if($endDate < now()->toDateString())
-                                                <span class="badge bg-danger">Истек</span>
+                                                <span class="badge-custom bg-secondary">Истек</span>
                                             @elseif($remainingWorkouts <= 0)
-                                                <span class="badge bg-warning">Использован</span>
+                                                <span class="badge-custom badge-missed">Использован</span>
                                             @else
-                                                <span class="badge bg-success">Активен</span>
+                                                <span class="badge-custom badge-attended">Активен</span>
                                             @endif
                                         @elseif($status === 'expired')
-                                            <span class="badge bg-secondary">Истек</span>
+                                            <span class="badge-custom bg-secondary">Истек</span>
                                         @elseif($status === 'frozen')
-                                            <span class="badge bg-info">Заморожен</span>
+                                            <span class="badge-custom badge-cancelled">Заморожен</span>
                                         @elseif($status === 'canceled')
-                                            <span class="badge bg-danger">Отменен</span>
+                                            <span class="badge-custom badge-missed">Отменен</span>
                                         @endif
                                     </td>
-                                    <td>{{ number_format($price, 0, ',', ' ') }} ₽</td>
+                                    <td><strong>{{ number_format($price, 0, ',', ' ') }} ₽</strong></td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             @else
-                <div class="text-center py-4">
-                    <i class="fas fa-history fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">У вас еще нет истории абонементов</p>
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <h4>Нет истории абонементов</h4>
+                    <p>У вас пока нет истории покупок</p>
                 </div>
             @endif
         </div>
     </div>
     
     <div class="text-center mt-4">
-        <a href="{{ route('subscriptions.index') }}" class="btn btn-primary btn-lg">
+        <a href="{{ route('subscriptions.index') }}" class="btn-gradient btn-gradient-primary btn-lg">
             <i class="fas fa-plus-circle me-2"></i>Купить новый абонемент
+            <span class="btn-glow"></span>
         </a>
     </div>
 </div>
@@ -352,49 +330,13 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="submit" class="btn btn-warning">
+                    <button type="submit" class="btn-gradient btn-gradient-warning">
                         <i class="fas fa-snowflake me-2"></i>Заморозить
+                        <span class="btn-glow"></span>
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-<style>
-.progress {
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.progress-bar {
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.card {
-    border: none;
-    transition: transform 0.2s;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-}
-
-.badge {
-    font-size: 0.8rem;
-    padding: 0.35em 0.65em;
-}
-
-.table-success {
-    background-color: rgba(40, 167, 69, 0.1);
-}
-
-.table-warning {
-    background-color: rgba(255, 193, 7, 0.1);
-}
-</style>
 @endsection
