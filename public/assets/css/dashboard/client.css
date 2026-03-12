@@ -16,6 +16,11 @@
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
+.subscription-page {
+    background: linear-gradient(135deg, #f9fafc 0%, #ffffff 100%);
+    min-height: 100vh;
+}
+
 .subscription-progress .progress-bar {
     height: 100%;
     background: linear-gradient(135deg, #84fab0, #14d4bb);
@@ -1945,4 +1950,583 @@
     .frozen-title {
         font-size: 1.3rem;
     }
+}
+
+/* ========================================
+   СТИЛИ ДЛЯ СТРАНИЦЫ РАСПИСАНИЯ
+   ======================================== */
+
+/* ----------------------------------------
+   1. ОБЩИЕ СТИЛИ
+   ---------------------------------------- */
+
+.schedule-page {
+    background: linear-gradient(135deg, #f9fafc 0%, #ffffff 100%);
+    min-height: 100vh;
+}
+
+/* ----------------------------------------
+   2. ЗАГОЛОВОК
+   ---------------------------------------- */
+
+.schedule-header {
+    background: linear-gradient(135deg, #2aa8e2, #0e2778);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(11, 52, 187, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.schedule-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(100px);
+}
+
+.schedule-header h1 {
+    color: white;
+    font-weight: 700;
+    margin: 0;
+    font-size: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.schedule-header .back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.schedule-header .back-btn:hover {
+    background: white;
+    color: #0b34bb; 
+    transform: translateX(-3px);
+}
+
+/* ----------------------------------------
+   3. АЛЕРТЫ
+   ---------------------------------------- */
+
+.schedule-alert {
+    border-radius: 15px;
+    border: none;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.schedule-alert.success {
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    color: #00573d;
+}
+
+.schedule-alert.error {
+    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+    color: #9b1d1d;
+}
+
+/* ----------------------------------------
+   4. ФИЛЬТРЫ
+   ---------------------------------------- */
+
+.filters-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.filters-header {
+    background: linear-gradient(135deg, #2aa8e2, #667eea);
+    color: white;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+}
+
+.filters-header i {
+    margin-right: 0.5rem;
+}
+
+.filters-body {
+    padding: 1.5rem;
+    background: white;
+}
+
+.filters-body .form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.filters-body .form-control,
+.filters-body .form-select {
+    border: 2px solid #767c83;
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.filters-body .form-control:focus,
+.filters-body .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.btn-filter {
+    background: linear-gradient(135deg, #2aa8e2, #667eea);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.7rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    color: white;
+}
+
+.btn-reset {
+    background: white;
+    border: 2px solid #667eea;
+    color: #667eea;
+    border-radius: 12px;
+    padding: 0.7rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-reset:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ----------------------------------------
+   5. КАРТОЧКИ ДНЕЙ
+   ---------------------------------------- */
+
+.day-card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.day-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+
+.day-header {
+    background: linear-gradient(135deg, #2aa8e2, #667eea);
+    color: white;
+    padding: 1rem 1.5rem;
+}
+
+.day-header h5 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+}
+
+.day-header i {
+    margin-right: 0.5rem;
+    color: #ffffff;
+}
+
+/* ----------------------------------------
+   6. ТАБЛИЦА РАСПИСАНИЯ (ДЕСКТОП)
+   ---------------------------------------- */
+
+.schedule-table {
+    margin-bottom: 0;
+}
+
+.schedule-table thead th {
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.schedule-table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.schedule-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.schedule-table tbody tr:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.schedule-table tbody tr.booked-row {
+    background: rgba(40, 167, 69, 0.05);
+}
+
+.workout-name {
+    font-weight: 700;
+    color: #212529;
+}
+
+.workout-desc {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.trainer-name {
+    font-weight: 500;
+    color: #495057;
+}
+
+.room-badge {
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    color: #004085;
+    border-radius: 50px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.slots-badge {
+    border-radius: 50px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.slots-badge.available {
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    color: #00573d;
+}
+
+.slots-badge.full {
+    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+    color: #9b1d1d;
+}
+
+.status-badge {
+    border-radius: 50px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-badge.completed {
+    background: #6c757d;
+    color: white;
+}
+
+.status-badge.cancelled {
+    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+    color: #9b1d1d;
+}
+
+.status-badge.full {
+    background: #ffc107;
+    color: #856404;
+}
+
+.status-badge.available {
+    background: #28a745;
+    color: white;
+}
+
+/* ----------------------------------------
+   7. КНОПКИ ДЕЙСТВИЙ
+   ---------------------------------------- */
+
+.btn-book {
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    color: #00573d;
+    border: none;
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(132, 250, 176, 0.3);
+}
+
+.btn-book:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(132, 250, 176, 0.4);
+    color: #00573d;
+}
+
+.btn-cancel {
+    background: white;
+    border: 2px solid #dc3545;
+    color: #dc3545;
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-disabled {
+    background: #e9ecef;
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: not-allowed;
+}
+
+/* ----------------------------------------
+   8. МОБИЛЬНЫЕ КАРТОЧКИ
+   ---------------------------------------- */
+
+.mobile-schedule-cards {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .schedule-table {
+        display: none;
+    }
+    
+    .mobile-schedule-cards {
+        display: block;
+    }
+    
+    .mobile-workout-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.2rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border-left: 4px solid;
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-workout-card.available {
+        border-left-color: #28a745;
+    }
+    
+    .mobile-workout-card.booked {
+        border-left-color: #17a2b8;
+    }
+    
+    .mobile-workout-card.full {
+        border-left-color: #dc3545;
+    }
+    
+    .mobile-workout-card.cancelled {
+        border-left-color: #6c757d;
+    }
+    
+    .mobile-workout-card.completed {
+        border-left-color: #6c757d;
+    }
+    
+    .mobile-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .mobile-card-header h4 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+        color: #212529;
+    }
+    
+    .mobile-card-header .time {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #667eea;
+        background: #f0f3ff;
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+    }
+    
+    .mobile-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+        margin-bottom: 1rem;
+    }
+    
+    .mobile-info-item {
+        background: #f8f9fa;
+        padding: 0.6rem;
+        border-radius: 12px;
+    }
+    
+    .mobile-info-item .label {
+        font-size: 0.7rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        display: block;
+        margin-bottom: 0.2rem;
+    }
+    
+    .mobile-info-item .value {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #212529;
+    }
+    
+    .mobile-status-row {
+        margin-bottom: 1rem;
+    }
+    
+    .mobile-status-badge {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .mobile-status-badge.available {
+        background: #28a745;
+        color: white;
+    }
+    
+    .mobile-status-badge.full {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .mobile-status-badge.cancelled {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .mobile-status-badge.completed {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .mobile-status-badge.booked {
+        background: #17a2b8;
+        color: white;
+    }
+    
+    .mobile-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .mobile-actions .btn {
+        flex: 1;
+        padding: 0.8rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .mobile-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .mobile-actions {
+        flex-direction: column;
+    }
+    
+    .day-header h5 {
+        font-size: 1rem;
+    }
+}
+
+/* ----------------------------------------
+   9. ПУСТОЕ СОСТОЯНИЕ
+   ---------------------------------------- */
+
+.empty-state-schedule {
+    text-align: center;
+    padding: 4rem 1rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.empty-state-schedule i {
+    font-size: 5rem;
+    color: #dee2e6;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-schedule h4 {
+    color: #495057;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state-schedule p {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.btn-reset-large {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 1rem 2.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-reset-large:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    color: white;
 }
