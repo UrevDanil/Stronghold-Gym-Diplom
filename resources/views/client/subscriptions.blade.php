@@ -201,90 +201,178 @@
     @endif
     
     <!-- История абонементов (всегда показываем) -->
-    <div class="main-card mt-5 fade-in">
-        <div class="card-header">
-            <i class="fas fa-history"></i> История абонементов
-        </div>
-        <div class="card-body">
-            @if(isset($userSubscriptions) && $userSubscriptions->count() > 0)
-                <div class="table-responsive">
-                    <table class="table subscription-history-table">
-                        <thead>
-                            <tr>
-                                <th>Абонемент</th>
-                                <th>Дата активации</th>
-                                <th>Окончание</th>
-                                <th>Тренировок</th>
-                                <th>Статус</th>
-                                <th>Цена</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($userSubscriptions as $userSub)
-                                @php
-                                    $isUserSubscription = method_exists($userSub, 'isActive');
-                                    
-                                    if ($isUserSubscription) {
-                                        $subscriptionName = $userSub->subscription->name ?? 'Абонемент';
-                                        $workoutsCount = $userSub->subscription->workouts_count ?? 0;
-                                        $remainingWorkouts = $userSub->remaining_workouts;
-                                        $status = $userSub->status;
-                                        $startDate = $userSub->start_date;
-                                        $endDate = $userSub->end_date;
-                                        $price = $userSub->subscription->price ?? 0;
-                                    } else {
-                                        $subscriptionName = $userSub->name;
-                                        $workoutsCount = $userSub->workouts_count ?? 0;
-                                        $remainingWorkouts = $userSub->pivot->remaining_workouts;
-                                        $status = $userSub->pivot->status;
-                                        $startDate = $userSub->pivot->start_date;
-                                        $endDate = $userSub->pivot->end_date;
-                                        $price = $userSub->price;
-                                    }
-                                @endphp
-                                <tr>
-                                    <td>
-                                        <strong>{{ $subscriptionName }}</strong>
-                                    </td>
-                                    <td>{{ \Carbon\Carbon::parse($startDate)->format('d.m.Y') }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($endDate)->format('d.m.Y') }}</td>
-                                    <td>
-                                        <span class="badge-custom {{ $remainingWorkouts > 0 ? 'badge-attended' : 'badge-missed' }}">
-                                            {{ $remainingWorkouts }}/{{ $workoutsCount }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @if($status === 'active')
-                                            @if($endDate < now()->toDateString())
-                                                <span class="badge-custom bg-secondary">Истек</span>
-                                            @elseif($remainingWorkouts <= 0)
-                                                <span class="badge-custom badge-missed">Использован</span>
-                                            @else
-                                                <span class="badge-custom badge-attended">Активен</span>
-                                            @endif
-                                        @elseif($status === 'expired')
-                                            <span class="badge-custom bg-secondary">Истек</span>
-                                        @elseif($status === 'frozen')
-                                            <span class="badge-custom badge-cancelled">Заморожен</span>
-                                        @elseif($status === 'canceled')
-                                            <span class="badge-custom badge-missed">Отменен</span>
-                                        @endif
-                                    </td>
-                                    <td><strong>{{ number_format($price, 0, ',', ' ') }} ₽</strong></td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <div class="empty-state">
-                    <i class="fas fa-history"></i>
-                    <h4>Нет истории абонементов</h4>
-                    <p>У вас пока нет истории покупок</p>
-                </div>
-            @endif
-        </div>
+<div class="main-card mt-5 fade-in">
+    <div class="card-header">
+        <i class="fas fa-history"></i> История абонементов
     </div>
+    <div class="card-body">
+        @if(isset($userSubscriptions) && $userSubscriptions->count() > 0)
+            <!-- Десктопная версия таблицы (только на компьютере) -->
+            <div class="table-responsive">
+                <table class="table subscription-history-table">
+                    <thead>
+                        <tr>
+                            <th>Абонемент</th>
+                            <th>Дата активации</th>
+                            <th>Окончание</th>
+                            <th>Тренировок</th>
+                            <th>Статус</th>
+                            <th>Цена</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($userSubscriptions as $userSub)
+                            @php
+                                $isUserSubscription = method_exists($userSub, 'isActive');
+                                
+                                if ($isUserSubscription) {
+                                    $subscriptionName = $userSub->subscription->name ?? 'Абонемент';
+                                    $workoutsCount = $userSub->subscription->workouts_count ?? 0;
+                                    $remainingWorkouts = $userSub->remaining_workouts;
+                                    $status = $userSub->status;
+                                    $startDate = $userSub->start_date;
+                                    $endDate = $userSub->end_date;
+                                    $price = $userSub->subscription->price ?? 0;
+                                } else {
+                                    $subscriptionName = $userSub->name;
+                                    $workoutsCount = $userSub->workouts_count ?? 0;
+                                    $remainingWorkouts = $userSub->pivot->remaining_workouts;
+                                    $status = $userSub->pivot->status;
+                                    $startDate = $userSub->pivot->start_date;
+                                    $endDate = $userSub->pivot->end_date;
+                                    $price = $userSub->price;
+                                }
+                            @endphp
+                            <tr>
+                                <td>
+                                    <strong>{{ $subscriptionName }}</strong>
+                                </td>
+                                <td>{{ \Carbon\Carbon::parse($startDate)->format('d.m.Y') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($endDate)->format('d.m.Y') }}</td>
+                                <td>
+                                    <span class="badge-custom {{ $remainingWorkouts > 0 ? 'badge-attended' : 'badge-missed' }}">
+                                        {{ $remainingWorkouts }}/{{ $workoutsCount }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($status === 'active')
+                                        @if($endDate < now()->toDateString())
+                                            <span class="badge-custom bg-secondary">Истек</span>
+                                        @elseif($remainingWorkouts <= 0)
+                                            <span class="badge-custom badge-missed">Использован</span>
+                                        @else
+                                            <span class="badge-custom badge-attended">Активен</span>
+                                        @endif
+                                    @elseif($status === 'expired')
+                                        <span class="badge-custom bg-secondary">Истек</span>
+                                    @elseif($status === 'frozen')
+                                        <span class="badge-custom badge-cancelled">Заморожен</span>
+                                    @elseif($status === 'canceled')
+                                        <span class="badge-custom badge-missed">Отменен</span>
+                                    @endif
+                                </td>
+                                <td><strong>{{ number_format($price, 0, ',', ' ') }} ₽</strong></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Мобильная версия карточек -->
+            <div class="mobile-subscription-cards">
+                @foreach($userSubscriptions as $userSub)
+                    @php
+                        $isUserSubscription = method_exists($userSub, 'isActive');
+                        
+                        if ($isUserSubscription) {
+                            $subscriptionName = $userSub->subscription->name ?? 'Абонемент';
+                            $workoutsCount = $userSub->subscription->workouts_count ?? 0;
+                            $remainingWorkouts = $userSub->remaining_workouts;
+                            $status = $userSub->status;
+                            $startDate = $userSub->start_date;
+                            $endDate = $userSub->end_date;
+                            $price = $userSub->subscription->price ?? 0;
+                        } else {
+                            $subscriptionName = $userSub->name;
+                            $workoutsCount = $userSub->workouts_count ?? 0;
+                            $remainingWorkouts = $userSub->pivot->remaining_workouts;
+                            $status = $userSub->pivot->status;
+                            $startDate = $userSub->pivot->start_date;
+                            $endDate = $userSub->pivot->end_date;
+                            $price = $userSub->price;
+                        }
+                        
+                        $statusClass = match($status) {
+                            'active' => 'active',
+                            'frozen' => 'frozen',
+                            'expired' => 'expired',
+                            'canceled' => 'canceled',
+                            default => ''
+                        };
+                        
+                        $statusText = match($status) {
+                            'active' => 'Активен',
+                            'frozen' => 'Заморожен',
+                            'expired' => 'Истек',
+                            'canceled' => 'Отменен',
+                            default => $status
+                        };
+                    @endphp
+                    
+                    <div class="subscription-mobile-card" data-status="{{ $statusClass }}">
+                        <div class="card-header-mobile">
+                            <h5>{{ $subscriptionName }}</h5>
+                            <span class="price">{{ number_format($price, 0, ',', ' ') }} ₽</span>
+                        </div>
+                        
+                        <div class="info-grid">
+    <div class="info-item">
+        <span class="label">Активация</span>
+        <span class="value">{{ \Carbon\Carbon::parse($startDate)->format('d.m.Y') }}</span>
+    </div>
+    <div class="info-item">
+        <span class="label">Окончание</span>
+        <span class="value">{{ \Carbon\Carbon::parse($endDate)->format('d.m.Y') }}</span>
+    </div>
+    <div class="info-item">
+        <span class="label">Тренировки</span>
+        <span class="value">{{ $remainingWorkouts }}/{{ $workoutsCount }}</span>
+    </div>
+    <div class="info-item">
+        <span class="label">Цена</span>
+        <span class="value">{{ number_format($price, 0, ',', ' ') }} ₽</span>
+    </div>
+</div>
+
+<!-- Статус на отдельной строке -->
+<div class="status-row">
+    <span class="status-badge {{ $statusClass }}">
+        @if($status === 'frozen')
+            <i class="fas fa-snowflake"></i>
+        @elseif($status === 'active')
+            <i class="fas fa-check-circle"></i>
+        @elseif($status === 'expired')
+            <i class="fas fa-clock"></i>
+        @elseif($status === 'canceled')
+            <i class="fas fa-times-circle"></i>
+        @endif
+        {{ $statusText }}
+    </span>
+</div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="empty-state">
+                <i class="fas fa-history"></i>
+                <h4>Нет истории абонементов</h4>
+                <p>У вас пока нет истории покупок</p>
+            </div>
+        @endif
+    </div>
+</div>
     
     <div class="text-center mt-4">
         <a href="{{ route('subscriptions.index') }}" class="btn-gradient btn-gradient-primary btn-lg">

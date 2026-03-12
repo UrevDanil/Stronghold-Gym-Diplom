@@ -17,31 +17,37 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
     public function dashboard()
-    {
-        $user = Auth::user();
-        
-        if (!$user->is_active) {
-            Auth::logout();
-            return redirect()->route('login')
-                ->withErrors(['email' => 'Ваш аккаунт деактивирован.']);
-        }
-
-        $data = [
-            'user' => $user,
-            'upcomingBookings' => $user->upcomingBookings()->limit(5)->get(),
-            // ИСПРАВЛЕНО: используем статусы attended и missed для истории
-            'pastBookings' => Booking::where('user_id', $user->id)
-                ->whereIn('status', ['attended', 'missed']) // Только посещенные и пропущенные
-                ->with('schedule.workout', 'schedule.trainer')
-                ->orderBy('created_at', 'desc')
-                ->limit(5)
-                ->get(),
-            'activeSubscription' => $user->activeSubscription(),
-            'availableSubscriptions' => Subscription::where('is_active', true)->get(),
-        ];
-        
-        return view('client.dashboard', $data);
+{
+    $user = Auth::user();
+    
+    if (!$user->is_active) {
+        Auth::logout();
+        return redirect()->route('login')
+            ->withErrors(['email' => 'Ваш аккаунт деактивирован.']);
     }
+
+    // Получаем все абонементы пользователя для проверки замороженных
+    $userSubscriptions = $user->userSubscriptions()
+        ->with('subscription')
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    $data = [
+        'user' => $user,
+        'userSubscriptions' => $userSubscriptions, // ЭТО ВАЖНО!
+        'upcomingBookings' => $user->upcomingBookings()->limit(5)->get(),
+        'pastBookings' => Booking::where('user_id', $user->id)
+            ->whereIn('status', ['attended', 'missed'])
+            ->with('schedule.workout', 'schedule.trainer')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get(),
+        'activeSubscription' => $user->activeSubscription(),
+        'availableSubscriptions' => Subscription::where('is_active', true)->get(),
+    ];
+    
+    return view('client.dashboard', $data);
+}
 
 public function schedule(Request $request)
 {

@@ -53,7 +53,7 @@
     margin-bottom: 0.5rem;
     color: #495057;
     font-weight: 500;
-    padding: 0 1rem; /* Увеличен отступ от краев */
+    padding: 0 1rem;
 }
 
 .progress-percentage {
@@ -306,7 +306,6 @@
     color: #ffffff;
 }
 
-/* Эффект свечения */
 .main-card .card-header::before {
     content: '';
     position: absolute;
@@ -323,7 +322,6 @@
     transform: skewX(-20deg) translateX(100px);
 }
 
-/* Иконка в заголовке */
 .main-card .card-header i {
     font-size: 1.4rem;
     margin-right: 12px;
@@ -336,7 +334,6 @@
     transform: scale(1.1);
 }
 
-/* Текст заголовка */
 .main-card .card-header h5,
 .main-card .card-header .card-title,
 .main-card .card-header i + * {
@@ -346,54 +343,6 @@
     text-transform: uppercase;
     color: #ffffff;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    margin: 0;
-    background: none;
-    -webkit-text-fill-color: #ffffff;
-}
-
-/* Альтернативные стили заголовков */
-.card-header-modern {
-    position: relative;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    border-radius: 20px 20px 0 0;
-    padding: 1.2rem 1.5rem;
-    overflow: hidden;
-}
-
-.card-header-modern::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, #ffd700, #ff8c00, #ffd700);
-    animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-    0% { background-position: -100px; }
-    100% { background-position: 100px; }
-}
-
-.card-header-striped {
-    background: #ffffff;
-    border-left: 5px solid #667eea;
-    border-radius: 15px 15px 0 0;
-    padding: 1.2rem 1.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.card-header-striped i {
-    color: #667eea;
-    font-size: 1.3rem;
-    margin-right: 10px;
-}
-
-.card-header-striped h5 {
-    color: #495057;
-    font-weight: 700;
     margin: 0;
 }
 
@@ -432,41 +381,6 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Цвета градиентных кнопок */
-.btn-gradient-primary {
-    background: linear-gradient(135deg, #84fab0, #8fd3f4);
-    color: #00573d;
-    margin-bottom: 20px;
-}
-
-.btn-gradient-success {
-    background: linear-gradient(135deg, #84fab0, #8fd3f4);
-    color: #00573d;
-    margin-bottom: 20px;
-}
-
-.btn-gradient-warning {
-    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-    color: #4635dc; 
-    margin-bottom: 20px;
-}
-
-.btn-gradient-warning:hover {
-    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-    color: #ffffff; /* Белый текст при наведении */
-}
-
-.btn-gradient-info {
-    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-    color: #004085;
-}
-
-.btn-gradient-danger {
-    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
-    color: #9b1d1d;
-}
-
-/* Эффект свечения */
 .btn-glow {
     position: absolute;
     top: 0;
@@ -481,31 +395,35 @@
     left: 100%;
 }
 
-/* Размеры кнопок */
-.btn-gradient-sm {
-    padding: 8px 20px;
-    font-size: 0.9rem;
+/* Цвета градиентных кнопок */
+.btn-gradient-primary {
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    color: #00573d;
 }
 
-.btn-gradient-lg {
-    padding: 15px 40px;
-    font-size: 1.1rem;
+.btn-gradient-success {
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    color: #00573d;
 }
 
-.btn-gradient-block {
-    display: block;
-    width: 100%;
+.btn-gradient-warning {
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    color: #4635dc; 
 }
 
-/* Анимация пульсации */
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+.btn-gradient-warning:hover {
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    color: #ffffff;
 }
 
-.btn-gradient-pulse {
-    animation: pulse 2s infinite;
+.btn-gradient-info {
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    color: #004085;
+}
+
+.btn-gradient-danger {
+    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+    color: #9b1d1d;
 }
 
 /* Кнопка отмены */
@@ -548,6 +466,7 @@
     background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
     color: #4635dc;
 }
+
 /* ----------------------------------------
    7. МОБИЛЬНЫЕ КАРТОЧКИ
    ---------------------------------------- */
@@ -641,60 +560,7 @@
 }
 
 /* ----------------------------------------
-   10. БЫСТРЫЕ ДЕЙСТВИЯ
-   ---------------------------------------- */
-
-.quick-actions {
-    border-top: 1px solid #e9ecef;
-    padding-top: 1.5rem;
-}
-
-.quick-actions h6 {
-    font-size: 0.9rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-.quick-actions .btn {
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    border: 1px solid #e9ecef;
-    background: white;
-}
-
-.quick-actions .btn:hover {
-    transform: translateX(5px);
-    border-color: transparent;
-}
-
-.quick-actions .btn-outline-primary:hover {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-}
-
-.quick-actions .btn-outline-success:hover {
-    background: linear-gradient(135deg, #84fab0, #8fd3f4);
-    color: #00573d;
-}
-
-.quick-actions .btn-outline-info:hover {
-    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-    color: #004085;
-}
-
-.quick-actions .fa-chevron-right {
-    font-size: 0.8rem;
-    opacity: 0.5;
-    transition: all 0.3s ease;
-}
-
-.quick-actions .btn:hover .fa-chevron-right {
-    opacity: 1;
-    transform: translateX(3px);
-}
-
-/* ----------------------------------------
-   11. АДАПТИВНОСТЬ
+   10. АДАПТИВНОСТЬ
    ---------------------------------------- */
 
 /* Переключение между десктоп и мобильным видом */
@@ -789,12 +655,10 @@
     }
     
     .subscription-name {
-    font-size: 1.8rem;
-    font-weight: 800;
-    margin-bottom: 0.5rem;
-    color: #0e2778;
-    background: none;
-    -webkit-text-fill-color: unset;
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        color: #0e2778;
     }
     
     .user-avatar-large {
@@ -852,10 +716,9 @@
 }
 
 /* ----------------------------------------
-   12. МОБИЛЬНЫЕ КНОПКИ ДЛЯ ПРЕДСТОЯЩИХ ТРЕНИРОВОК
+   11. МОБИЛЬНЫЕ КНОПКИ ДЛЯ ПРЕДСТОЯЩИХ ТРЕНИРОВОК
    ---------------------------------------- */
 
-/* Стили для кнопок в мобильных карточках */
 .mobile-view .btn-gradient-danger {
     background: linear-gradient(135deg, #dc3545, #a6c1ee);
     color: #9b1d1d;
@@ -878,7 +741,6 @@
     transform: translateY(1px);
 }
 
-/* Кнопка "Забронировать еще" в мобильной версии */
 .mobile-view + .mt-3 .btn-gradient-success,
 .mobile-view ~ .mt-3 .btn-gradient-success {
     width: 100%;
@@ -888,7 +750,6 @@
     margin-top: 1rem;
 }
 
-/* Улучшение карточек для мобильных */
 .mobile-view .mobile-booking-card {
     background: white;
     border-radius: 16px;
@@ -904,7 +765,6 @@
     box-shadow: 0 8px 16px rgba(0,0,0,0.12);
 }
 
-/* Контейнер для кнопки в карточке */
 .mobile-view .booking-actions {
     margin-top: 1rem;
     width: 100%;
@@ -915,7 +775,6 @@
     margin: 0;
 }
 
-/* Адаптация для очень маленьких экранов */
 @media (max-width: 480px) {
     .mobile-view .btn-gradient-danger {
         padding: 8px 14px;
@@ -936,13 +795,12 @@
 }
 
 /* ----------------------------------------
-   13. СТИЛИ ДЛЯ СТРАНИЦЫ "МОИ АБОНЕМЕНТЫ"
+   12. СТИЛИ ДЛЯ СТРАНИЦЫ "МОИ АБОНЕМЕНТЫ"
    ---------------------------------------- */
 
-/* Карточка активного абонемента */
 .subscription-card {
     border: none;
-    border-radius: 20px 20px 20px 20px; /* Нижнее скругление добавлено */
+    border-radius: 20px;
     overflow: hidden;
     transition: all 0.3s ease;
     margin-bottom: 2rem;
@@ -954,7 +812,6 @@
     box-shadow: 0 15px 40px rgba(0,0,0,0.15);
 }
 
-/* Градиентные заголовки */
 .subscription-header {
     padding: 1.5rem;
     color: white;
@@ -974,17 +831,50 @@
     font-size: 1.3rem;
 }
 
-/* Убираем корону рядом с Текущий абонемент */
 .subscription-header h4 i {
-    display: none; /* Скрываем иконку */
+    display: none;
 }
 
-/* Иконка абонемента */
+.subscription-header .badge.bg-light.text-dark {
+    background: rgba(255, 255, 255, 0.25) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50px;
+    padding: 0.5rem 1.2rem;
+    color: white !important;
+    font-weight: 500;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.subscription-header .badge.bg-light.text-dark i {
+    font-size: 1rem;
+    color: #ffd700;
+}
+
+.subscription-header .badge.bg-light.text-dark:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.subscription-header .badge.bg-light.text-dark span {
+    font-weight: 700;
+    color: white;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
+    margin-left: 5px;
+}
+
 .subscription-icon-large {
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #0e2778 0%, #0bbba3 100%);
+    background: linear-gradient(135deg, #1a45d3 0%, #0bbba3 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -996,14 +886,11 @@
     color: white;
 }
 
-/* Название и описание */
 .subscription-title {
     font-size: 1.8rem;
     font-weight: 800;
     margin-bottom: 0.5rem;
     color: #0e2778;
-    background: none;
-    -webkit-text-fill-color: unset;
 }
 
 .subscription-description {
@@ -1011,14 +898,13 @@
     font-size: 1rem;
 }
 
-/* Прогресс бар для страницы абонементов */
 .subscription-progress-large {
     height: 25px;
     border-radius: 50px;
     background-color: #e9ecef;
     overflow: hidden;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-    margin: 1rem 0; /* Добавлен отступ сверху и снизу */
+    margin: 1rem 0;
 }
 
 .subscription-progress-large .progress-bar {
@@ -1051,7 +937,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1rem;
-    margin: 1.5rem 0;
+    margin: 1.5rem 1rem; /* Добавлен отступ слева и справа */
 }
 
 .stat-box {
@@ -1097,29 +983,28 @@
     color: #0e2778;
 }
 
-/* Информационный блок */
-.subscription-info {
-    background: linear-gradient(135deg, #f8f9fa, #ffffff);
-    border-radius: 15px;
-    padding: 1.2rem;
-    margin: 1.5rem 0;
-    border-left: 4px solid #17a2b8;
-}
-
-.subscription-info i {
-    color: #17a2b8;
-}
-
-/* Кнопки действий - центрирование */
 .subscription-actions {
     display: flex;
     gap: 1rem;
-    justify-content: center; /* Центрирование кнопок */
+    justify-content: center;
     margin-top: 1.5rem;
 }
 
 .subscription-actions .btn-gradient {
-    min-width: 150px; /* Минимальная ширина для кнопок */
+    min-width: 150px;
+}
+
+@media (max-width: 768px) {
+    .subscription-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .subscription-actions .btn-gradient {
+        width: 100%;
+        min-width: auto;
+    }
 }
 
 /* Таблица истории */
@@ -1127,7 +1012,6 @@
     width: 100%;
     border-collapse: collapse;
     background-color: #ffffff;
-    border-radius: 0;
     overflow: hidden;
 }
 
@@ -1139,7 +1023,6 @@
     font-size: 0.85rem;
     letter-spacing: 0.5px;
     padding: 1rem;
-    border: none;
     border-bottom: 2px solid #dee2e6;
 }
 
@@ -1148,10 +1031,6 @@
     vertical-align: middle;
     border-bottom: 1px solid #f0f0f0;
     color: #212529;
-}
-
-.subscription-history-table tbody tr {
-    transition: all 0.2s ease;
 }
 
 .subscription-history-table tbody tr:hover {
@@ -1182,63 +1061,15 @@
     margin-bottom: 2rem;
 }
 
-/* Адаптивность */
-@media (max-width: 768px) {
-    .subscription-title {
-        font-size: 1.5rem;
-    }
-    
-    .subscription-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .stat-box .stat-number {
-        font-size: 1.5rem;
-    }
-    
-    .subscription-actions {
-        flex-direction: column;
-        gap: 0.5rem;
-        align-items: center;
-    }
-    
-    .subscription-actions .btn-gradient {
-        width: 100%;
-        margin: 0 !important;
-        min-width: auto;
-    }
-}
-
-@media (max-width: 480px) {
-    .subscription-stats {
-        grid-template-columns: 1fr;
-    }
-    
-    .subscription-title {
-        font-size: 1.3rem;
-    }
-    
-    .subscription-icon-large {
-        width: 60px;
-        height: 60px;
-    }
-    
-    .subscription-icon-large i {
-        font-size: 2rem;
-    }
-}
-
 /* ----------------------------------------
-   14. МОДАЛЬНОЕ ОКНО ЗАМОРОЗКИ
+   13. МОДАЛЬНОЕ ОКНО ЗАМОРОЗКИ
    ---------------------------------------- */
 
-/* Затемнение фона */
 .modal-backdrop {
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(3px);
 }
 
-/* Основное окно */
 .modal-content {
     border: none;
     border-radius: 25px;
@@ -1258,7 +1089,6 @@
     }
 }
 
-/* Заголовок модального окна */
 .modal-header {
     background: linear-gradient(135deg, #0b34bb, #0e2778);
     border-bottom: none;
@@ -1291,32 +1121,26 @@
 .modal-title i {
     font-size: 1.5rem;
     color: #ffd700;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
 }
 
-/* Кнопка закрытия */
 .btn-close {
     background-color: white;
     opacity: 0.8;
     border-radius: 50%;
     padding: 0.5rem;
     transition: all 0.3s ease;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
 .btn-close:hover {
     opacity: 1;
     transform: rotate(90deg);
-    background-color: white;
 }
 
-/* Тело модального окна */
 .modal-body {
     padding: 2rem;
     background: linear-gradient(135deg, #ffffff, #f8f9fa);
 }
 
-/* Текст */
 .modal-body p {
     color: #495057;
     font-size: 1rem;
@@ -1324,7 +1148,6 @@
     margin-bottom: 1rem;
 }
 
-/* Список причин */
 .modal-body ul {
     list-style: none;
     padding: 0;
@@ -1340,21 +1163,20 @@
 }
 
 .modal-body ul li:nth-child(1)::before {
-    content: '🤒'; /* Болезнь */
+    content: '🤒';
     font-size: 1.2rem;
 }
 
 .modal-body ul li:nth-child(2)::before {
-    content: '✈️'; /* Командировка */
+    content: '✈️';
     font-size: 1.2rem;
 }
 
 .modal-body ul li:nth-child(3)::before {
-    content: '🏖️'; /* Отпуск */
+    content: '🏖️';
     font-size: 1.2rem;
 }
 
-/* Поля ввода */
 .modal-body .form-label {
     font-weight: 600;
     color: #495057;
@@ -1382,17 +1204,6 @@
     resize: vertical;
 }
 
-.modal-body input[type="number"].form-control {
-    -moz-appearance: textfield;
-}
-
-.modal-body input[type="number"].form-control::-webkit-outer-spin-button,
-.modal-body input[type="number"].form-control::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-/* Подсказка */
 .modal-body .alert {
     background: linear-gradient(135deg, #f8f9fa, #ffffff);
     border: 2px solid #0b34bb;
@@ -1410,19 +1221,17 @@
     color: #0b34bb;
 }
 
-/* Футер модального окна - КНОПКИ ПО ЦЕНТРУ */
 .modal-footer {
     border-top: 2px solid #e9ecef;
     padding: 1.5rem;
     background: #f8f9fa;
     display: flex;
-    justify-content: center; /* Центрирование по горизонтали */
+    justify-content: center;
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
 }
 
-/* Кнопка отмены */
 .modal-footer .btn-secondary {
     background: #6c757d;
     border: none;
@@ -1432,7 +1241,7 @@
     font-size: 1rem;
     transition: all 0.3s ease;
     color: white;
-    min-width: 140px; /* Одинаковая минимальная ширина */
+    min-width: 140px;
     text-align: center;
 }
 
@@ -1442,15 +1251,13 @@
     box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
 }
 
-/* Кнопка заморозки - одинаковая ширина с кнопкой отмены */
 .modal-footer .btn-gradient-warning {
-    min-width: 140px; /* Одинаковая минимальная ширина */
+    min-width: 140px;
     margin: 0;
     text-align: center;
-    padding: 12px 30px; /* Одинаковый padding с кнопкой отмены */
+    padding: 12px 30px;
 }
 
-/* Адаптивность для мобильных */
 @media (max-width: 576px) {
     .modal-dialog {
         margin: 1rem;
@@ -1467,26 +1274,675 @@
     
     .modal-footer .btn {
         width: 100%;
-        margin: 0 !important;
-        min-width: 100%; /* На мобильных на всю ширину */
+        min-width: 100%;
+    }
+}
+
+/* ----------------------------------------
+   14. МОБИЛЬНАЯ ВЕРСИЯ ДЛЯ ИСТОРИИ АБОНЕМЕНТОВ
+   ---------------------------------------- */
+
+.mobile-subscription-cards {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .table-responsive {
+        display: none;
     }
     
-    .modal-body ul li {
+    .mobile-subscription-cards {
+        display: block;
+    }
+    
+    .subscription-mobile-card {
+        background: white;
+        border-radius: 1px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border-left: 4px solid #dee2e6;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .subscription-mobile-card[data-status="active"] {
+        border-left-color: #ffffff;
+    }
+    
+    .subscription-mobile-card[data-status="frozen"] {
+        border-left-color: #ffffff;
+    }
+    
+    .subscription-mobile-card[data-status="expired"] {
+        border-left-color: #6c757d;
+    }
+    
+    .subscription-mobile-card[data-status="canceled"] {
+        border-left-color: #dc3545;
+    }
+    
+    .subscription-mobile-card .card-header-mobile {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        width: 100%;
+    }
+    
+    .subscription-mobile-card .card-header-mobile h5 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0;
+        color: #212529;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .subscription-mobile-card .card-header-mobile .price {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #0e2778;
+        margin-left: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    .subscription-mobile-card .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        width: 100%;
+    }
+    
+    .subscription-mobile-card .info-item {
+        background: #f8f9fa;
+        padding: 0.6rem 0.5rem;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+    
+    .subscription-mobile-card .info-item .label {
+        font-size: 0.65rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 0.2rem;
+        white-space: nowrap;
+    }
+    
+    .subscription-mobile-card .info-item .value {
         font-size: 0.9rem;
+        font-weight: 600;
+        color: #212529;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .subscription-mobile-card .status-row {
+        margin-top: 0.5rem;
+        width: 100%;
+    }
+    
+    .subscription-mobile-card .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .subscription-mobile-card .status-badge.active {
+        background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    color: #00573d;
+    }
+    
+    .subscription-mobile-card .status-badge.frozen {
+        background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        color: #4635dc;
+    }
+    
+    .subscription-mobile-card .status-badge.expired {
+        background: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+    }
+    
+    .subscription-mobile-card .status-badge.canceled {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
     }
 }
 
 @media (max-width: 480px) {
-    .modal-title {
-        font-size: 1.1rem;
+    .subscription-mobile-card .info-grid {
+        gap: 0.4rem;
     }
     
-    .modal-body p {
-        font-size: 0.9rem;
+    .subscription-mobile-card .info-item {
+        padding: 0.5rem 0.4rem;
     }
     
-    .modal-body .form-label {
-        font-size: 0.9rem;
+    .subscription-mobile-card .info-item .value {
+        font-size: 0.85rem;
+    }
+    
+    .subscription-mobile-card .card-header-mobile h5 {
+        font-size: 1rem;
+    }
+    
+    .subscription-mobile-card .card-header-mobile .price {
+        font-size: 1rem;
+    }
+    
+    .subscription-mobile-card .status-badge {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
     }
 }
 
+@media (max-width: 360px) {
+    .subscription-mobile-card .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .subscription-mobile-card .card-header-mobile {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+    
+    .subscription-mobile-card .card-header-mobile .price {
+        margin-left: 0;
+    }
+}
+
+/* ----------------------------------------
+   12. СТИЛИ ДЛЯ СТРАНИЦЫ "МОИ АБОНЕМЕНТЫ"
+   ---------------------------------------- */
+
+/* Прогресс бар - отступ от краев */
+.subscription-progress-large {
+    height: 25px;
+    border-radius: 50px;
+    background-color: #e9ecef;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    margin: 1rem 1rem; /* Добавлен отступ слева и справа */
+    width: calc(100% - 2rem); /* Учитываем отступы */
+}
+
+/* Статистика в карточках */
+.subscription-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 1rem; /* Добавлен отступ слева и справа */
+}
+
+/* Кнопки действий */
+.subscription-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 1.5rem 1rem; /* Добавлен отступ слева и справа */
+}
+
+.subscription-actions .btn-gradient {
+    min-width: 150px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    padding: 12px 20px; /* Унифицированные отступы */
+    line-height: 1.2;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    /* Статистика в ряд на мобильных */
+    .subscription-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* Три колонки на мобильных */
+        gap: 0.5rem;
+        margin: 1rem 0.5rem;
+    }
+    
+    .stat-box {
+        padding: 0.8rem 0.3rem;
+    }
+    
+    .stat-box .stat-label {
+        font-size: 0.7rem;
+        white-space: nowrap;
+    }
+    
+    .stat-box .stat-number {
+        font-size: 1.2rem;
+    }
+    
+    /* Кнопки в ряд на мобильных */
+    .subscription-actions {
+        flex-direction: row; /* Меняем обратно на ряд */
+        gap: 0.5rem;
+        margin: 1rem 0.5rem;
+    }
+    
+    .subscription-actions .btn-gradient {
+        flex: 1; /* Равномерное распределение ширины */
+        min-width: 0; /* Сбрасываем минимальную ширину */
+        padding: 10px 8px;
+        font-size: 0.85rem;
+        white-space: normal; /* Разрешаем перенос текста */
+        word-break: break-word;
+        height: auto;
+        min-height: 50px; /* Минимальная высота для одинакового размера */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Специально для кнопки "Продлить" */
+    .subscription-actions .btn-gradient-primary {
+        padding: 10px 4px;
+        font-size: 0.8rem;
+    }
+    
+    /* Кнопка купить новый абонемент */
+    .text-center.mt-4 .btn-gradient-primary.btn-lg {
+        margin-bottom: 20px; /* Отступ снизу */
+        width: calc(100% - 2rem);
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+}
+
+@media (max-width: 480px) {
+    .subscription-stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.3rem;
+        margin: 0.8rem 0.3rem;
+    }
+    
+    .stat-box {
+        padding: 0.6rem 0.2rem;
+    }
+    
+    .stat-box .stat-label {
+        font-size: 0.6rem;
+    }
+    
+    .stat-box .stat-number {
+        font-size: 1rem;
+    }
+    
+    .subscription-actions .btn-gradient {
+        padding: 8px 4px;
+        font-size: 0.75rem;
+        min-height: 45px;
+    }
+}
+
+@media (max-width: 360px) {
+    .subscription-actions {
+        flex-direction: column; /* На очень маленьких экранах снова в колонку */
+    }
+    
+    .subscription-actions .btn-gradient {
+        width: 100%;
+    }
+}
+
+/* ----------------------------------------
+   12. СТИЛИ ДЛЯ СТРАНИЦЫ "МОИ АБОНЕМЕНТЫ"
+   ---------------------------------------- */
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    /* Кнопки в ряд на мобильных */
+    .subscription-actions {
+        display: flex;
+        flex-direction: row;
+        gap: 0.8rem;
+        margin: 1.5rem 0.5rem;
+    }
+    
+    .subscription-actions .btn-gradient {
+        flex: 1;
+        min-width: 0;
+        padding: 16px 10px; /* Увеличен padding для больших кнопок */
+        font-size: 1rem; /* Увеличен размер шрифта */
+        font-weight: 700; /* Более жирный шрифт */
+        white-space: nowrap; /* Запрещаем перенос текста */
+        height: 56px; /* Фиксированная высота для одинакового размера */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Специально для кнопки "Продлить" */
+    .subscription-actions .btn-gradient-primary {
+        padding: 16px 8px;
+    }
+    
+    /* Специально для кнопки "Заморозить" */
+    .subscription-actions .btn-gradient-warning {
+        padding: 16px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .subscription-actions {
+        gap: 0.6rem;
+        margin: 1.2rem 0.3rem;
+    }
+    
+    .subscription-actions .btn-gradient {
+        padding: 14px 6px;
+        font-size: 0.9rem;
+        height: 52px;
+    }
+}
+
+@media (max-width: 360px) {
+    .subscription-actions .btn-gradient {
+        padding: 12px 4px;
+        font-size: 0.85rem;
+        height: 48px;
+        white-space: normal; /* На очень маленьких экранах разрешаем перенос */
+        line-height: 1.2;
+    }
+}
+
+/* ----------------------------------------
+   12. СТИЛИ ДЛЯ СТРАНИЦЫ "МОИ АБОНЕМЕНТЫ"
+   ---------------------------------------- */
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    /* Заголовок на мобильных */
+    .subscription-header .d-flex {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.8rem;
+        width: 100%;
+    }
+    
+    .subscription-header h4 {
+        font-size: 1.1rem;
+        width: 100%;
+        margin-bottom: 0 !important;
+    }
+    
+    /* Бейдж заморозки на мобильных - снизу */
+    .subscription-header .badge.bg-light.text-dark {
+        width: 100%;
+        justify-content: center;
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+        order: 2; /* Перемещаем вниз */
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+    }
+    
+    /* Для замороженного абонемента - текст сверху, бейдж снизу */
+    .subscription-header.frozen .d-flex {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    .subscription-header.frozen h4 {
+        order: 1; /* Текст сверху */
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .subscription-header.frozen .badge.bg-light.text-dark {
+        order: 2; /* Бейдж снизу */
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .subscription-header .badge.bg-light.text-dark {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.8rem;
+    }
+}
+
+/* ----------------------------------------
+   15. СТИЛИ ДЛЯ ЗАМОРОЖЕННОГО АБОНЕМЕНТА В ДАШБОРДЕ
+   ---------------------------------------- */
+
+/* Контейнер для замороженного абонемента */
+.frozen-subscription-container {
+    background: linear-gradient(135deg, #e6f0ff, #d4e4ff);
+    border-radius: 20px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #0720ff;
+    box-shadow: 0 10px 30px rgba(7, 32, 255, 0.2);
+}
+
+.frozen-subscription-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    animation: rotate 10s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Иконка снежинки */
+.frozen-icon-large {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0720ff, #14bbfd);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 10px 20px rgba(7, 32, 255, 0.3);
+    animation: float 3s ease-in-out infinite;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.frozen-icon-large i {
+    font-size: 3rem;
+    color: white;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+/* Текст */
+.frozen-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #0720ff, #14bbfd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+}
+
+.frozen-message {
+    color: #495057;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Кнопка разморозки - холодный стиль */
+.btn-frozen {
+    background: linear-gradient(135deg, #0720ff, #14bbfd);
+    border: none;
+    border-radius: 50px;
+    padding: 16px 30px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(7, 32, 255, 0.4);
+    letter-spacing: 0.5px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-frozen:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(7, 32, 255, 0.5);
+    color: white;
+    background: linear-gradient(135deg, #14bbfd, #0720ff);
+}
+
+.btn-frozen:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 15px rgba(7, 32, 255, 0.4);
+}
+
+.btn-frozen i {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Эффект снежинок */
+.frozen-subscription-container .snowflake {
+    position: absolute;
+    color: white;
+    font-size: 1rem;
+    opacity: 0.2;
+    pointer-events: none;
+}
+
+.snowflake:nth-child(1) {
+    top: 10%;
+    left: 10%;
+    animation: snow 5s linear infinite;
+}
+
+.snowflake:nth-child(2) {
+    top: 20%;
+    right: 15%;
+    font-size: 1.5rem;
+    animation: snow 7s linear infinite;
+}
+
+.snowflake:nth-child(3) {
+    bottom: 15%;
+    left: 20%;
+    font-size: 1.2rem;
+    animation: snow 6s linear infinite;
+}
+
+.snowflake:nth-child(4) {
+    bottom: 25%;
+    right: 25%;
+    font-size: 1.8rem;
+    animation: snow 8s linear infinite;
+}
+
+@keyframes snow {
+    0% {
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 0.2;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        transform: translateY(10px) rotate(360deg);
+        opacity: 0.2;
+    }
+}
+
+/* Анимация для иконки */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .frozen-icon-large {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .frozen-icon-large i {
+        font-size: 2.5rem;
+    }
+    
+    .frozen-title {
+        font-size: 1.5rem;
+    }
+    
+    .frozen-message {
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
+    
+    .btn-frozen {
+        padding: 14px 20px;
+        font-size: 1rem;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .frozen-icon-large {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .frozen-icon-large i {
+        font-size: 2rem;
+    }
+    
+    .frozen-title {
+        font-size: 1.3rem;
+    }
+}

@@ -31,6 +31,20 @@
         </div>
     </div>
 
+    <!-- Проверяем, есть ли замороженный абонемент -->
+    @php
+        $hasFrozen = false;
+        $frozenSub = null;
+        if(isset($userSubscriptions) && $userSubscriptions->count() > 0) {
+            $frozenSub = $userSubscriptions->first(function($sub) {
+                return $sub->status === 'frozen';
+            });
+            if($frozenSub) {
+                $hasFrozen = true;
+            }
+        }
+    @endphp
+
     <!-- Активный абонемент -->
     <div class="main-card fade-in mb-5" style="animation-delay: 0.7s">
         <div class="card-header">
@@ -72,7 +86,36 @@
                         <span class="btn-glow"></span>
                     </a>
                 </div>
-            @else
+                @elseif($hasFrozen)
+                    {{-- Абонемент заморожен --}}
+                    <div class="frozen-subscription-container">
+                        <!-- Декоративные снежинки -->
+                        <div class="snowflake">❄️</div>
+                        <div class="snowflake">❄️</div>
+                        <div class="snowflake">❄️</div>
+                        <div class="snowflake">❄️</div>
+                        
+                        <div class="text-center">
+                            <div class="frozen-icon-large">
+                                <i class="fas fa-snowflake"></i>
+                            </div>
+                            
+                            <h2 class="frozen-title">❄️ Ваш абонемент заморожен</h2>
+                            
+                            <p class="frozen-message">
+                                Абонемент временно заморожен. Вы можете разморозить его в любой момент 
+                                в разделе "Абонементы".
+                            </p>
+                            
+                            <a href="{{ route('client.subscriptions') }}" class="btn-frozen">
+                                <i class="fas fa-play"></i>
+                                Разморозить абонемент
+                                <span class="btn-glow"></span>
+                            </a>
+                        </div>
+                    </div>
+                @else
+                {{-- Нет абонемента --}}
                 <div class="empty-state">
                     <i class="fas fa-id-card"></i>
                     <h4>Нет активного абонемента</h4>
@@ -92,7 +135,10 @@
             <div class="stat-card bg-primary-gradient text-white">
                 <div class="card-body">
                     <h6 class="card-title">Активный абонемент</h6>
-                    @if($activeSubscription)
+                    @if($hasFrozen && $frozenSub)
+                        <div class="stat-value">Заморожен</div>
+                        <small class="stat-label">{{ $frozenSub->subscription->workouts_count ?? 0 }} тренировок</small>
+                    @elseif($activeSubscription)
                         <div class="stat-value">{{ $activeSubscription->subscription->name ?? 'Абонемент' }}</div>
                         <small class="stat-label">{{ $activeSubscription->subscription->workouts_count ?? 0 }} тренировок</small>
                     @else
@@ -109,7 +155,10 @@
             <div class="stat-card bg-success-gradient text-white">
                 <div class="card-body">
                     <h6 class="card-title">Осталось тренировок</h6>
-                    @if($activeSubscription)
+                    @if($hasFrozen && $frozenSub)
+                        <div class="stat-value">{{ $frozenSub->remaining_workouts }}</div>
+                        <small class="stat-label">из {{ $frozenSub->subscription->workouts_count ?? 0 }}</small>
+                    @elseif($activeSubscription)
                         <div class="stat-value">{{ $activeSubscription->remaining_workouts }}</div>
                         <small class="stat-label">из {{ $activeSubscription->subscription->workouts_count ?? 0 }}</small>
                     @else
@@ -138,7 +187,10 @@
             <div class="stat-card bg-warning-gradient text-white">
                 <div class="card-body">
                     <h6 class="card-title">Абонемент до</h6>
-                    @if($activeSubscription)
+                    @if($hasFrozen && $frozenSub)
+                        <div class="stat-value">{{ \Carbon\Carbon::parse($frozenSub->end_date)->format('d.m') }}</div>
+                        <small class="stat-label">{{ \Carbon\Carbon::parse($frozenSub->end_date)->format('Y') }}</small>
+                    @elseif($activeSubscription)
                         <div class="stat-value">{{ \Carbon\Carbon::parse($activeSubscription->end_date)->format('d.m') }}</div>
                         <small class="stat-label">{{ \Carbon\Carbon::parse($activeSubscription->end_date)->format('Y') }}</small>
                     @else
@@ -165,111 +217,112 @@
         </div>
     @endif
 
+    <!-- Предстоящие тренировки -->
     <div class="row">
-        <!-- Левая колонка (Предстоящие тренировки) -->
         <div class="col-lg-12">
-            <!-- Предстоящие тренировки -->
-<div class="main-card fade-in" style="animation-delay: 0.5s">
-    <div class="card-header">
-        <i class="fas fa-calendar-alt"></i> Предстоящие тренировки
-    </div>
-    <div class="card-body">
-        @if($upcomingBookings->count() > 0)
-            <!-- Десктопная версия таблицы -->
-            <div class="desktop-view">
-                <div class="table-responsive">
-                    <table class="table dashboard-table">
-                        <thead>
-                            <tr>
-                                <th>Дата</th>
-                                <th>Время</th>
-                                <th>Тренировка</th>
-                                <th>Тренер</th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+            <div class="main-card fade-in" style="animation-delay: 0.5s">
+                <div class="card-header">
+                    <i class="fas fa-calendar-alt"></i> Предстоящие тренировки
+                </div>
+                <div class="card-body">
+                    @if($upcomingBookings->count() > 0)
+                        <!-- Десктопная версия таблицы -->
+                        <div class="desktop-view">
+                            <div class="table-responsive">
+                                <table class="table dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Дата</th>
+                                            <th>Время</th>
+                                            <th>Тренировка</th>
+                                            <th>Тренер</th>
+                                            <th>Действия</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($upcomingBookings as $booking)
+                                        <tr>
+                                            <td><strong>{{ $booking->schedule->date->format('d.m.Y') }}</strong></td>
+                                            <td>{{ \Carbon\Carbon::parse($booking->schedule->start_time)->format('H:i') }}</td>
+                                            <td>{{ $booking->schedule->workout->name }}</td>
+                                            <td>{{ $booking->schedule->trainer->name }}</td>
+                                            <td>
+                                                <form action="{{ route('client.bookings.cancel', $booking) }}" 
+                                                      method="POST" 
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Вы уверены, что хотите отменить бронирование?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn-outline-danger btn-action">
+                                                        <i class="fas fa-times me-1"></i>Отменить
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Мобильная версия карточек -->
+                        <div class="mobile-view">
                             @foreach($upcomingBookings as $booking)
-                            <tr>
-                                <td><strong>{{ $booking->schedule->date->format('d.m.Y') }}</strong></td>
-                                <td>{{ \Carbon\Carbon::parse($booking->schedule->start_time)->format('H:i') }}</td>
-                                <td>{{ $booking->schedule->workout->name }}</td>
-                                <td>{{ $booking->schedule->trainer->name }}</td>
-                                <td>
-                                    <form action="{{ route('client.bookings.cancel', $booking) }}" 
-                                          method="POST" 
-                                          class="d-inline"
-                                          onsubmit="return confirm('Вы уверены, что хотите отменить бронирование?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-outline-danger btn-action">
-                                            <i class="fas fa-times me-1"></i>Отменить
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
+                                <div class="mobile-booking-card">
+                                    <div class="booking-row">
+                                        <span class="booking-label">Дата и время:</span>
+                                        <span class="booking-value">
+                                            {{ $booking->schedule->date->format('d.m.Y') }} 
+                                            {{ \Carbon\Carbon::parse($booking->schedule->start_time)->format('H:i') }}
+                                        </span>
+                                    </div>
+                                    <div class="booking-row">
+                                        <span class="booking-label">Тренировка:</span>
+                                        <span class="booking-value">{{ $booking->schedule->workout->name }}</span>
+                                    </div>
+                                    <div class="booking-row">
+                                        <span class="booking-label">Тренер:</span>
+                                        <span class="booking-value">{{ $booking->schedule->trainer->name }}</span>
+                                    </div>
+                                    <div class="booking-actions">
+                                        <form action="{{ route('client.bookings.cancel', $booking) }}" 
+                                              method="POST" 
+                                              class="d-inline w-100"
+                                              onsubmit="return confirm('Вы уверены, что хотите отменить бронирование?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-gradient btn-gradient-danger w-100 py-2">
+                                                <i class="fas fa-times me-2"></i>Отменить
+                                                <span class="btn-glow"></span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
                             @endforeach
-                        </tbody>
-                    </table>
+                        </div>
+
+                        <!-- Кнопка -->
+                        <div class="mt-3 text-center text-md-start">
+                            <a href="{{ route('client.schedule') }}" class="btn-gradient btn-gradient-success">
+                                <i class="fas fa-calendar-plus me-2"></i>Забронировать еще
+                                <span class="btn-glow"></span>
+                            </a>
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-times"></i>
+                            <h4>Нет предстоящих тренировок</h4>
+                            <p>У вас пока нет запланированных тренировок</p>
+                            <a href="{{ route('client.schedule') }}" class="btn-gradient btn-gradient-success">
+                                <i class="fas fa-calendar-alt me-2"></i>Посмотреть расписание
+                                <span class="btn-glow"></span>
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
-
-            <!-- Мобильная версия карточек (ИСПРАВЛЕНО) -->
-            <div class="mobile-view">
-                @foreach($upcomingBookings as $booking)
-                    <div class="mobile-booking-card">
-                        <div class="booking-row">
-                            <span class="booking-label">Дата и время:</span>
-                            <span class="booking-value">
-                                {{ $booking->schedule->date->format('d.m.Y') }} 
-                                {{ \Carbon\Carbon::parse($booking->schedule->start_time)->format('H:i') }}
-                            </span>
-                        </div>
-                        <div class="booking-row">
-                            <span class="booking-label">Тренировка:</span>
-                            <span class="booking-value">{{ $booking->schedule->workout->name }}</span>
-                        </div>
-                        <div class="booking-row">
-                            <span class="booking-label">Тренер:</span>
-                            <span class="booking-value">{{ $booking->schedule->trainer->name }}</span>
-                        </div>
-                        <div class="booking-actions">
-                            <form action="{{ route('client.bookings.cancel', $booking) }}" 
-                                  method="POST" 
-                                  class="d-inline w-100"
-                                  onsubmit="return confirm('Вы уверены, что хотите отменить бронирование?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn-gradient btn-gradient-danger w-100 py-2">
-                                    <i class="fas fa-times me-2"></i>Отменить
-                                    <span class="btn-glow"></span>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- Кнопка -->
-            <div class="mt-3 text-center text-md-start">
-                <a href="{{ route('client.schedule') }}" class="btn-gradient btn-gradient-success">
-                    <i class="fas fa-calendar-plus me-2"></i>Забронировать еще
-                    <span class="btn-glow"></span>
-                </a>
-            </div>
-        @else
-            <div class="empty-state">
-                <i class="fas fa-calendar-times"></i>
-                <h4>Нет предстоящих тренировок</h4>
-                <p>У вас пока нет запланированных тренировок</p>
-                <a href="{{ route('client.schedule') }}" class="btn-gradient btn-gradient-success">
-                    <i class="fas fa-calendar-alt me-2"></i>Посмотреть расписание
-                    <span class="btn-glow"></span>
-                </a>
-            </div>
-        @endif
+        </div>
     </div>
-</div>
 
     <!-- История посещений -->
     <div class="row">
