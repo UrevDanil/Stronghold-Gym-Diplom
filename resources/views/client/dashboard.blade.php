@@ -50,7 +50,7 @@
                     <div class="subscription-icon mb-3">
                         <i class="fas fa-id-card"></i>
                     </div>
-                    <h4 class="fw-bold mb-1 subscription-name">{{ $subscription->name ?? 'Абонемент' }}</h4>
+                    <h4 class="subscription-title">{{ $subscription->name ?? 'Абонемент' }}</h4>
                     <p class="subscription-description">{{ $subscription->description ?? '' }}</p>
                 </div>            
                 

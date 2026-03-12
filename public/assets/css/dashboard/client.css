@@ -53,6 +53,7 @@
     margin-bottom: 0.5rem;
     color: #495057;
     font-weight: 500;
+    padding: 0 1rem; /* Увеличен отступ от краев */
 }
 
 .progress-percentage {
@@ -70,7 +71,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto;
+    margin: 20px auto 0 auto;
 }
 
 .subscription-icon i {
@@ -433,18 +434,26 @@
 
 /* Цвета градиентных кнопок */
 .btn-gradient-primary {
-    background: linear-gradient(135deg, #84fab0, #8fd3f4 );
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
     color: #00573d;
+    margin-bottom: 20px;
 }
 
 .btn-gradient-success {
     background: linear-gradient(135deg, #84fab0, #8fd3f4);
     color: #00573d;
+    margin-bottom: 20px;
 }
 
 .btn-gradient-warning {
-    background: linear-gradient(135deg, #f6d365, #fda085);
-    color: rgb(255, 252, 254);
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    color: #4635dc; 
+    margin-bottom: 20px;
+}
+
+.btn-gradient-warning:hover {
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    color: #ffffff; /* Белый текст при наведении */
 }
 
 .btn-gradient-info {
@@ -536,10 +545,9 @@
 }
 
 .badge-cancelled {
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-    color: #9b4d1d;
+    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+    color: #4635dc;
 }
-
 /* ----------------------------------------
    7. МОБИЛЬНЫЕ КАРТОЧКИ
    ---------------------------------------- */
@@ -593,7 +601,7 @@
    ---------------------------------------- */
 
 .greeting-title {
-    background: linear-gradient(135deg, #0e2778, #0b34bb );
+    background: linear-gradient(135deg, #0e2778, #0b34bb);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 0.5rem;
@@ -781,7 +789,12 @@
     }
     
     .subscription-name {
-        font-size: 1.4rem;
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: #0e2778;
+    background: none;
+    -webkit-text-fill-color: unset;
     }
     
     .user-avatar-large {
@@ -929,7 +942,7 @@
 /* Карточка активного абонемента */
 .subscription-card {
     border: none;
-    border-radius: 20px;
+    border-radius: 20px 20px 20px 20px; /* Нижнее скругление добавлено */
     overflow: hidden;
     transition: all 0.3s ease;
     margin-bottom: 2rem;
@@ -948,7 +961,7 @@
 }
 
 .subscription-header.active {
-    background: linear-gradient(135deg, #54ca6f, #20c997);
+    background: linear-gradient(135deg, #6fe089, #84fab0);
 }
 
 .subscription-header.frozen {
@@ -961,21 +974,25 @@
     font-size: 1.3rem;
 }
 
+/* Убираем корону рядом с Текущий абонемент */
+.subscription-header h4 i {
+    display: none; /* Скрываем иконку */
+}
+
 /* Иконка абонемента */
 .subscription-icon-large {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
+    background: linear-gradient(135deg, #0e2778 0%, #0bbba3 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1rem;
-    background: rgba(255,255,255,0.2);
-    backdrop-filter: blur(5px);
+    margin: 20px auto 0 auto;
 }
 
 .subscription-icon-large i {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: white;
 }
 
@@ -984,9 +1001,9 @@
     font-size: 1.8rem;
     font-weight: 800;
     margin-bottom: 0.5rem;
-    background: linear-gradient(135deg, #333, #667eea);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #0e2778;
+    background: none;
+    -webkit-text-fill-color: unset;
 }
 
 .subscription-description {
@@ -1001,11 +1018,12 @@
     background-color: #e9ecef;
     overflow: hidden;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    margin: 1rem 0; /* Добавлен отступ сверху и снизу */
 }
 
 .subscription-progress-large .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
     border-radius: 50px;
     font-weight: 600;
     display: flex;
@@ -1076,7 +1094,7 @@
 }
 
 .stat-box .stat-number.warning {
-    color: #ffc107;
+    color: #0e2778;
 }
 
 /* Информационный блок */
@@ -1092,36 +1110,44 @@
     color: #17a2b8;
 }
 
-/* Кнопки действий */
+/* Кнопки действий - центрирование */
 .subscription-actions {
     display: flex;
     gap: 1rem;
-    justify-content: flex-end;
+    justify-content: center; /* Центрирование кнопок */
     margin-top: 1.5rem;
+}
+
+.subscription-actions .btn-gradient {
+    min-width: 150px; /* Минимальная ширина для кнопок */
 }
 
 /* Таблица истории */
 .subscription-history-table {
-    border-radius: 15px;
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 0;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 
 .subscription-history-table thead th {
-    background: linear-gradient(135deg, #0b34bb, #0e2778);
-    color: white;
-    font-weight: 600;
+    background-color: #ffffff;
+    color: #212529;
+    font-weight: 700;
     text-transform: uppercase;
     font-size: 0.85rem;
     letter-spacing: 0.5px;
     padding: 1rem;
     border: none;
+    border-bottom: 2px solid #dee2e6;
 }
 
 .subscription-history-table tbody td {
     padding: 1rem;
     vertical-align: middle;
-    border-color: #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+    color: #212529;
 }
 
 .subscription-history-table tbody tr {
@@ -1173,11 +1199,13 @@
     .subscription-actions {
         flex-direction: column;
         gap: 0.5rem;
+        align-items: center;
     }
     
-    .subscription-actions .btn {
+    .subscription-actions .btn-gradient {
         width: 100%;
         margin: 0 !important;
+        min-width: auto;
     }
 }
 
@@ -1199,3 +1227,266 @@
         font-size: 2rem;
     }
 }
+
+/* ----------------------------------------
+   14. МОДАЛЬНОЕ ОКНО ЗАМОРОЗКИ
+   ---------------------------------------- */
+
+/* Затемнение фона */
+.modal-backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+}
+
+/* Основное окно */
+.modal-content {
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Заголовок модального окна */
+.modal-header {
+    background: linear-gradient(135deg, #0b34bb, #0e2778);
+    border-bottom: none;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(50px);
+}
+
+.modal-title {
+    color: white;
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-title i {
+    font-size: 1.5rem;
+    color: #ffd700;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+/* Кнопка закрытия */
+.btn-close {
+    background-color: white;
+    opacity: 0.8;
+    border-radius: 50%;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+    background-color: white;
+}
+
+/* Тело модального окна */
+.modal-body {
+    padding: 2rem;
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+}
+
+/* Текст */
+.modal-body p {
+    color: #495057;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+/* Список причин */
+.modal-body ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.modal-body ul li {
+    padding: 0.5rem 0;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-body ul li:nth-child(1)::before {
+    content: '🤒'; /* Болезнь */
+    font-size: 1.2rem;
+}
+
+.modal-body ul li:nth-child(2)::before {
+    content: '✈️'; /* Командировка */
+    font-size: 1.2rem;
+}
+
+.modal-body ul li:nth-child(3)::before {
+    content: '🏖️'; /* Отпуск */
+    font-size: 1.2rem;
+}
+
+/* Поля ввода */
+.modal-body .form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.modal-body .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.modal-body .form-control:focus {
+    border-color: #0b34bb;
+    box-shadow: 0 0 0 0.2rem rgba(11, 52, 187, 0.1);
+    outline: none;
+}
+
+.modal-body textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modal-body input[type="number"].form-control {
+    -moz-appearance: textfield;
+}
+
+.modal-body input[type="number"].form-control::-webkit-outer-spin-button,
+.modal-body input[type="number"].form-control::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Подсказка */
+.modal-body .alert {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border: 2px solid #0b34bb;
+    border-radius: 15px;
+    color: #0b34bb;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-body .alert i {
+    font-size: 1.5rem;
+    color: #0b34bb;
+}
+
+/* Футер модального окна - КНОПКИ ПО ЦЕНТРУ */
+.modal-footer {
+    border-top: 2px solid #e9ecef;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: center; /* Центрирование по горизонтали */
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Кнопка отмены */
+.modal-footer .btn-secondary {
+    background: #6c757d;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    color: white;
+    min-width: 140px; /* Одинаковая минимальная ширина */
+    text-align: center;
+}
+
+.modal-footer .btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+/* Кнопка заморозки - одинаковая ширина с кнопкой отмены */
+.modal-footer .btn-gradient-warning {
+    min-width: 140px; /* Одинаковая минимальная ширина */
+    margin: 0;
+    text-align: center;
+    padding: 12px 30px; /* Одинаковый padding с кнопкой отмены */
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 1rem;
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+        margin: 0 !important;
+        min-width: 100%; /* На мобильных на всю ширину */
+    }
+    
+    .modal-body ul li {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-title {
+        font-size: 1.1rem;
+    }
+    
+    .modal-body p {
+        font-size: 0.9rem;
+    }
+    
+    .modal-body .form-label {
+        font-size: 0.9rem;
+    }
+}
+
