@@ -138,7 +138,11 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if($schedule->isPast())
+                                            @if($isBooked)
+                                                <span class="status-badge booked">
+                                                    <i class="fas fa-calendar-check me-1"></i>Забронировано
+                                                </span>
+                                            @elseif($schedule->isPast())
                                                 <span class="status-badge completed">
                                                     <i class="fas fa-check-circle me-1"></i>Завершено
                                                 </span>
@@ -192,7 +196,7 @@
                         </table>
                     </div>
 
-                    <!-- Мобильная версия карточек -->
+                                        <!-- Мобильная версия карточек -->
                     <div class="mobile-schedule-cards">
                         @foreach($daySchedules as $schedule)
                             @php
@@ -210,9 +214,11 @@
                             <div class="mobile-workout-card {{ $cardClass }}">
                                 <div class="mobile-card-header">
                                     <h4>{{ $schedule->workout->name }}</h4>
-                                    <span class="time">
-                                        {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}
-                                    </span>
+                                    <div class="time-container">
+                                        <span class="start-time">{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}</span>
+                                        <span class="time-separator">-</span>
+                                        <span class="end-time">{{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}</span>
+                                    </div>
                                 </div>
                                 
                                 <div class="mobile-info-grid">
@@ -222,27 +228,23 @@
                                     </div>
                                     <div class="mobile-info-item">
                                         <span class="label">Зал</span>
-                                        <span class="room-badge"> <i class="fas fa-door-open me-1"></i>{{ $schedule->room ?? 'Основной зал' }}</span>
+                                        <span class="value">{{ $schedule->room ?? 'Основной зал' }}</span>
                                     </div>
                                     <div class="mobile-info-item">
                                         <span class="label">Места</span>
-                                        <span class="slots-badge available"> <i class="fas fa-users me-1"></i>{{ $availableSlots }}/{{ $schedule->capacity() }}</span>
-                                    </div>
-                                    <div class="mobile-info-item">
-                                        <span class="label">До</span>
-                                        <span class="value">{{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}</span>
+                                        <span class="value">{{ $availableSlots }}/{{ $schedule->capacity() }}</span>
                                     </div>
                                 </div>
                                 
                                 <div class="mobile-status-row">
                                     @if($schedule->isPast())
-                                        <span class="mobile-status-badge completed"> <i class="fas fa-check-circle me-1"></i>Завершено</span>
+                                        <span class="mobile-status-badge completed"><i class="fas fa-check-circle me-1"></i>Завершено</span>
                                     @elseif($schedule->status === 'cancelled')
-                                        <span class="mobile-status-badge cancelled">Отменено</span>
+                                        <span class="mobile-status-badge cancelled"><i class="fas fa-times-circle me-1"></i>Отменено</span>
                                     @elseif($availableSlots == 0)
-                                        <span class="mobile-status-badge full">Мест нет</span>
+                                        <span class="mobile-status-badge full"><i class="fas fa-exclamation-circle me-1"></i>Мест нет</span>
                                     @elseif($isBooked)
-                                        <span class="mobile-status-badge booked">Забронировано</span>
+                                        <span class="mobile-status-badge booked"> <i class="fas fa-calendar-check me-2"></i>Забронировано</span>
                                     @else
                                         <span class="mobile-status-badge available"> <i class="fas fa-check-circle me-1"></i>Доступно</span>
                                     @endif
@@ -262,8 +264,8 @@
                                         @endphp
                                         @if($userBooking)
                                             <form action="{{ route('client.bookings.cancel', $userBooking->id) }}" 
-                                                  method="POST" class="w-100"
-                                                  onsubmit="return confirm('Отменить бронирование?');">
+                                                method="POST" class="w-100"
+                                                onsubmit="return confirm('Отменить бронирование?');">
                                                 @csrf
                                                 <button type="submit" class="btn-cancel w-100">
                                                     <i class="fas fa-times me-2"></i>Отменить
