@@ -10,7 +10,13 @@
 
 @section('content')
 <div class="container py-4">
-    <h1 class="display-5 fw-bold greeting-title mb-2">Мои абонементы</h1>
+    <!-- Заголовок с кнопкой назад -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold greeting-title mb-0">Мои абонементы</h1>
+        <a href="{{ route('client.dashboard') }}" class="back-btn-subscription">
+            <i class="fas fa-arrow-left me-2"></i>Назад
+        </a>
+    </div>
     
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -121,12 +127,7 @@
                     </div>
                     <h2 class="subscription-title">{{ $subscription->name ?? 'Абонемент' }}</h2>
                     <p class="subscription-description">{{ $subscription->description ?? '' }}</p>
-                    @if($subscriptionType === 'frozen' && $activeUserSub->pause_reason)
-                        <div class="alert alert-warning d-inline-block mt-3">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Причина заморозки: {{ $activeUserSub->pause_reason }}
-                        </div>
-                    @endif
+                    
                 </div>
                 
                 @if($subscriptionType !== 'frozen')
@@ -259,14 +260,14 @@
                                         @if($endDate < now()->toDateString())
                                             <span class="badge-custom bg-secondary">Истек</span>
                                         @elseif($remainingWorkouts <= 0)
-                                            <span class="badge-custom badge-missed">Использован</span>
+                                            <span class="badge-custom badge-missed"><i class="fas fa-exclamation-circle me-1"></i>Использован</span>
                                         @else
                                             <span class="badge-custom badge-attended">Активен</span>
                                         @endif
                                     @elseif($status === 'expired')
                                         <span class="badge-custom bg-secondary">Истек</span>
                                     @elseif($status === 'frozen')
-                                        <span class="badge-custom badge-cancelled">Заморожен</span>
+                                        <span class="badge-custom badge-cancelled"><i class="fas fa-snowflake me-1"></i>Заморожен</span>
                                     @elseif($status === 'canceled')
                                         <span class="badge-custom badge-missed">Отменен</span>
                                     @endif
@@ -302,64 +303,78 @@
                             $price = $userSub->price;
                         }
                         
-                        $statusClass = match($status) {
-                            'active' => 'active',
-                            'frozen' => 'frozen',
-                            'expired' => 'expired',
-                            'canceled' => 'canceled',
-                            default => ''
-                        };
-                        
-                        $statusText = match($status) {
-                            'active' => 'Активен',
-                            'frozen' => 'Заморожен',
-                            'expired' => 'Истек',
-                            'canceled' => 'Отменен',
-                            default => $status
-                        };
+                        // ИСПРАВЛЕННАЯ ЛОГИКА СТАТУСА - как на компьютере
+                        if ($status === 'active') {
+                            if ($endDate < now()->toDateString()) {
+                                $badgeClass = 'bg-secondary';
+                                $badgeText = 'Истек';
+                            } elseif ($remainingWorkouts <= 0) {
+                                $badgeClass = 'badge-missed';
+                                $badgeText = 'Использован';
+                            } else {
+                                $badgeClass = 'badge-attended';
+                                $badgeText = 'Активен';
+                            }
+                        } elseif ($status === 'expired') {
+                            $badgeClass = 'bg-secondary';
+                            $badgeText = 'Истек';
+                        } elseif ($status === 'frozen') {
+                            $badgeClass = 'badge-cancelled';
+                            $badgeText = 'Заморожен';
+                        } elseif ($status === 'canceled') {
+                            $badgeClass = 'badge-missed';
+                            $badgeText = 'Отменен';
+                        } else {
+                            $badgeClass = 'bg-secondary';
+                            $badgeText = $status;
+                        }
                     @endphp
                     
-                    <div class="subscription-mobile-card" data-status="{{ $statusClass }}">
+                    <div class="subscription-mobile-card" data-status="{{ $status }}">
                         <div class="card-header-mobile">
                             <h5>{{ $subscriptionName }}</h5>
                             <span class="price">{{ number_format($price, 0, ',', ' ') }} ₽</span>
                         </div>
                         
                         <div class="info-grid">
-    <div class="info-item">
-        <span class="label">Активация</span>
-        <span class="value">{{ \Carbon\Carbon::parse($startDate)->format('d.m.Y') }}</span>
-    </div>
-    <div class="info-item">
-        <span class="label">Окончание</span>
-        <span class="value">{{ \Carbon\Carbon::parse($endDate)->format('d.m.Y') }}</span>
-    </div>
-    <div class="info-item">
-        <span class="label">Тренировки</span>
-        <span class="value">{{ $remainingWorkouts }}/{{ $workoutsCount }}</span>
-    </div>
-    <div class="info-item">
-        <span class="label">Цена</span>
-        <span class="value">{{ number_format($price, 0, ',', ' ') }} ₽</span>
-    </div>
-</div>
-
-<!-- Статус на отдельной строке -->
-<div class="status-row">
-    <span class="status-badge {{ $statusClass }}">
-        @if($status === 'frozen')
-            <i class="fas fa-snowflake"></i>
-        @elseif($status === 'active')
-            <i class="fas fa-check-circle"></i>
-        @elseif($status === 'expired')
-            <i class="fas fa-clock"></i>
-        @elseif($status === 'canceled')
-            <i class="fas fa-times-circle"></i>
-        @endif
-        {{ $statusText }}
-    </span>
-</div>
+                            <div class="info-item">
+                                <span class="label">Активация</span>
+                                <span class="value">{{ \Carbon\Carbon::parse($startDate)->format('d.m.Y') }}</span>
                             </div>
+                            <div class="info-item">
+                                <span class="label">Окончание</span>
+                                <span class="value">{{ \Carbon\Carbon::parse($endDate)->format('d.m.Y') }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Тренировки</span>
+                                <span class="value">
+                                    <span class="badge-custom {{ $remainingWorkouts > 0 ? 'badge-attended' : 'badge-missed' }}">
+                                        {{ $remainingWorkouts }}/{{ $workoutsCount }}
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Цена</span>
+                                <span class="value">{{ number_format($price, 0, ',', ' ') }} ₽</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Статус на отдельной строке -->
+                        <div class="status-row">
+                            <span class="badge-custom {{ $badgeClass }}">
+                                @if($status === 'frozen')
+                                    <i class="fas fa-snowflake me-1"></i>
+                                @elseif($status === 'active' && $remainingWorkouts > 0 && $endDate >= now()->toDateString())
+                                    <i class="fas fa-check-circle me-1"></i>
+                                @elseif($status === 'active' && $remainingWorkouts <= 0)
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                @elseif($status === 'expired' || ($status === 'active' && $endDate < now()->toDateString()))
+                                    <i class="fas fa-clock me-1"></i>
+                                @elseif($status === 'canceled')
+                                    <i class="fas fa-times-circle me-1"></i>
+                                @endif
+                                {{ $badgeText }}
+                            </span>
                         </div>
                     </div>
                 @endforeach

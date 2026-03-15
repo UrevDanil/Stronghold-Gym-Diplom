@@ -38,28 +38,22 @@
 
     <div class="profile-card">
         <!-- Вкладки -->
-        <div class="profile-tabs">
-            <ul class="nav nav-tabs" id="profileTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" 
-                            data-bs-target="#personal" type="button" role="tab">
-                        <i class="fas fa-user"></i>Личные данные
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="security-tab" data-bs-toggle="tab" 
-                            data-bs-target="#security" type="button" role="tab">
-                        <i class="fas fa-lock"></i>Безопасность
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="subscription-tab" data-bs-toggle="tab" 
-                            data-bs-target="#subscription" type="button" role="tab">
-                        <i class="fas fa-id-card"></i>Мой абонемент
-                    </button>
-                </li>
-            </ul>
-        </div>
+<div class="profile-tabs">
+    <ul class="nav nav-tabs" id="profileTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" 
+                    data-bs-target="#personal" type="button" role="tab">
+                <i class="fas fa-user me-2"></i>Личные данные
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="security-tab" data-bs-toggle="tab" 
+                    data-bs-target="#security" type="button" role="tab">
+                <i class="fas fa-lock me-2"></i>Безопасность
+            </button>
+        </li>
+    </ul>
+</div>
 
         <!-- Содержимое вкладок -->
         <div class="tab-content" id="profileTabContent">
@@ -188,125 +182,6 @@
                     </button>
                 </form>
             </div>
-
-            <!-- Вкладка 3: Абонемент -->
-            <div class="tab-pane fade" id="subscription" role="tabpanel">
-                @if($user->activeSubscription())
-                    @php
-                        $activeUserSub = $user->activeSubscription();
-                        $subscription = $activeUserSub->subscription;
-                        
-                        $remaining = $activeUserSub->remaining_workouts;
-                        $totalWorkouts = $subscription->workouts_count ?? 0;
-                        $used = max(0, $totalWorkouts - $remaining);
-                        $percentage = $totalWorkouts > 0 ? min(100, ($used / $totalWorkouts) * 100) : 0;
-                        
-                        $startDate = \Carbon\Carbon::parse($activeUserSub->start_date);
-                        $endDate = \Carbon\Carbon::parse($activeUserSub->end_date);
-                        $daysLeft = max(0, $endDate->diffInDays(now(), false));
-                    @endphp
-                    
-                    <div class="subscription-detail-card">
-                        <div class="text-center mb-4">
-                            <div class="icon-circle">
-                                <i class="fas fa-id-card"></i>
-                            </div>
-                            <h4>{{ $subscription->name ?? 'Абонемент' }}</h4>
-                            <p class="text-muted">{{ $subscription->description ?? '' }}</p>
-                            
-                            @if($activeUserSub->isPaused())
-                                <div class="badge-frozen">
-                                    <i class="fas fa-snowflake me-1"></i>
-                                    Заморожен до {{ $activeUserSub->paused_until->format('d.m.Y H:i') }}
-                                </div>
-                            @endif
-                        </div>
-                        
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Прогресс</span>
-                                <span class="fw-bold">{{ round($percentage, 1) }}%</span>
-                            </div>
-                            <div class="progress-sm">
-                                <div class="progress-bar" style="width: {{ $percentage }}%"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <ul class="stats-list">
-                                    <li>
-                                        <i class="fas fa-dumbbell"></i>
-                                        Осталось тренировок
-                                        <strong class="text-success">{{ $remaining }}</strong>
-                                    </li>
-                                    <li>
-                                        <i class="fas fa-calendar-check"></i>
-                                        Использовано
-                                        <strong>{{ $used }}</strong>
-                                    </li>
-                                    <li>
-                                        <i class="fas fa-percentage"></i>
-                                        Прогресс
-                                        <strong>{{ round($percentage, 1) }}%</strong>
-                                    </li>
-                                </ul>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <ul class="stats-list">
-                                    <li>
-                                        <i class="fas fa-calendar-plus"></i>
-                                        Начало
-                                        <strong>{{ $startDate->format('d.m.Y') }}</strong>
-                                    </li>
-                                    <li>
-                                        <i class="fas fa-calendar-minus"></i>
-                                        Окончание
-                                        <strong>{{ $endDate->format('d.m.Y') }}</strong>
-                                    </li>
-                                    <li>
-                                        <i class="fas fa-clock"></i>
-                                        Осталось дней
-                                        <strong class="text-warning">{{ $daysLeft }}</strong>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <div class="text-center mt-4">
-                            @if($activeUserSub->isPaused())
-                                <form action="{{ route('client.subscriptions.resume') }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn-subscription">
-                                        <i class="fas fa-play me-2"></i>Разморозить абонемент
-                                    </button>
-                                </form>
-                            @else
-                                <a href="{{ route('client.subscriptions') }}" class="btn-subscription me-2">
-                                    <i class="fas fa-sync-alt me-2"></i>Продлить
-                                </a>
-                                <button class="btn-subscription-outline" data-bs-toggle="modal" data-bs-target="#freezeModal">
-                                    <i class="fas fa-snowflake me-2"></i>Заморозить
-                                </button>
-                            @endif
-                        </div>
-                    </div>
-                @else
-                    <div class="text-center py-5">
-                        <div class="icon-circle mx-auto mb-4" style="background: linear-gradient(135deg, #ffc107, #fd7e14);">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <h4 class="mb-3">У вас нет активного абонемента</h4>
-                        <p class="text-muted mb-4">Приобретите абонемент, чтобы начать тренировки</p>
-                        <a href="{{ route('client.subscriptions') }}" class="btn-subscription">
-                            <i class="fas fa-shopping-cart me-2"></i>Купить абонемент
-                        </a>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
 
     <!-- Информация об аккаунте -->
     <div class="account-info-card mt-4">

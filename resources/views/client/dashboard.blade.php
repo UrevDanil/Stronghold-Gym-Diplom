@@ -23,10 +23,6 @@
                         {{ now()->isoFormat('dddd, D MMMM YYYY') }}
                     </div>
                 </div>
-                <div class="mt-3 mt-md-0">
-                    <div class="user-avatar-large">
-                    </div>
-                </div>
             </div>
         </div>
     </div>
