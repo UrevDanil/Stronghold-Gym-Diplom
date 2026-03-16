@@ -286,7 +286,7 @@
             <h4>Нет доступных тренировок</h4>
             <p class="text-muted">На выбранные даты нет запланированных тренировок</p>
             <a href="{{ route('client.schedule') }}" class="btn-reset-large">
-                <i class="fas fa-sync-alt me-2"></i>Сбросить фильтры
+                Сбросить фильтры
             </a>
         </div>
     @endif

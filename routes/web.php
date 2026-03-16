@@ -249,7 +249,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 // Уведомления
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', function () {
-        return view('notifications.index');
+        $notifications = App\Models\Notification::where('user_id', auth()->id())
+            ->latest()
+            ->paginate(20);
+            
+        return view('notifications.index', compact('notifications'));
     })->name('notifications');
     
     Route::post('/notifications/{id}/read', function ($id) {
@@ -259,6 +263,13 @@ Route::middleware(['auth'])->group(function () {
         }
         return back();
     })->name('notifications.read');
+    
+    Route::post('/notifications/read-all', function () {
+        App\Models\Notification::where('user_id', auth()->id())
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+        return back()->with('success', 'Все уведомления отмечены как прочитанные');
+    })->name('notifications.read-all');
 });
 
 // ====================

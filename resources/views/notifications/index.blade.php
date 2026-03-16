@@ -2,13 +2,30 @@
 
 @section('title', 'Уведомления')
 
+@section('styles')
+    <link href="{{ asset('assets/css/dashboard/notifications.css') }}" rel="stylesheet">
+@endsection
+
 @section('content')
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Мои уведомления</h1>
-        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Назад
-        </a>
+<div class="container py-4 notifications-page">
+    <!-- Заголовок -->
+    <div class="notifications-header d-flex justify-content-between align-items-center">
+        <h1 class="mb-0">
+            <i class="fas fa-bell me-3"></i>Мои уведомления
+        </h1>
+        <div class="d-flex gap-2">
+            @if($notifications->where('is_read', false)->count() > 0)
+                <form action="{{ route('notifications.read-all') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn-mark-all">
+                        <i class="fas fa-check-double me-2"></i>Все прочитано
+                    </button>
+                </form>
+            @endif
+            <a href="{{ url()->previous() }}" class="back-btn">
+                <i class="fas fa-arrow-left me-2"></i>Назад
+            </a>
+        </div>
     </div>
 
     @php
@@ -17,51 +34,103 @@
             ->paginate(20);
     @endphp
 
-    <div class="card">
+    <div class="notifications-card">
         <div class="card-body">
             @if($notifications->count() > 0)
-                <div class="list-group">
+                <div class="notifications-list">
                     @foreach($notifications as $notification)
-                        <div class="list-group-item {{ !$notification->is_read ? 'list-group-item-primary' : '' }}">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <div class="flex-shrink-0 me-3">
-                                        @if($notification->type == 'booking')
-                                            <i class="fas fa-calendar-check fa-2x text-primary"></i>
-                                        @elseif($notification->type == 'subscription')
-                                            <i class="fas fa-id-card fa-2x text-success"></i>
-                                        @else
-                                            <i class="fas fa-bell fa-2x text-warning"></i>
-                                        @endif
-                                    </div>
-                                    <div>
-                                        <p class="mb-1">{{ $notification->message }}</p>
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock me-1"></i>{{ $notification->created_at->format('d.m.Y H:i') }}
-                                        </small>
+                        <div class="notification-item d-flex align-items-center justify-content-between {{ !$notification->is_read ? 'unread' : '' }}">
+                            <div class="d-flex align-items-center">
+                                <div class="notification-icon 
+                                    @if($notification->type == 'booking') booking
+                                    @elseif($notification->type == 'subscription') subscription
+                                    @else system
+                                    @endif">
+                                    @if($notification->type == 'booking')
+                                        <i class="fas fa-calendar-check"></i>
+                                    @elseif($notification->type == 'subscription')
+                                        <i class="fas fa-id-card"></i>
+                                    @else
+                                        <i class="fas fa-bell"></i>
+                                    @endif
+                                </div>
+                                <div class="notification-content">
+                                    <p class="notification-message">{{ $notification->message }}</p>
+                                    <div class="notification-time">
+                                        <i class="fas fa-clock"></i>
+                                        {{ $notification->created_at->format('d.m.Y H:i') }}
                                     </div>
                                 </div>
-                                @if(!$notification->is_read)
-                                    <form action="{{ route('notifications.read', $notification->id) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary">
-                                            <i class="fas fa-check"></i> Отметить прочитанным
-                                        </button>
-                                    </form>
-                                @endif
                             </div>
+                            
+                            @if(!$notification->is_read)
+                                <form action="{{ route('notifications.read', $notification->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="mark-read-btn">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     @endforeach
                 </div>
                 
-                <div class="mt-4">
-                    {{ $notifications->links() }}
-                </div>
+                @if($notifications->hasPages())
+                    <div class="pagination-wrapper">
+                        <div class="pagination-info">
+                            Показано с {{ $notifications->firstItem() }} по {{ $notifications->lastItem() }} из {{ $notifications->total() }} уведомлений
+                        </div>
+                        
+                        <div class="pagination-container">
+                            {{-- Кнопка "Назад" --}}
+                            @if($notifications->onFirstPage())
+                                <span class="pagination-prev disabled">
+                                    <i class="fas fa-chevron-left"></i>
+                                </span>
+                            @else
+                                <a href="{{ $notifications->previousPageUrl() }}" class="pagination-prev">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            @endif
+                            
+                            {{-- Номера страниц --}}
+                            <div class="pagination-pages">
+                                @foreach(range(1, $notifications->lastPage()) as $i)
+                                    @if($i == $notifications->currentPage())
+                                        <span class="pagination-page active">{{ $i }}</span>
+                                    @elseif($i >= $notifications->currentPage() - 2 && $i <= $notifications->currentPage() + 2)
+                                        <a href="{{ $notifications->url($i) }}" class="pagination-page">{{ $i }}</a>
+                                    @elseif($i == 1 || $i == $notifications->lastPage())
+                                        <a href="{{ $notifications->url($i) }}" class="pagination-page">{{ $i }}</a>
+                                    @elseif($i == $notifications->currentPage() - 3 || $i == $notifications->currentPage() + 3)
+                                        <span class="pagination-dots">...</span>
+                                    @endif
+                                @endforeach
+                            </div>
+                            
+                            {{-- Кнопка "Вперед" --}}
+                            @if($notifications->hasMorePages())
+                                <a href="{{ $notifications->nextPageUrl() }}" class="pagination-next">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            @else
+                                <span class="pagination-next disabled">
+                                    <i class="fas fa-chevron-right"></i>
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                @endif
             @else
-                <div class="text-center py-5">
-                    <i class="fas fa-bell-slash fa-4x text-muted mb-3"></i>
+                <div class="empty-notifications">
+                    <div class="empty-icon">
+                        <i class="fas fa-bell-slash"></i>
+                    </div>
                     <h4>Нет уведомлений</h4>
                     <p class="text-muted">У вас пока нет уведомлений</p>
+                    <a href="{{ route('client.dashboard') }}" class="btn-primary">
+                        <i class="fas fa-home me-2"></i>На главную
+                    </a>
                 </div>
             @endif
         </div>

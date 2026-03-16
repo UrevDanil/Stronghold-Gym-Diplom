@@ -64,4 +64,40 @@ class Notification extends Model
             'is_read' => false
         ]);
     }
+
+    // Добавь в конец класса, перед последней закрывающей скобкой
+
+/**
+ * Получить иконку для типа уведомления
+ */
+public function getIconAttribute()
+{
+    return match($this->type) {
+        self::TYPE_BOOKING => 'calendar-check',
+        self::TYPE_SUBSCRIPTION => 'id-card',
+        self::TYPE_REMINDER => 'clock',
+        default => 'bell'
+    };
+}
+
+/**
+ * Получить цвет для типа уведомления
+ */
+public function getColorAttribute()
+{
+    return match($this->type) {
+        self::TYPE_BOOKING => 'primary',
+        self::TYPE_SUBSCRIPTION => 'success',
+        self::TYPE_REMINDER => 'warning',
+        default => 'info'
+    };
+}
+
+/**
+ * Получить текст статуса
+ */
+public function getStatusTextAttribute()
+{
+    return $this->is_read ? 'Прочитано' : 'Новое';
+}
 }

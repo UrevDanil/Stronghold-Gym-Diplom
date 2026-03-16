@@ -1,0 +1,518 @@
+/* ========================================
+   СТИЛИ ДЛЯ СТРАНИЦЫ УВЕДОМЛЕНИЙ
+   ======================================== */
+
+/* ----------------------------------------
+   1. ОБЩИЕ СТИЛИ
+   ---------------------------------------- */
+
+.notifications-page {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    min-height: 100vh;
+}
+
+/* ----------------------------------------
+   2. ЗАГОЛОВОК
+   ---------------------------------------- */
+
+.notifications-header {
+    background: linear-gradient(135deg, #0b34bb, #0e2778);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(11, 52, 187, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.notifications-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(100px);
+}
+
+.notifications-header h1 {
+    color: white;
+    font-weight: 700;
+    margin: 0;
+    font-size: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.notifications-header .back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    text-decoration: none;
+}
+
+.notifications-header .back-btn:hover {
+    background: white;
+    color: #0b34bb;
+    transform: translateX(-3px);
+}
+
+/* ----------------------------------------
+   3. ОСНОВНАЯ КАРТОЧКА
+   ---------------------------------------- */
+
+.notifications-card {
+    border: none;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    background: white;
+}
+
+/* ----------------------------------------
+   4. СПИСОК УВЕДОМЛЕНИЙ
+   ---------------------------------------- */
+
+.notifications-list {
+    padding: 1rem;
+}
+
+.notification-item {
+    background: white;
+    border-radius: 16px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.notification-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.notification-item.unread {
+    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    border-left-color: #0b34bb;
+}
+
+.notification-item.unread::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(11, 52, 187, 0.05));
+    transform: skewX(-20deg) translateX(50px);
+}
+
+.notification-item .notification-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.notification-item .notification-icon.booking {
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    color: #00573d;
+}
+
+.notification-item .notification-icon.subscription {
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    color: #4635dc;
+}
+
+.notification-item .notification-icon.system {
+    background: linear-gradient(135deg, #f6d365, #fda085);
+    color: #9b4d1d;
+}
+
+.notification-item .notification-icon i {
+    font-size: 1.5rem;
+}
+
+.notification-item .notification-content {
+    flex: 1;
+}
+
+.notification-item .notification-message {
+    font-size: 1rem;
+    color: #212529;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+}
+
+.notification-item .notification-time {
+    font-size: 0.85rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.notification-item .notification-time i {
+    font-size: 0.8rem;
+}
+
+.notification-item .mark-read-btn {
+    background: transparent;
+    border: 2px solid #0b34bb;
+    color: #0b34bb;
+    border-radius: 50px;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notification-item .mark-read-btn:hover {
+    background: #0b34bb;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(11, 52, 187, 0.3);
+}
+
+.notification-item .mark-read-btn i {
+    font-size: 0.9rem;
+}
+
+/* ----------------------------------------
+   5. ПУСТОЕ СОСТОЯНИЕ
+   ---------------------------------------- */
+
+.empty-notifications {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-notifications .empty-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.empty-notifications .empty-icon i {
+    font-size: 3rem;
+    color: #adb5bd;
+}
+
+.empty-notifications h4 {
+    color: #495057;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-notifications p {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.empty-notifications .btn-primary {
+    background: linear-gradient(135deg, #0b34bb, #0e2778);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.empty-notifications .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(11, 52, 187, 0.3);
+}
+
+/* ----------------------------------------
+   6. КНОПКА "ВСЕ ПРОЧИТАНО"
+   ---------------------------------------- */
+
+.btn-mark-all {
+    background: linear-gradient(135deg, #0b34bb, #4c71eb);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(11, 52, 187, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.btn-mark-all:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(11, 52, 187, 0.3);
+}
+
+.btn-mark-all:active {
+    transform: translateY(0);
+}
+
+.btn-mark-all i {
+    font-size: 1rem;
+    color: #ffffff;
+}
+
+/* ----------------------------------------
+   7. ПАГИНАЦИЯ И ИНФОРМАЦИЯ
+   ---------------------------------------- */
+
+.pagination-wrapper {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border-top: 2px solid #e9ecef;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 0 0 25px 25px;
+}
+
+.pagination-info {
+    text-align: center;
+    color: #495057;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    padding: 0.7rem 1.5rem;
+    background: white;
+    border-radius: 50px;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #e9ecef;
+    font-weight: 500;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.pagination-info i {
+    color: #0b34bb;
+    margin-right: 0.5rem;
+}
+
+.pagination-info strong {
+    color: #0b34bb;
+    font-weight: 700;
+    margin: 0 0.2rem;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.pagination-prev,
+.pagination-next {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: white;
+    border: 2px solid #0b34bb;
+    color: #0b34bb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.pagination-prev:hover,
+.pagination-next:hover {
+    background: #0b34bb;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(11, 52, 187, 0.2);
+}
+
+.pagination-prev.disabled,
+.pagination-next.disabled {
+    border-color: #ced4da;
+    color: #ced4da;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.pagination-page {
+    min-width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: white;
+    color: #495057;
+    border: 1px solid #e9ecef;
+}
+
+.pagination-page:hover {
+    background: #f0f4ff;
+    color: #0b34bb;
+    border-color: #0b34bb;
+    transform: translateY(-2px);
+}
+
+.pagination-page.active {
+    background: linear-gradient(135deg, #0b34bb, #0e2778);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(11, 52, 187, 0.3);
+}
+
+.pagination-dots {
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+/* ----------------------------------------
+   8. АДАПТИВНОСТЬ
+   ---------------------------------------- */
+
+@media (max-width: 768px) {
+    .notifications-header {
+        padding: 1.2rem 1.5rem;
+    }
+    
+    .notifications-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .notifications-header .back-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-mark-all {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .notification-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .notification-item .mark-read-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .notification-item .d-flex {
+        width: 100%;
+    }
+    
+    .pagination-container {
+        gap: 0.5rem;
+    }
+    
+    .pagination-page {
+        min-width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+    
+    .pagination-prev,
+    .pagination-next {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .pagination-info {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .notifications-header {
+        padding: 1rem;
+    }
+    
+    .notifications-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .btn-mark-all {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .notification-item {
+        padding: 1rem;
+    }
+    
+    .notification-item .notification-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .notification-item .notification-icon i {
+        font-size: 1.2rem;
+    }
+    
+    .notification-item .notification-message {
+        font-size: 0.9rem;
+    }
+    
+    .pagination-pages {
+        gap: 0.3rem;
+    }
+    
+    .pagination-page {
+        min-width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+    
+    .pagination-prev,
+    .pagination-next {
+        width: 32px;
+        height: 32px;
+    }
+}
