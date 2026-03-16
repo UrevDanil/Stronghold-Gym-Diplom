@@ -2,19 +2,24 @@
 
 @section('title', 'Мой профиль')
 
+@section('styles')
+    <link href="{{ asset('assets/css/dashboard/trainer/trainer-profile.css') }}" rel="stylesheet">
+@endsection
+
 @section('content')
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Мой профиль</h1>
-        <div>
-            <a href="{{ route('trainer.dashboard') }}" class="btn btn-outline-secondary me-2">
-                <i class="fas fa-arrow-left me-2"></i>Назад
-            </a>
-        </div>
+<div class="container py-4 trainer-profile-page">
+    <!-- Заголовок -->
+    <div class="trainer-profile-header d-flex justify-content-between align-items-center">
+        <h1 class="mb-0">
+            <i class="fas fa-user-circle me-3"></i>Мой профиль
+        </h1>
+        <a href="{{ route('trainer.dashboard') }}" class="back-btn">
+            <i class="fas fa-arrow-left me-2"></i>Назад
+        </a>
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
+        <div class="alert trainer-alert success alert-dismissible fade show" role="alert">
             <i class="fas fa-check-circle me-2"></i>
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -22,41 +27,77 @@
     @endif
 
     <div class="row">
-        <!-- Основная информация -->
+        <!-- Левая колонка: Аватар и информация -->
         <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <div class="avatar-circle bg-primary text-white mx-auto mb-3">
-                        {{ strtoupper(substr($user->name, 0, 1)) }}
+            <div class="profile-card">
+                <div class="card-body">
+                    <div class="trainer-avatar">
+                        <span>{{ strtoupper(substr($user->name, 0, 1)) }}</span>
                     </div>
-                    <h3>{{ $user->name }}</h3>
-                    <p class="text-muted">{{ $user->qualification ?? 'Тренер' }}</p>
                     
-                    <div class="text-start mt-4">
-                        <p class="mb-2">
-                            <i class="fas fa-envelope text-primary me-2"></i>
-                            {{ $user->email }}
-                        </p>
+                    <div class="text-center">
+                        <h2 class="trainer-name">{{ $user->name }}</h2>
+                        <p class="trainer-title">{{ $user->qualification ?? 'Тренер' }}</p>
+                    </div>
+                    
+                    <!-- УЛУЧШЕННЫЙ БЛОК ИНФОРМАЦИИ -->
+                    <div class="profile-info-grid">
+                        <!-- Email -->
+                        <div class="profile-info-row">
+                            <div class="profile-info-icon email">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="profile-info-content">
+                                <span class="profile-info-label">Email</span>
+                                <span class="profile-info-value email-value">{{ $user->email }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Телефон (если есть) -->
                         @if($user->phone)
-                        <p class="mb-2">
-                            <i class="fas fa-phone text-success me-2"></i>
-                            {{ $user->phone }}
-                        </p>
+                        <div class="profile-info-row">
+                            <div class="profile-info-icon phone">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="profile-info-content">
+                                <span class="profile-info-label">Телефон</span>
+                                <span class="profile-info-value phone-value">{{ $user->phone }}</span>
+                            </div>
+                        </div>
                         @endif
-                        <p class="mb-2">
-                            <i class="fas fa-calendar text-info me-2"></i>
-                            Зарегистрирован: {{ $user->created_at->format('d.m.Y') }}
-                        </p>
+                        
+                        <!-- Дата регистрации -->
+                        <div class="profile-info-row">
+                            <div class="profile-info-icon calendar">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <div class="profile-info-content">
+                                <span class="profile-info-label">Регистрация</span>
+                                <span class="profile-info-value">{{ $user->created_at->format('d.m.Y') }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- ID пользователя -->
+                        <div class="profile-info-row">
+                            <div class="profile-info-icon id">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div class="profile-info-content">
+                                <span class="profile-info-label">ID</span>
+                                <span class="profile-info-value">#{{ $user->id }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Редактирование профиля -->
-        <div class="col-md-8 mb-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Редактировать профиль</h5>
+        <!-- Правая колонка: Формы -->
+        <div class="col-md-8">
+            <!-- Форма редактирования профиля -->
+            <div class="form-card">
+                <div class="card-header">
+                    <i class="fas fa-edit"></i> Редактировать профиль
                 </div>
                 <div class="card-body">
                     <form method="POST" action="{{ route('trainer.profile.update') }}">
@@ -89,17 +130,17 @@
                             @enderror
                         </div>
 
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Сохранить изменения
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-save me-2"></i> Сохранить изменения
                         </button>
                     </form>
                 </div>
             </div>
 
-            <!-- Квалификация -->
-            <div class="card mt-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Квалификация и специализация</h5>
+            <!-- Форма квалификации -->
+            <div class="form-card mt-4">
+                <div class="card-header">
+                    <i class="fas fa-certificate"></i> Квалификация и специализация
                 </div>
                 <div class="card-body">
                     <form method="POST" action="{{ route('trainer.profile.qualification') }}">
@@ -124,8 +165,8 @@
                             @enderror
                         </div>
 
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-certificate me-2"></i>Обновить квалификацию
+                        <button type="submit" class="btn-qualification">
+                            <i class="fas fa-certificate me-2"></i> Обновить квалификацию
                         </button>
                     </form>
                 </div>
@@ -133,17 +174,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    .avatar-circle {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 40px;
-        font-weight: bold;
-    }
-</style>
 @endsection
