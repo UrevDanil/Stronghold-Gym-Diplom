@@ -12,7 +12,7 @@
 }
 
 /* ----------------------------------------
-   2. ЗАГОЛОВОК - ИСПРАВЛЕННАЯ ВЕРСИЯ
+   2. ЗАГОЛОВОК - РАБОЧАЯ ВЕРСИЯ
    ---------------------------------------- */
 
 .clients-header {
@@ -26,11 +26,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: nowrap;
+    flex-wrap: wrap; /* Меняем на wrap */
+    gap: 10px; /* Добавляем отступ если перенесется */
 }
 
 .clients-header::before {
-    content: '';    position: absolute;
+    content: '';
+    position: absolute;
     top: 0;
     right: 0;
     width: 200px;
@@ -45,7 +47,6 @@
     margin: 0;
     font-size: 2rem;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-    white-space: nowrap;
 }
 
 .clients-header .back-btn {
@@ -58,10 +59,7 @@
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
+    display: inline-block; /* Меняем на inline-block */
 }
 
 .clients-header .back-btn:hover {
@@ -145,18 +143,18 @@
 
 .filters-body .form-control:focus,
 .filters-body .form-select:focus {
-    border-color: #007bff;
+    border-color: #70fff8;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
     outline: none;
 }
 
 .filters-body .input-group .form-control:focus {
-    border-color: #007bff;
+    border-color: #70fff8;
     border-left-color: #e9ecef;
 }
 
 .btn-filter {
-    background: linear-gradient(135deg, #007bff, #00bcd4);
+    background: linear-gradient(135deg, #ff7077, #ff6d33);
     color: white;
     border: none;
     border-radius: 12px;
@@ -173,14 +171,14 @@
 
 .btn-filter:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 6px 20px rgba(212, 116, 52, 0.3);
     color: white;
 }
 
 .btn-reset {
     background: white;
-    border: 2px solid #007bff;
-    color: #007bff;
+    border: 2px solid #ff7077;
+    color: #ff7077;
     border-radius: 12px;
     padding: 0.7rem 1rem;
     font-weight: 600;
@@ -195,7 +193,7 @@
 }
 
 .btn-reset:hover {
-    background: #007bff;
+    background: linear-gradient(135deg, #ff7077, #ff6d33);
     color: white;
     transform: translateY(-2px);
 }
@@ -252,81 +250,120 @@
 }
 
 .stat-card.bg-primary {
-    background: linear-gradient(135deg, #007bff, #00bcd4);
+    background: linear-gradient(135deg, #7cacdf, #00bcd4);
 }
 
 .stat-card.bg-success {
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #91e6a5, #20c997);
 }
 
 .stat-card.bg-warning {
-    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    background: linear-gradient(135deg, #ffc107, #f1a465);
 }
 
 /* ----------------------------------------
-   6. КАРТОЧКА КЛИЕНТА
+   6. КАРТОЧКА КЛИЕНТА - УЛУЧШЕННЫЙ ДИЗАЙН
    ---------------------------------------- */
 
 .client-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     height: 100%;
     display: flex;
     flex-direction: column;
     position: relative;
+    border: 1px solid rgba(255, 112, 119, 0.1);
 }
 
 .client-card:hover {
-    box-shadow: 0 15px 40px rgba(0, 123, 255, 0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 25px 45px rgba(255, 112, 119, 0.2);
+    border-color: rgba(255, 112, 119, 0.3);
 }
 
 .client-card__header {
-    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    background: linear-gradient(135deg, #fff5f5, #fff0f0);
     padding: 1.5rem 1.5rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 2px solid rgba(255, 112, 119, 0.1);
+    position: relative;
+}
+
+.client-card__header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #ff7077, #70fff8);
+    border-radius: 2px;
 }
 
 .client-avatar {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #007bff, #00bcd4);
+    background: linear-gradient(135deg, #ff7077, #ff8a8f);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     position: relative;
+    box-shadow: 0 10px 20px rgba(255, 112, 119, 0.3);
+    border: 3px solid white;
+    transition: all 0.3s ease;
+}
+
+.client-card:hover .client-avatar {
+    transform: scale(1.05) rotate(5deg);
+    box-shadow: 0 15px 25px rgba(255, 112, 119, 0.4);
 }
 
 .client-avatar.active::after {
     content: '';
     position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 12px;
-    height: 12px;
+    bottom: 5px;
+    right: 5px;
+    width: 14px;
+    height: 14px;
     background: #28a745;
     border: 2px solid white;
     border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .online-badge {
     position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 12px;
-    height: 12px;
+    bottom: 5px;
+    right: 5px;
+    width: 14px;
+    height: 14px;
     background: #28a745;
     border: 2px solid white;
     border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
 }
 
 .client-badges {
@@ -336,94 +373,158 @@
 }
 
 .trainings-badge {
-    background: linear-gradient(135deg, #007bff, #00bcd4);
+    background: linear-gradient(135deg, #ff7077, #ff8a8f);
     color: white;
-    padding: 0.3rem 0.8rem;
+    padding: 0.4rem 1rem;
     border-radius: 50px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
+    box-shadow: 0 4px 10px rgba(255, 112, 119, 0.2);
+    letter-spacing: 0.3px;
 }
 
 .subscription-badge {
-    background: linear-gradient(135deg, #ffd700, #ffa500);
+    background: linear-gradient(135deg, #ffd700, #ffb347);
     color: white;
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
-    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
+    font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+    animation: crownGlow 2s infinite;
+}
+
+@keyframes crownGlow {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
+    }
 }
 
 .client-card__body {
     padding: 1.5rem;
     flex: 1;
+    background: white;
 }
 
 .client-name {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 700;
-    color: #212529;
-    margin-bottom: 1rem;
+    color: #2c3e50;
+    margin-bottom: 1.2rem;
+    border-left: 4px solid #ff7077;
+    padding-left: 0.8rem;
 }
 
 .client-contacts {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.7rem;
     margin-bottom: 1.5rem;
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 16px;
 }
 
 .contact-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    color: #6c757d;
+    gap: 0.8rem;
+    color: #2c3e50;
     text-decoration: none;
     font-size: 0.9rem;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    padding: 0.4rem 0.6rem;
+    border-radius: 12px;
 }
 
 .contact-item:hover {
-    color: #007bff;
-    transform: translateX(3px);
+    background: white;
+    color: #ff7077;
+    transform: translateX(5px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
 .contact-item i {
-    width: 16px;
-    color: #007bff;
+    width: 20px;
+    font-size: 1rem;
+    color: #ff7077;
+    transition: all 0.3s ease;
+}
+
+.contact-item:hover i {
+    transform: scale(1.2);
 }
 
 /* Прогресс */
 .progress-section {
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
+    background: #f8f9fa;
+    padding: 0.8rem;
+    border-radius: 16px;
 }
 
 .progress-label {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.4rem;
     font-size: 0.85rem;
     color: #6c757d;
+    font-weight: 500;
 }
 
 .progress-value {
-    font-weight: 600;
+    font-weight: 700;
     color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
 }
 
 .progress {
-    height: 6px;
+    height: 8px;
     background-color: #e9ecef;
     border-radius: 10px;
     overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .progress-bar {
     border-radius: 10px;
-    transition: width 0.6s ease;
+    transition: width 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+    background: linear-gradient(90deg, #28a745, #20c997);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0.2) 0%, 
+        rgba(255,255,255,0.4) 50%, 
+        rgba(255,255,255,0.2) 100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 /* Последняя тренировка */
@@ -432,27 +533,42 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.9rem;
-    color: #495057;
-    background: #f8f9fa;
-    padding: 0.75rem;
-    border-radius: 12px;
+    color: #2c3e50;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    padding: 0.8rem 1rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 112, 119, 0.1);
     flex-wrap: wrap;
+    transition: all 0.3s ease;
+}
+
+.last-training:hover {
+    border-color: #ff7077;
+    box-shadow: 0 4px 12px rgba(255, 112, 119, 0.1);
 }
 
 .last-training i {
-    color: #007bff;
+    color: #ff7077;
+    font-size: 1rem;
 }
 
 .last-training strong {
-    color: #212529;
+    color: #2c3e50;
+    font-weight: 700;
+    background: rgba(255, 112, 119, 0.1);
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
 }
 
 .workout-name {
-    background: #e9ecef;
-    padding: 0.2rem 0.5rem;
+    background: linear-gradient(135deg, #ff7077, #ff8a8f);
+    color: white;
+    padding: 0.2rem 0.8rem;
     border-radius: 50px;
     font-size: 0.8rem;
-    color: #495057;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 5px rgba(255, 112, 119, 0.3);
 }
 
 /* Футер карточки */
@@ -460,58 +576,78 @@
     padding: 1rem 1.5rem 1.5rem;
     display: flex;
     gap: 0.5rem;
-    border-top: 1px solid rgba(0,0,0,0.05);
+    border-top: 2px solid rgba(255, 112, 119, 0.1);
+    background: #f8f9fa;
 }
 
 .btn-action {
     flex: 1;
-    padding: 0.6rem;
-    border-radius: 12px;
+    padding: 0.7rem;
+    border-radius: 14px;
     font-size: 0.85rem;
     font-weight: 600;
     text-decoration: none;
     text-align: center;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     border: none;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.3px;
 }
 
 .btn-profile {
-    background: linear-gradient(135deg, #007bff, #00bcd4);
+    background: linear-gradient(135deg, #ff7077, #ff8a8f);
     color: white;
+    box-shadow: 0 4px 10px rgba(255, 112, 119, 0.3);
 }
 
 .btn-profile:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 112, 119, 0.4);
+    background: linear-gradient(135deg, #ff8a8f, #ff7077);
 }
 
 .btn-history {
     background: white;
-    border: 2px solid #28a745;
-    color: #28a745;
+    border: 2px solid #ff7077;
+    color: #ff7077;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .btn-history:hover {
-    background: #28a745;
+    background: #ff7077;
     color: white;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 112, 119, 0.3);
 }
 
 .btn-contact {
     background: white;
-    border: 2px solid #6c757d;
-    color: #6c757d;
+    border: 2px solid #28a745;
+    color: #28a745;
     flex: 0 0 auto;
-    width: 42px;
-    padding: 0.6rem 0;
+    width: 46px;
+    padding: 0.7rem 0;
+    border-radius: 14px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .btn-contact:hover {
-    background: #6c757d;
+    background: #28a745;
     color: white;
-    transform: translateY(-2px);
+    transform: translateY(-3px) rotate(10deg);
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+}
+
+.btn-contact i {
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-contact:hover i {
+    transform: scale(1.2);
 }
 
 /* ----------------------------------------
@@ -633,161 +769,60 @@
 }
 
 /* ----------------------------------------
-   9. АДАПТИВНОСТЬ (исправленная)
+   9. АДАПТИВНОСТЬ - ПРОСТОЕ РЕШЕНИЕ
    ---------------------------------------- */
 
 @media (max-width: 768px) {
     .clients-header {
-        padding: 1rem 1.2rem;
+        padding: 1rem 1.5rem;
     }
     
     .clients-header h1 {
         font-size: 1.3rem;
-        /* Убираем все ограничения */
-        max-width: none;
-        overflow: visible;
-        text-overflow: clip;
-        white-space: nowrap;
-    }
-    
-    .clients-header h1 i {
-        margin-right: 0.5rem;
     }
     
     .clients-header .back-btn {
-        padding: 0.4rem 1rem;
+        padding: 0.4rem 1.2rem;
         font-size: 0.9rem;
-        margin-left: auto;
-        white-space: nowrap;
-        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .clients-header {
+        padding: 0.8rem 1.2rem;
+    }
+    
+    .clients-header h1 {
+        font-size: 1.2rem;
+    }
+    
+    .clients-header .back-btn {
+        padding: 0.35rem 1rem;
+        font-size: 0.85rem;
     }
 }
 
 @media (max-width: 480px) {
     .clients-header {
-        padding: 0.8rem 1rem;
+        padding: 0.7rem 1rem;
     }
     
     .clients-header h1 {
         font-size: 1.1rem;
-        /* Убираем все ограничения */
-        max-width: none;
-        overflow: visible;
-        text-overflow: clip;
     }
     
     .clients-header h1 i {
+        font-size: 0.9rem;
         margin-right: 0.4rem;
-        font-size: 1rem;
     }
     
     .clients-header .back-btn {
-        padding: 0.3rem 0.8rem;
-        font-size: 0.85rem;
+        padding: 0.3rem 0.9rem;
+        font-size: 0.8rem;
     }
     
     .clients-header .back-btn i {
+        font-size: 0.75rem;
         margin-right: 0.3rem;
-        font-size: 0.8rem;
-    }
-}
-
-@media (max-width: 360px) {
-    .clients-header h1 {
-        font-size: 1rem;
-        /* Убираем все ограничения */
-        max-width: none;
-    }
-    
-    .clients-header .back-btn {
-        padding: 0.25rem 0.6rem;
-        font-size: 0.8rem;
-    }
-}
-
-/* ----------------------------------------
-   10. ИСПРАВЛЕНИЯ ДЛЯ КНОПКИ НАЗАД
-   ---------------------------------------- */
-
-/* Базовые стили для кнопки */
-.clients-header .back-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap; /* САМОЕ ГЛАВНОЕ - запрещаем перенос текста */
-    flex-shrink: 0; /* Запрещаем сжиматься */
-    padding: 0.6rem 1.5rem;
-    font-size: 1rem;
-    line-height: 1.2;
-    text-decoration: none;
-}
-
-/* Иконка внутри кнопки */
-.clients-header .back-btn i {
-    margin-right: 0.5rem;
-    flex-shrink: 0; /* Иконка тоже не сжимается */
-}
-
-/* Для мобильных устройств */
-@media (max-width: 768px) {
-    .clients-header {
-        flex-wrap: nowrap; /* Запрещаем перенос элементов в заголовке */
-        padding: 1rem 1.2rem;
-    }
-    
-    .clients-header h1 {
-        font-size: 1.3rem;
-        white-space: nowrap; /* Заголовок тоже не переносим */
-        overflow: hidden;
-        text-overflow: ellipsis; /* Если очень длинный - обрезаем с троеточием */
-        flex: 1; /* Заголовок занимает доступное место */
-        min-width: 0; /* Разрешаем ему сжиматься */
-    }
-    
-    .clients-header .back-btn {
-        padding: 0.4rem 1rem;
-        font-size: 0.9rem;
-        margin-right: 0.5rem;
-    }
-    
-    .clients-header .trainer-info {
-        padding: 0.4rem 1rem;
-        font-size: 0.85rem;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-}
-
-/* Для очень маленьких экранов */
-@media (max-width: 480px) {
-    .clients-header {
-        padding: 0.8rem 1rem;
-    }
-    
-    .clients-header h1 {
-        font-size: 1.1rem;
-        max-width: 120px; /* Ограничиваем ширину заголовка */
-    }
-    
-    .clients-header .back-btn {
-        padding: 0.3rem 0.8rem;
-        font-size: 0.85rem;
-    }
-    
-    .clients-header .back-btn i {
-        margin-right: 0.3rem;
-        font-size: 0.8rem;
-    }
-    
-    .clients-header .trainer-info {
-        padding: 0.3rem 0.8rem;
-        font-size: 0.8rem;
-    }
-}
-
-/* Экстренный случай - если все еще не работает */
-@media (max-width: 360px) {
-    .clients-header .trainer-info {
-        display: none; /* Прячем информацию о тренере на совсем маленьких */
     }
 }

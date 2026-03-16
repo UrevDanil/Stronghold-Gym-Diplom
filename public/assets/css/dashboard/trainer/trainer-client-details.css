@@ -1,0 +1,726 @@
+/* ========================================
+   СТИЛИ ДЛЯ СТРАНИЦЫ ПРОФИЛЯ КЛИЕНТА
+   ======================================== */
+
+/* ----------------------------------------
+   1. ОБЩИЕ СТИЛИ
+   ---------------------------------------- */
+
+.client-profile-page {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    min-height: 100vh;
+}
+
+/* ----------------------------------------
+   2. ЗАГОЛОВОК
+   ---------------------------------------- */
+
+.profile-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(100px);
+}
+
+.profile-header h1 {
+    color: white;
+    font-weight: 700;
+    margin: 0;
+    font-size: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.profile-header .back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.profile-header .back-btn:hover {
+    background: white;
+    color: #667eea;
+    transform: translateX(-3px);
+}
+
+.profile-header .trainer-info {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    padding: 0.5rem 1.2rem;
+    color: white;
+    font-weight: 500;
+    backdrop-filter: blur(5px);
+    white-space: nowrap;
+}
+
+/* ----------------------------------------
+   3. КАРТОЧКА ПРОФИЛЯ
+   ---------------------------------------- */
+
+.profile-card {
+    background: white;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    height: 100%;
+}
+
+.profile-card__header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 2rem 1.5rem 1.5rem;
+    text-align: center;
+    position: relative;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #667eea;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    border: 4px solid rgba(255,255,255,0.5);
+    position: relative;
+}
+
+.profile-avatar.online::after {
+    content: '';
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 15px;
+    height: 15px;
+    background: #28a745;
+    border: 2px solid white;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+.online-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 15px;
+    height: 15px;
+    background: #28a745;
+    border: 2px solid white;
+    border-radius: 50%;
+}
+
+.profile-status {
+    margin-top: 0.5rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+}
+
+.status-badge.active {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+}
+
+.status-badge.inactive {
+    background: linear-gradient(135deg, #6c757d, #5a6268);
+    box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+}
+
+.profile-card__body {
+    padding: 1.5rem;
+}
+
+.profile-name {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Сетка информации */
+.profile-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.info-row:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.info-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.info-icon.email {
+    background: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.info-icon.phone {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.info-icon.birthday {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.info-icon.registered {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-label {
+    display: block;
+    font-size: 0.7rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.1rem;
+}
+
+.info-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+.info-value.email-value {
+    color: #0d6efd;
+}
+
+.info-value.phone-value {
+    color: #28a745;
+}
+
+.age-badge {
+    display: inline-block;
+    background: #e9ecef;
+    color: #6c757d;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.1rem 0.4rem;
+    border-radius: 50px;
+    margin-left: 0.3rem;
+}
+
+/* Заметки о клиенте */
+.client-notes {
+    background: #fff8e7;
+    border-radius: 16px;
+    padding: 1.2rem;
+    border-left: 4px solid #ffc107;
+}
+
+.notes-header {
+    display: flex;
+    align-items: center;
+    color: #856404;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+}
+
+.notes-content {
+    color: #2c3e50;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+/* ----------------------------------------
+   4. КАРТОЧКА СТАТИСТИКИ
+   ---------------------------------------- */
+
+.stats-card {
+    background: white;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+.stats-card__header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 1.2rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card__header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(50px);
+}
+
+.stats-card__body {
+    padding: 1.5rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.bg-primary-soft {
+    background: rgba(13, 110, 253, 0.1);
+}
+
+.bg-success-soft {
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.bg-danger-soft {
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.bg-warning-soft {
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 0.2rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+/* Прогресс посещаемости */
+.attendance-progress {
+    background: #f8f9fa;
+    padding: 1.2rem;
+    border-radius: 16px;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.progress-percent {
+    color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+}
+
+.progress {
+    height: 10px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 0.8s ease;
+}
+
+/* ----------------------------------------
+   5. КАРТОЧКА ИСТОРИИ
+   ---------------------------------------- */
+
+.history-card {
+    background: white;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+.history-card__header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 1.2rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.history-card__header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(50px);
+}
+
+.history-card__body {
+    padding: 1.5rem;
+}
+
+/* Таблица истории */
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table thead th {
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.history-table tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.history-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.history-table tbody tr:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.date-cell {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.date-cell small {
+    font-size: 0.7rem;
+    color: #6c757d;
+    font-weight: 400;
+}
+
+.time-badge {
+    background: #e9ecef;
+    color: #495057;
+    padding: 0.3rem 0.6rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.workout-name {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.trainer-name {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Мини-бейджи статусов */
+.status-badge-mini {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge-mini.success {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.status-badge-mini.danger {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.status-badge-mini.warning {
+    background: rgba(255, 193, 7, 0.1);
+    color: #856404;
+}
+
+.status-badge-mini.secondary {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+/* Пустое состояние */
+.empty-history {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-history i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.empty-history h4 {
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+/* ----------------------------------------
+   6. АДАПТИВНОСТЬ
+   ---------------------------------------- */
+
+@media (max-width: 768px) {
+    .profile-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .profile-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .profile-header .back-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .profile-name {
+        font-size: 1.5rem;
+    }
+    
+    .stat-item {
+        padding: 0.8rem;
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .history-table thead {
+        display: none;
+    }
+    
+    .history-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    
+    .history-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem;
+    }
+    
+    .history-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .date-cell {
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-header {
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: flex-start;
+    }
+    
+    .profile-header h1 {
+        font-size: 1.2rem;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+    
+    .info-row {
+        flex-wrap: wrap;
+    }
+}
+
+/* ----------------------------------------
+   ИНФОРМАЦИЯ ДЛЯ ТРЕНЕРА (ОТ КЛИЕНТА)
+   ---------------------------------------- */
+
+.client-notes-section {
+    background: linear-gradient(135deg, #e3f2fd, #bbdef5);
+    border-radius: 16px;
+    padding: 1.2rem;
+    margin-top: 1.5rem;
+    border-left: 4px solid #2196f3;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.15);
+    transition: all 0.3s ease;
+}
+
+.client-notes-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(33, 150, 243, 0.2);
+}
+
+.client-notes-section.empty {
+    background: #f8f9fa;
+    border-left-color: #6c757d;
+    opacity: 0.9;
+}
+
+.client-notes-section .notes-header {
+    display: flex;
+    align-items: center;
+    color: #1976d2;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.client-notes-section.empty .notes-header {
+    color: #6c757d;
+}
+
+.client-notes-section .notes-header i {
+    font-size: 1.1rem;
+}
+
+.client-notes-section .notes-content {
+    color: #2c3e50;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 0.8rem;
+    background: rgba(255,255,255,0.8);
+    border-radius: 12px;
+}
+
+.client-notes-section .text-muted {
+    color: #6c757d !important;
+    font-style: italic;
+}
+
+.client-notes-section .text-muted i {
+    color: #6c757d;
+}

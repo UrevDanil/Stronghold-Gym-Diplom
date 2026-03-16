@@ -324,20 +324,26 @@
 .client-info {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 1rem;
 }
 
 .client-avatar {
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    background: #b8b8b8;
+    background: linear-gradient(135deg, #b12121, #ee6c15);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 700;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+    box-shadow: 0 8px 15px rgba(238, 108, 21, 0.3);
+    transition: all 0.3s ease;
+}
+
+.client-avatar:hover {
+    transform: scale(1.1) rotate(5deg);
 }
 
 .client-details {
@@ -346,13 +352,19 @@
 
 .client-name {
     font-weight: 700;
-    color: #212529;
+    color: #2c3e50;
     margin-bottom: 0.2rem;
+    font-size: 1.1rem;
 }
 
 .client-age {
     font-size: 0.8rem;
     color: #6c757d;
+    background: #f8f9fa;
+    padding: 0.1rem 0.5rem;
+    border-radius: 50px;
+    display: inline-block;
+    margin-right: 0.5rem;
 }
 
 .client-phone {
@@ -360,45 +372,74 @@
     text-decoration: none;
     font-weight: 500;
     transition: all 0.2s ease;
+    font-size: 0.85rem;
+    background: rgba(40, 167, 69, 0.1);
+    padding: 0.1rem 0.5rem;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 
 .client-phone:hover {
-    color: #20c997;
-    text-decoration: underline;
+    background: #28a745;
+    color: white;
+    transform: translateX(3px);
 }
 
 .client-phone i {
-    font-size: 0.8rem;
-    margin-right: 0.3rem;
+    font-size: 0.7rem;
 }
 
 /* ----------------------------------------
    8. БЕЙДЖИ СТАТУСОВ
    ---------------------------------------- */
 
+/* Базовые стили для всех статусов */
 .status-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     padding: 0.4rem 1rem;
     border-radius: 50px;
     font-size: 0.85rem;
     font-weight: 600;
-    text-align: center;
     min-width: 100px;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
+/* Статус Ожидает */
 .status-badge.waiting {
-    background: #ffc107;
-    color: #856404;
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: white;
+    box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+}
+
+.status-badge.waiting i {
+    color: white;
+    font-size: 0.9rem;
 }
 
 .status-badge.attended {
-    background: #28a745;
+    background: linear-gradient(135deg, #28a745, #20c997);
     color: white;
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
 }
 
+/* Бейдж "Пропустил" */
 .status-badge.missed {
-    background: #dc3545;
+    background: linear-gradient(135deg, #dc3545, #c82333);
     color: white;
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 .status-badge.cancelled {
@@ -417,45 +458,57 @@
 }
 
 .btn-attend {
-    background: white;
-    border: 2px solid #28a745;
-    color: #28a745;
+    background: linear-gradient(135deg, #28a745, #57d875);
+    border: none;
+    color: white;
     border-radius: 50px;
-    padding: 0.4rem 1rem;
+    padding: 0.5rem 1.2rem;
     font-size: 0.85rem;
     font-weight: 600;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.5rem;
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
 .btn-attend:hover {
     background: #28a745;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(61, 224, 102, 0.4);
+    background: linear-gradient(135deg, #28a745, #57d875);
 }
 
 .btn-miss {
-    background: white;
-    border: 2px solid #dc3545;
-    color: #dc3545;
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border: none;
+    color: white;
     border-radius: 50px;
-    padding: 0.4rem 1rem;
+    padding: 0.5rem 1.2rem;
     font-size: 0.85rem;
     font-weight: 600;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.5rem;
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
 .btn-miss:hover {
-    background: #dc3545;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+    background: linear-gradient(135deg, #c82333, #dc3545);
+}
+
+.btn-miss i {
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.btn-miss:hover i {
+    transform: rotate(10deg) scale(1.2);
 }
 
 .btn-attend:disabled,
@@ -474,14 +527,59 @@
 
 .status-text.success {
     color: #28a745;
+    background: linear-gradient(135deg, #fff, #f0fff4);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
 }
 
+/* Статус "Не пришел" (когда уже отмечено) */
 .status-text.danger {
     color: #dc3545;
+    background: linear-gradient(135deg, #fff, #fff0f0);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
 }
 
-.status-text i {
+.status-text.danger i {
     font-size: 1rem;
+    animation: shake 2s infinite;
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(-10deg);
+    }
+    75% {
+        transform: rotate(10deg);
+    }
+}
+
+
+.status-text.success i {
+    font-size: 1rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-2px);
+    }
 }
 
 /* ----------------------------------------
@@ -758,5 +856,21 @@
     
     .action-btn-group {
         flex-direction: column;
+    }
+
+        /* Название тренировки */
+    .attendance-table td:nth-child(2) {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .attendance-table td:nth-child(2) small {
+        display: inline-block;
+        background: #f8f9fa;
+        padding: 0.2rem 0.6rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-left: 0.5rem;
     }
 }
