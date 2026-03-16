@@ -196,14 +196,16 @@
 
         <!-- Статистика за день -->
         <div class="stats-row">
-            <div class="row">
+            <div class="row g-2"> <!-- Добавил g-2 для меньших отступов между колонками -->
                 <div class="col-md-4">
                     <div class="stat-card bg-success">
                         <div class="card-body">
-                            <div class="stat-icon">
-                                <i class="fas fa-check-circle"></i>
+                            <div class="stat-left">
+                                <div class="stat-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stat-label">Посетили</div>
                             </div>
-                            <div class="stat-label">Посетили</div>
                             <div class="stat-number">{{ $bookings->where('status', 'attended')->count() }}</div>
                         </div>
                     </div>
@@ -211,10 +213,12 @@
                 <div class="col-md-4">
                     <div class="stat-card bg-warning">
                         <div class="card-body">
-                            <div class="stat-icon">
-                                <i class="fas fa-clock"></i>
+                            <div class="stat-left">
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-label">Ожидают</div>
                             </div>
-                            <div class="stat-label">Ожидают</div>
                             <div class="stat-number">{{ $bookings->where('status', 'booked')->count() }}</div>
                         </div>
                     </div>
@@ -222,10 +226,12 @@
                 <div class="col-md-4">
                     <div class="stat-card bg-danger">
                         <div class="card-body">
-                            <div class="stat-icon">
-                                <i class="fas fa-times-circle"></i>
+                            <div class="stat-left">
+                                <div class="stat-icon">
+                                    <i class="fas fa-times-circle"></i>
+                                </div>
+                                <div class="stat-label">Пропустили</div>
                             </div>
-                            <div class="stat-label">Пропустили</div>
                             <div class="stat-number">{{ $bookings->where('status', 'missed')->count() }}</div>
                         </div>
                     </div>

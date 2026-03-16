@@ -97,6 +97,24 @@ public function clients(Request $request)
 {
     $user = auth()->user();
     
+    // ============= НОВЫЙ КОД: Статистика для верхних карточек =============
+    
+    // 1. Количество тренировок на сегодня
+    $todayTrainings = Schedule::where('trainer_id', $user->id)
+        ->whereDate('date', today())
+        ->count();
+    
+    // 2. Средняя посещаемость всех клиентов этого тренера
+    $avgAttendance = Booking::whereHas('schedule', function($q) use ($user) {
+            $q->where('trainer_id', $user->id);
+        })
+        ->selectRaw('AVG(CASE WHEN status = "attended" THEN 100 ELSE 0 END) as avg')
+        ->value('avg') ?? 0;
+    
+    $avgAttendance = round($avgAttendance); // Округляем до целого
+    
+    // ============= ОСНОВНОЙ ЗАПРОС КЛИЕНТОВ =============
+    
     // Получаем уникальных клиентов, которые посещали тренировки тренера
     $query = User::whereHas('bookings.schedule', function($q) use ($user) {
             $q->where('trainer_id', $user->id);
@@ -109,7 +127,7 @@ public function clients(Request $request)
             ->latest();
         }]);
 
-    // Поиск по имени или телефону
+    // Поиск по имени, email или телефону
     if ($request->filled('search')) {
         $search = $request->search;
         $query->where(function($q) use ($search) {
@@ -206,7 +224,9 @@ public function clients(Request $request)
     return view('trainer.clients', [
         'user' => $user,
         'clients' => $paginated,
-        'workouts' => $workouts
+        'workouts' => $workouts,
+        'todayTrainings' => $todayTrainings,      // <-- НОВОЕ
+        'avgAttendance' => $avgAttendance          // <-- НОВОЕ
     ]);
 }
 

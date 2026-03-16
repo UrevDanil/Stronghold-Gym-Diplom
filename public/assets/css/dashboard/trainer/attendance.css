@@ -16,11 +16,11 @@
    ---------------------------------------- */
 
 .attendance-header {
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #b12121, #ee6c15);
     border-radius: 20px;
     padding: 1.5rem 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(40, 167, 69, 0.2);
+    box-shadow: 0 10px 30px rgba(153, 161, 155, 0.2);
     position: relative;
     overflow: hidden;
 }
@@ -59,7 +59,7 @@
 
 .attendance-header .back-btn:hover {
     background: white;
-    color: #28a745;
+    color: #ee6c15;
     transform: translateX(-3px);
 }
 
@@ -74,7 +74,7 @@
 
 .attendance-header .trainer-info i {
     margin-right: 0.5rem;
-    color: #ffd700;
+    color: #ffffff;
 }
 
 /* ----------------------------------------
@@ -123,7 +123,7 @@
 }
 
 .filters-header {
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #b12121, #ee6c15);
     color: white;
     padding: 1rem 1.5rem;
     font-weight: 600;
@@ -131,7 +131,7 @@
 
 .filters-header i {
     margin-right: 0.5rem;
-    color: #ffd700;
+    color: #ffffff;
 }
 
 .filters-body {
@@ -158,7 +158,7 @@
 
 .filters-body .form-control:focus,
 .filters-body .form-select:focus {
-    border-color: #28a745;
+    border-color: #ee6c15;
     box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.1);
     outline: none;
 }
@@ -172,7 +172,7 @@
 }
 
 .btn-filter {
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #f32727, #fc8333);
     color: white;
     border: none;
     border-radius: 12px;
@@ -190,14 +190,14 @@
 
 .btn-filter:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 6px 20px rgba(233, 100, 23, 0.3);
     color: white;
 }
 
 .btn-reset {
     background: white;
-    border: 2px solid #28a745;
-    color: #28a745;
+    border: 2px solid #ee6c15;
+    color: #ee6c15;
     border-radius: 12px;
     padding: 0.7rem 1rem;
     font-weight: 600;
@@ -212,7 +212,7 @@
 }
 
 .btn-reset:hover {
-    background: #28a745;
+    background: #ee6c15;
     color: white;
     transform: translateY(-2px);
 }
@@ -241,7 +241,7 @@
 }
 
 .attendance-card .card-header {
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #b12121, #ee6c15);
     color: white;
     padding: 1.2rem 1.5rem;
     font-weight: 700;
@@ -264,7 +264,7 @@
 
 .attendance-card .card-header i {
     margin-right: 0.5rem;
-    color: #ffd700;
+    color: #ffffff;
 }
 
 .attendance-card .card-header .date-badge {
@@ -331,7 +331,7 @@
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: #b8b8b8;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -485,7 +485,7 @@
 }
 
 /* ----------------------------------------
-   10. СТАТИСТИКА
+   10. СТАТИСТИКА - УМЕНЬШЕННЫЙ ВАРИАНТ
    ---------------------------------------- */
 
 .stats-row {
@@ -494,36 +494,47 @@
 
 .stat-card {
     border: none;
-    border-radius: 20px;
+    border-radius: 16px; /* Чуть уменьшил скругление */
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05); /* Меньше тень */
     transition: all 0.3s ease;
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    transform: translateY(-3px); /* Меньше подъем */
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
 }
 
 .stat-card .card-body {
-    padding: 1.5rem;
+    padding: 1rem 1rem; /* Уменьшил отступы (было 1.5rem) */
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Распределяем иконку и текст по краям */
+}
+
+/* Левая часть с иконкой и лейблом */
+.stat-card .stat-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .stat-card .stat-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+    font-size: 1.8rem; /* Уменьшил иконку (было 2.5rem) */
+    margin-bottom: 0; /* Убрал нижний отступ */
 }
 
 .stat-card .stat-label {
-    font-size: 1rem;
+    font-size: 0.95rem; /* Чуть меньше текст */
     color: rgba(255,255,255,0.9);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0; /* Убрал нижний отступ */
+    font-weight: 500;
 }
 
 .stat-card .stat-number {
-    font-size: 2.5rem;
-    font-weight: 800;
+    font-size: 1.8rem; /* Уменьшил цифры (было 2.5rem) */
+    font-weight: 700; /* Сделал чуть менее жирным (было 800) */
     color: white;
     line-height: 1;
 }
@@ -538,6 +549,25 @@
 
 .stat-card.bg-danger {
     background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .stat-card .card-body {
+        padding: 0.8rem; /* Еще меньше на мобилках */
+    }
+    
+    .stat-card .stat-icon {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.9rem;
+    }
+    
+    .stat-card .stat-number {
+        font-size: 1.5rem;
+    }
 }
 
 /* ----------------------------------------
@@ -575,7 +605,7 @@
 }
 
 .empty-state .btn-primary {
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #b12121, #ee6c15);
     color: white;
     border: none;
     border-radius: 50px;
@@ -591,7 +621,7 @@
 
 .empty-state .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 6px 20px rgba(167, 70, 40, 0.3);
 }
 
 .empty-state .btn-outline-secondary {

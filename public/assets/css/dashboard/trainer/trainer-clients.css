@@ -1,0 +1,793 @@
+/* ========================================
+   СТИЛИ ДЛЯ СТРАНИЦЫ МОИ КЛИЕНТЫ
+   ======================================== */
+
+/* ----------------------------------------
+   1. ОБЩИЕ СТИЛИ
+   ---------------------------------------- */
+
+.clients-page {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    min-height: 100vh;
+}
+
+/* ----------------------------------------
+   2. ЗАГОЛОВОК - ИСПРАВЛЕННАЯ ВЕРСИЯ
+   ---------------------------------------- */
+
+.clients-header {
+    background: linear-gradient(135deg, #ff7077, #70fff8);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 123, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.clients-header::before {
+    content: '';    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(100px);
+}
+
+.clients-header h1 {
+    color: white;
+    font-weight: 700;
+    margin: 0;
+    font-size: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    white-space: nowrap;
+}
+
+.clients-header .back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.clients-header .back-btn:hover {
+    background: white;
+    color: #70fff8;
+    transform: translateX(-3px);
+}
+
+.clients-header .back-btn i {
+    margin-right: 0.5rem;
+}
+
+/* ----------------------------------------
+   3. АЛЕРТЫ
+   ---------------------------------------- */
+
+.clients-alert {
+    border-radius: 15px;
+    border: none;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    animation: slideDown 0.3s ease;
+}
+
+.clients-alert.success {
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    color: #00573d;
+}
+
+/* ----------------------------------------
+   4. ФИЛЬТРЫ
+   ---------------------------------------- */
+
+.filters-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.filters-header {
+    background: linear-gradient(135deg, #ff7077, #70fff8);
+    color: white;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+}
+
+.filters-header i {
+    margin-right: 0.5rem;
+    color: #ffffff;
+}
+
+.filters-body {
+    padding: 1.5rem;
+    background: white;
+}
+
+.filters-body .form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.filters-body .input-group-text {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-right: none;
+    border-radius: 12px 0 0 12px;
+}
+
+.filters-body .form-control,
+.filters-body .form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.filters-body .form-control:focus,
+.filters-body .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
+    outline: none;
+}
+
+.filters-body .input-group .form-control:focus {
+    border-color: #007bff;
+    border-left-color: #e9ecef;
+}
+
+.btn-filter {
+    background: linear-gradient(135deg, #007bff, #00bcd4);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.7rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.btn-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+    color: white;
+}
+
+.btn-reset {
+    background: white;
+    border: 2px solid #007bff;
+    color: #007bff;
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 46px;
+    width: 46px;
+}
+
+.btn-reset:hover {
+    background: #007bff;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ----------------------------------------
+   5. СТАТИСТИКА
+   ---------------------------------------- */
+
+.stats-row {
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+}
+
+.stat-card .card-body {
+    padding: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stat-card .stat-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.stat-card .stat-icon {
+    font-size: 2rem;
+}
+
+.stat-card .stat-label {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.9);
+    font-weight: 500;
+}
+
+.stat-card .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1;
+}
+
+.stat-card.bg-primary {
+    background: linear-gradient(135deg, #007bff, #00bcd4);
+}
+
+.stat-card.bg-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.stat-card.bg-warning {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+}
+
+/* ----------------------------------------
+   6. КАРТОЧКА КЛИЕНТА
+   ---------------------------------------- */
+
+.client-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.client-card:hover {
+    box-shadow: 0 15px 40px rgba(0, 123, 255, 0.1);
+}
+
+.client-card__header {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    padding: 1.5rem 1.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.client-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007bff, #00bcd4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.5rem;
+    position: relative;
+}
+
+.client-avatar.active::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: #28a745;
+    border: 2px solid white;
+    border-radius: 50%;
+}
+
+.online-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: #28a745;
+    border: 2px solid white;
+    border-radius: 50%;
+}
+
+.client-badges {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.trainings-badge {
+    background: linear-gradient(135deg, #007bff, #00bcd4);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.subscription-badge {
+    background: linear-gradient(135deg, #ffd700, #ffa500);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
+}
+
+.client-card__body {
+    padding: 1.5rem;
+    flex: 1;
+}
+
+.client-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 1rem;
+}
+
+.client-contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.contact-item:hover {
+    color: #007bff;
+    transform: translateX(3px);
+}
+
+.contact-item i {
+    width: 16px;
+    color: #007bff;
+}
+
+/* Прогресс */
+.progress-section {
+    margin-bottom: 1rem;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.progress-value {
+    font-weight: 600;
+    color: #28a745;
+}
+
+.progress {
+    height: 6px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+/* Последняя тренировка */
+.last-training {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #495057;
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 12px;
+    flex-wrap: wrap;
+}
+
+.last-training i {
+    color: #007bff;
+}
+
+.last-training strong {
+    color: #212529;
+}
+
+.workout-name {
+    background: #e9ecef;
+    padding: 0.2rem 0.5rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    color: #495057;
+}
+
+/* Футер карточки */
+.client-card__footer {
+    padding: 1rem 1.5rem 1.5rem;
+    display: flex;
+    gap: 0.5rem;
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.btn-action {
+    flex: 1;
+    padding: 0.6rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-profile {
+    background: linear-gradient(135deg, #007bff, #00bcd4);
+    color: white;
+}
+
+.btn-profile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    color: white;
+}
+
+.btn-history {
+    background: white;
+    border: 2px solid #28a745;
+    color: #28a745;
+}
+
+.btn-history:hover {
+    background: #28a745;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-contact {
+    background: white;
+    border: 2px solid #6c757d;
+    color: #6c757d;
+    flex: 0 0 auto;
+    width: 42px;
+    padding: 0.6rem 0;
+}
+
+.btn-contact:hover {
+    background: #6c757d;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ----------------------------------------
+   7. ПАГИНАЦИЯ
+   ---------------------------------------- */
+
+.pagination-wrapper {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination-wrapper .pagination {
+    gap: 0.25rem;
+}
+
+.pagination-wrapper .page-link {
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    color: #007bff;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.pagination-wrapper .page-link:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.pagination-wrapper .page-item.active .page-link {
+    background: linear-gradient(135deg, #007bff, #00bcd4);
+    color: white;
+}
+
+/* ----------------------------------------
+   8. ПУСТОЕ СОСТОЯНИЕ
+   ---------------------------------------- */
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.empty-state-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 3rem;
+    color: #adb5bd;
+}
+
+.empty-state h4 {
+    color: #212529;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.empty-state .action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.empty-state .btn-primary {
+    background: linear-gradient(135deg, #007bff, #00bcd4);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.empty-state .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+}
+
+.empty-state .btn-outline-secondary {
+    background: white;
+    border: 2px solid #6c757d;
+    color: #6c757d;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.empty-state .btn-outline-secondary:hover {
+    background: #6c757d;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ----------------------------------------
+   9. АДАПТИВНОСТЬ (исправленная)
+   ---------------------------------------- */
+
+@media (max-width: 768px) {
+    .clients-header {
+        padding: 1rem 1.2rem;
+    }
+    
+    .clients-header h1 {
+        font-size: 1.3rem;
+        /* Убираем все ограничения */
+        max-width: none;
+        overflow: visible;
+        text-overflow: clip;
+        white-space: nowrap;
+    }
+    
+    .clients-header h1 i {
+        margin-right: 0.5rem;
+    }
+    
+    .clients-header .back-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+        margin-left: auto;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .clients-header {
+        padding: 0.8rem 1rem;
+    }
+    
+    .clients-header h1 {
+        font-size: 1.1rem;
+        /* Убираем все ограничения */
+        max-width: none;
+        overflow: visible;
+        text-overflow: clip;
+    }
+    
+    .clients-header h1 i {
+        margin-right: 0.4rem;
+        font-size: 1rem;
+    }
+    
+    .clients-header .back-btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.85rem;
+    }
+    
+    .clients-header .back-btn i {
+        margin-right: 0.3rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .clients-header h1 {
+        font-size: 1rem;
+        /* Убираем все ограничения */
+        max-width: none;
+    }
+    
+    .clients-header .back-btn {
+        padding: 0.25rem 0.6rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* ----------------------------------------
+   10. ИСПРАВЛЕНИЯ ДЛЯ КНОПКИ НАЗАД
+   ---------------------------------------- */
+
+/* Базовые стили для кнопки */
+.clients-header .back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap; /* САМОЕ ГЛАВНОЕ - запрещаем перенос текста */
+    flex-shrink: 0; /* Запрещаем сжиматься */
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+/* Иконка внутри кнопки */
+.clients-header .back-btn i {
+    margin-right: 0.5rem;
+    flex-shrink: 0; /* Иконка тоже не сжимается */
+}
+
+/* Для мобильных устройств */
+@media (max-width: 768px) {
+    .clients-header {
+        flex-wrap: nowrap; /* Запрещаем перенос элементов в заголовке */
+        padding: 1rem 1.2rem;
+    }
+    
+    .clients-header h1 {
+        font-size: 1.3rem;
+        white-space: nowrap; /* Заголовок тоже не переносим */
+        overflow: hidden;
+        text-overflow: ellipsis; /* Если очень длинный - обрезаем с троеточием */
+        flex: 1; /* Заголовок занимает доступное место */
+        min-width: 0; /* Разрешаем ему сжиматься */
+    }
+    
+    .clients-header .back-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+        margin-right: 0.5rem;
+    }
+    
+    .clients-header .trainer-info {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 480px) {
+    .clients-header {
+        padding: 0.8rem 1rem;
+    }
+    
+    .clients-header h1 {
+        font-size: 1.1rem;
+        max-width: 120px; /* Ограничиваем ширину заголовка */
+    }
+    
+    .clients-header .back-btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.85rem;
+    }
+    
+    .clients-header .back-btn i {
+        margin-right: 0.3rem;
+        font-size: 0.8rem;
+    }
+    
+    .clients-header .trainer-info {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Экстренный случай - если все еще не работает */
+@media (max-width: 360px) {
+    .clients-header .trainer-info {
+        display: none; /* Прячем информацию о тренере на совсем маленьких */
+    }
+}

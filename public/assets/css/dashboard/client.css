@@ -3404,3 +3404,246 @@ textarea.form-control {
 .schedule-alert.frozen i {
     color: #ffd700;
 }
+
+/* ========================================
+   СОВРЕМЕННЫЕ АЛЕРТЫ
+   ======================================== */
+
+.alert-modern {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    border: none;
+    border-radius: 16px;
+    background: #65daa7;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    animation: slideIn 0.3s ease forwards;
+    overflow: hidden;
+}
+
+/* Градиентная полоска слева */
+.alert-modern::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 4px 0 0 4px;
+}
+
+/* Типы алертов */
+.alert-modern.success::before {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.alert-modern.info::before {
+    background: linear-gradient(135deg, #007bff, #00bcd4);
+}
+
+.alert-modern.warning::before {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+}
+
+.alert-modern.error::before {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+/* Иконка */
+.alert-modern .alert-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.alert-modern.success .alert-icon {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(32, 201, 151, 0.1));
+    color: #28a745;
+}
+
+.alert-modern.info .alert-icon {
+    background: linear-gradient(135deg, rgba(0, 123, 255, 0.1), rgba(0, 188, 212, 0.1));
+    color: #007bff;
+}
+
+.alert-modern.warning .alert-icon {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(253, 126, 20, 0.1));
+    color: #ffc107;
+}
+
+.alert-modern.error .alert-icon {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(200, 35, 51, 0.1));
+    color: #dc3545;
+}
+
+/* Контент */
+.alert-modern .alert-content {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.alert-modern .alert-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.alert-modern.success .alert-title {
+    color: #28a745;
+}
+
+.alert-modern.info .alert-title {
+    color: #007bff;
+}
+
+.alert-modern.warning .alert-title {
+    color: #ffc107;
+}
+
+.alert-modern.error .alert-title {
+    color: #dc3545;
+}
+
+.alert-modern .alert-message {
+    color: #6c757d;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Кнопка закрытия */
+.alert-modern .alert-close {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #adb5bd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.alert-modern .alert-close:hover {
+    background: #f8f9fa;
+    color: #495057;
+    transform: rotate(90deg);
+}
+
+/* Анимация появления */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Анимация исчезновения */
+.alert-modern.fade {
+    transition: opacity 0.15s linear;
+}
+
+.alert-modern.fade.show {
+    opacity: 1;
+}
+
+.alert-modern.fade:not(.show) {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Компактная версия (без заголовка) */
+.alert-modern.compact {
+    padding: 0.75rem 1rem;
+    align-items: center;
+}
+
+.alert-modern.compact .alert-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+}
+
+.alert-modern.compact .alert-title {
+    display: none;
+}
+
+.alert-modern.compact .alert-message {
+    font-size: 0.9rem;
+}
+
+/* Версия с иконкой справа */
+.alert-modern.icon-right {
+    flex-direction: row-reverse;
+}
+
+.alert-modern.icon-right .alert-icon {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Темная тема (если нужна) */
+.alert-modern.dark-theme {
+    background: #343a40;
+    color: white;
+}
+
+.alert-modern.dark-theme .alert-message {
+    color: #adb5bd;
+}
+
+.alert-modern.dark-theme .alert-close {
+    color: #6c757d;
+}
+
+.alert-modern.dark-theme .alert-close:hover {
+    background: #495057;
+    color: white;
+}
+
+/* Адаптивность */
+@media (max-width: 576px) {
+    .alert-modern {
+        padding: 0.875rem 1rem;
+        gap: 0.75rem;
+    }
+    
+    .alert-modern .alert-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.3rem;
+    }
+    
+    .alert-modern .alert-title {
+        font-size: 0.95rem;
+    }
+    
+    .alert-modern .alert-message {
+        font-size: 0.875rem;
+    }
+    
+    .alert-modern .alert-close {
+        width: 28px;
+        height: 28px;
+    }
+}

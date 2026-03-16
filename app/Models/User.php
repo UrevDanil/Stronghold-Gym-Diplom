@@ -83,11 +83,21 @@ class User extends Authenticatable
     }
 
 /**
- * Проверка, активен ли пользователь
+ * Проверка, активен ли пользователь (для отображения статуса онлайн)
  */
 public function isActive(): bool
 {
-    return $this->is_active && !$this->deleted_at;
+    // Если есть поле last_activity (которого пока нет), используем его
+    if (property_exists($this, 'last_activity') && $this->last_activity) {
+        return Carbon::parse($this->last_activity)->diffInMinutes(now()) < 5;
+    }
+    
+    // Если нет поля last_activity, просто возвращаем true
+    // чтобы не ломать отображение
+    return true;
+    
+    // ИЛИ можно проверять по полю is_active
+    // return (bool) $this->is_active;
 }
 
 // Тренер проводит занятия
