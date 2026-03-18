@@ -1,27 +1,25 @@
-<!-- Профиль -->
 @extends('layouts.app')
 
 @section('title', 'Мой профиль')
 
 @section('styles')
-    <link href="{{ asset('assets/css/dashboard/common.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/dashboard/client.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/dashboard/client/client-profile.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
-<div class="container py-4 profile-page">
+<div class="container py-4 client-profile-page">
     <!-- Заголовок -->
-    <div class="profile-header d-flex justify-content-between align-items-center">
-        <h2 class="mb-0">
+    <div class="client-profile-header d-flex justify-content-between align-items-center">
+        <h1 class="mb-0">
             <i class="fas fa-user-circle me-3"></i>Мой профиль
-        </h2>
+        </h1>
         <a href="{{ route('client.dashboard') }}" class="back-btn">
             <i class="fas fa-arrow-left me-2"></i>Назад
         </a>
     </div>
 
     @if(session('success'))
-        <div class="alert profile-alert success alert-dismissible fade show" role="alert">
+        <div class="alert client-alert success alert-dismissible fade show" role="alert">
             <i class="fas fa-check-circle me-2"></i>
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -29,169 +27,215 @@
     @endif
 
     @if(session('error'))
-        <div class="alert profile-alert error alert-dismissible fade show" role="alert">
+        <div class="alert client-alert error alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i>
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    <div class="profile-card">
-        <!-- Вкладки -->
-<div class="profile-tabs">
-    <ul class="nav nav-tabs" id="profileTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" 
-                    data-bs-target="#personal" type="button" role="tab">
-                <i class="fas fa-user me-2"></i>Личные данные
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="security-tab" data-bs-toggle="tab" 
-                    data-bs-target="#security" type="button" role="tab">
-                <i class="fas fa-lock me-2"></i>Безопасность
-            </button>
-        </li>
-    </ul>
-</div>
-
-        <!-- Содержимое вкладок -->
-        <div class="tab-content" id="profileTabContent">
-            <!-- Вкладка 1: Личные данные -->
-            <div class="tab-pane fade show active" id="personal" role="tabpanel">
-                <h3 class="form-section-title">
-                    <i class="fas fa-edit me-2"></i>Редактирование профиля
-                </h3>
-                
-                <form method="POST" action="{{ route('client.profile.update') }}">
-                    @csrf
+    <div class="row">
+        <!-- Левая колонка: Аватар и информация -->
+        <div class="col-md-4 mb-4">
+            <div class="client-profile-card">
+                <div class="card-body">
+                    <div class="client-avatar">
+                        <span>{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                    </div>
                     
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="name" class="form-label">Имя *</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                   id="name" name="name" value="{{ old('name', $user->name) }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                    <div class="text-center">
+                        <h2 class="client-name">{{ $user->name }}</h2>
+                        <p class="client-email">{{ $user->email }}</p>
+                    </div>
+                    
+                    <!-- Блок информации -->
+                    <div class="client-info-grid">
+                        <!-- Телефон (если есть) -->
+                        @if($user->phone)
+                        <div class="client-info-row">
+                            <div class="client-info-icon phone">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="client-info-content">
+                                <span class="client-info-label">Телефон</span>
+                                <span class="client-info-value phone-value">{{ $user->phone }}</span>
+                            </div>
                         </div>
+                        @endif
                         
-                        <div class="col-md-6 mb-3">
-                            <label for="email" class="form-label">Email *</label>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                                   id="email" name="email" value="{{ old('email', $user->email) }}" required>
-                            @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <!-- Дата рождения (если есть) -->
+                        @if($user->birth_date)
+                        <div class="client-info-row">
+                            <div class="client-info-icon calendar">
+                                <i class="fas fa-birthday-cake"></i>
+                            </div>
+                            <div class="client-info-content">
+                                <span class="client-info-label">Дата рождения</span>
+                                <span class="client-info-value">{{ \Carbon\Carbon::parse($user->birth_date)->format('d.m.Y') }}</span>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="phone" class="form-label">Телефон</label>
-                            <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
-                                   id="phone" name="phone" value="{{ old('phone', $user->phone) }}">
-                            @error('phone')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                        @endif
                         
-                        <div class="col-md-6 mb-3">
-                            <label for="birth_date" class="form-label">Дата рождения</label>
-                            <input type="date" class="form-control @error('birth_date') is-invalid @enderror" 
-                                   id="birth_date" name="birth_date" 
-                                   value="{{ old('birth_date', $user->birth_date ? $user->birth_date->format('Y-m-d') : '') }}">
-                            @error('birth_date')
+                        <!-- ID пользователя -->
+                        <div class="client-info-row">
+                            <div class="client-info-icon id">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div class="client-info-content">
+                                <span class="client-info-label">ID</span>
+                                <span class="client-info-value">#{{ $user->id }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Заметки (кратко) -->
+                        @if($user->notes)
+                        <div class="client-info-row">
+                            <div class="client-info-icon notes">
+                                <i class="fas fa-sticky-note"></i>
+                            </div>
+                            <div class="client-info-content">
+                                <span class="client-info-label">Заметки</span>
+                                <span class="client-info-value">{{ Str::limit($user->notes, 30) }}</span>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая колонка: Формы -->
+        <div class="col-md-8">
+            <!-- Форма редактирования профиля -->
+            <div class="client-form-card">
+                <div class="card-header">
+                    <i class="fas fa-edit"></i> Редактировать профиль
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ route('client.profile.update') }}">
+                        @csrf
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Имя *</label>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                       id="name" name="name" value="{{ old('name', $user->name) }}" required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                       id="email" name="email" value="{{ old('email', $user->email) }}" required>
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Телефон</label>
+                                <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
+                                       id="phone" name="phone" value="{{ old('phone', $user->phone) }}">
+                                @error('phone')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="birth_date" class="form-label">Дата рождения</label>
+                                <input type="date" class="form-control @error('birth_date') is-invalid @enderror" 
+                                       id="birth_date" name="birth_date" 
+                                       value="{{ old('birth_date', $user->birth_date ? $user->birth_date->format('Y-m-d') : '') }}">
+                                @error('birth_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Заметки пользователя (ВАЖНО: сохраняем) -->
+                        <div class="mb-4">
+                            <label for="notes" class="form-label">Информация для тренера</label>
+                            <textarea class="form-control notes-field @error('notes') is-invalid @enderror" 
+                                      id="notes" name="notes" rows="4" 
+                                      placeholder="Здесь вы можете указать информацию, которую хотите сообщить тренеру...">{{ old('notes', $user->notes) }}</textarea>
+                            @error('notes')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Эта информация будет доступна вашим тренерам
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Заметки пользователя -->
-                    <div class="mb-4">
-                        <label for="notes" class="form-label">Информация для тренера</label>
-                        <textarea class="form-control @error('notes') is-invalid @enderror" 
-                                  id="notes" name="notes" rows="4" 
-                                  placeholder="Здесь вы можете указать информацию, которую хотите сообщить тренеру...">{{ old('notes', $user->notes) }}</textarea>
-                        @error('notes')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="form-text text-muted">
-                            <i class="fas fa-info-circle me-1"></i>
-                            Эта информация будет доступна вашим тренерам
-                        </small>
-                    </div>
-
-                    <button type="submit" class="btn-save">
-                        <i class="fas fa-save"></i>Сохранить изменения
-                    </button>
-                </form>
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-save me-2"></i> Сохранить изменения
+                        </button>
+                    </form>
+                </div>
             </div>
 
-            <!-- Вкладка 2: Безопасность -->
-            <div class="tab-pane fade" id="security" role="tabpanel">
-                <h3 class="form-section-title">
-                    <i class="fas fa-key me-2"></i>Смена пароля
-                </h3>
-                
-                <form method="POST" action="{{ route('client.password.update') }}">
-                    @csrf
-                    
-                    <div class="mb-3">
-                        <label for="current_password" class="form-label">Текущий пароль *</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control @error('current_password') is-invalid @enderror" 
-                                id="current_password" name="current_password" required>
-                            <button class="btn btn-outline-secondary" type="button" id="toggleCurrentPassword">
-                                <i class="fas fa-eye"></i>
-                            </button>
+            <!-- Форма смены пароля -->
+            <div class="client-form-card mt-4">
+                <div class="card-header">
+                    <i class="fas fa-lock"></i> Смена пароля
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ route('client.password.update') }}">
+                        @csrf
+                        
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Текущий пароль *</label>
+                            <input type="text" class="form-control @error('current_password') is-invalid @enderror" 
+                                id="current_password" name="current_password" 
+                                value="{{ old('current_password') }}" 
+                                placeholder="Введите текущий пароль" required>
                             @error('current_password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Новый пароль *</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                                id="password" name="password" required>
-                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                <i class="fas fa-eye"></i>
-                            </button>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Новый пароль *</label>
+                            <input type="text" class="form-control @error('password') is-invalid @enderror" 
+                                id="password" name="password" 
+                                value="{{ old('password') }}" 
+                                placeholder="Введите новый пароль" required>
                             @error('password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div class="form-text">Минимум 8 символов</div>
                         </div>
-                        <div class="form-text">Минимум 8 символов</div>
-                    </div>
 
-                    <div class="mb-4">
-                        <label for="password_confirmation" class="form-label">Подтверждение пароля *</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" 
-                                id="password_confirmation" name="password_confirmation" required>
-                            <button class="btn btn-outline-secondary" type="button" id="togglePasswordConfirmation">
-                                <i class="fas fa-eye"></i>
-                            </button>
+                        <div class="mb-4">
+                            <label for="password_confirmation" class="form-label">Подтверждение пароля *</label>
+                            <input type="text" class="form-control" 
+                                id="password_confirmation" name="password_confirmation" 
+                                value="{{ old('password_confirmation') }}" 
+                                placeholder="Подтвердите новый пароль" required>
                         </div>
-                    </div>
 
-                    <button type="submit" class="btn-save">
-                        <i class="fas fa-key me-2"></i>Сменить пароль
-                    </button>
-                </form>
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-key me-2"></i> Сменить пароль
+                        </button>
+                    </form>
+                </div>
             </div>
+        </div>
+    </div>
 
     <!-- Информация об аккаунте -->
-    <div class="account-info-card mt-4">
+    <div class="account-info-card">
         <div class="card-header">
-            <i class="fas fa-info-circle"></i> Информация об аккаунте
+            <i class="fas fa-info-circle me-2"></i> Информация об аккаунте
         </div>
         <div class="info-grid">
             <div class="info-item">
                 <span class="label">Роль</span>
-                <span class="value">{{ $user->role->name }}</span>
+                <span class="value">{{ $user->role->name ?? 'Клиент' }}</span>
             </div>
             <div class="info-item">
                 <span class="label">ID пользователя</span>
@@ -199,98 +243,13 @@
             </div>
             <div class="info-item">
                 <span class="label">Дата регистрации</span>
-                <span class="value">{{ $user->created_at->format('d.m.Y H:i') }}</span>
+                <span class="value">{{ $user->created_at->format('d.m.Y') }}</span>
             </div>
             <div class="info-item">
                 <span class="label">Последнее обновление</span>
-                <span class="value">{{ $user->updated_at->format('d.m.Y H:i') }}</span>
+                <span class="value">{{ $user->updated_at->format('d.m.Y') }}</span>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Модальное окно заморозки -->
-<div class="modal fade freeze-modal" id="freezeModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ route('freeze-subscription') }}" method="POST">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-snowflake"></i> Заморозка абонемента
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Вы можете заморозить абонемент на срок до 14 дней.</p>
-                    <p>Причины заморозки:</p>
-                    <ul>
-                        <li><i class="fas fa-thermometer-half me-2"></i>Болезнь</li>
-                        <li><i class="fas fa-briefcase me-2"></i>Командировка</li>
-                        <li><i class="fas fa-umbrella-beach me-2"></i>Отпуск</li>
-                    </ul>
-                    
-                    <div class="mb-3">
-                        <label for="reason" class="form-label">Причина заморозки</label>
-                        <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="days" class="form-label">Количество дней (макс. 14)</label>
-                        <input type="number" class="form-control" id="days" name="days" min="1" max="14" value="7" required>
-                    </div>
-                    
-                    <div class="alert alert-warning">
-                        <i class="fas fa-info-circle me-2"></i>
-                        После заморозки срок действия абонемента будет продлен на указанное количество дней.
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="submit" class="btn btn-warning">
-                        <i class="fas fa-snowflake me-2"></i>Заморозить
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Сохранение активной вкладки
-        var triggerTabList = [].slice.call(document.querySelectorAll('#profileTab button'));
-        triggerTabList.forEach(function (triggerEl) {
-            var tabTrigger = new bootstrap.Tab(triggerEl);
-            triggerEl.addEventListener('click', function (event) {
-                event.preventDefault();
-                tabTrigger.show();
-            });
-        });
-
-        // Переключение видимости пароля
-        function togglePasswordVisibility(inputId, buttonId) {
-            const passwordInput = document.getElementById(inputId);
-            const toggleButton = document.getElementById(buttonId);
-            if (!passwordInput || !toggleButton) return;
-            
-            toggleButton.addEventListener('click', function() {
-                const icon = this.querySelector('i');
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                } else {
-                    passwordInput.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                }
-            });
-        }
-        
-        togglePasswordVisibility('current_password', 'toggleCurrentPassword');
-        togglePasswordVisibility('password', 'togglePassword');
-        togglePasswordVisibility('password_confirmation', 'togglePasswordConfirmation');
-    });
-</script>
 @endsection

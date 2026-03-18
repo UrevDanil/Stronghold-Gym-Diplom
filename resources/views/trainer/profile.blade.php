@@ -40,7 +40,7 @@
                         <p class="trainer-title">{{ $user->qualification ?? 'Тренер' }}</p>
                     </div>
                     
-                    <!-- УЛУЧШЕННЫЙ БЛОК ИНФОРМАЦИИ -->
+                    <!-- Блок информации -->
                     <div class="profile-info-grid">
                         <!-- Email -->
                         <div class="profile-info-row">
@@ -167,6 +167,53 @@
 
                         <button type="submit" class="btn-qualification">
                             <i class="fas fa-certificate me-2"></i> Обновить квалификацию
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Форма смены пароля -->
+            <div class="form-card mt-4">
+                <div class="card-header">
+                    <i class="fas fa-lock"></i> Смена пароля
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ route('trainer.profile.password') }}">
+                        @csrf
+                        
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Текущий пароль *</label>
+                            <input type="text" class="form-control @error('current_password') is-invalid @enderror" 
+                                id="current_password" name="current_password" 
+                                value="{{ old('current_password') }}" 
+                                placeholder="Введите текущий пароль" required>
+                            @error('current_password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Новый пароль *</label>
+                            <input type="text" class="form-control @error('password') is-invalid @enderror" 
+                                id="password" name="password" 
+                                value="{{ old('password') }}" 
+                                placeholder="Введите новый пароль" required>
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text">Минимум 8 символов</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password_confirmation" class="form-label">Подтверждение пароля *</label>
+                            <input type="text" class="form-control" 
+                                id="password_confirmation" name="password_confirmation" 
+                                value="{{ old('password_confirmation') }}" 
+                                placeholder="Подтвердите новый пароль" required>
+                        </div>
+
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-key me-2"></i> Сменить пароль
                         </button>
                     </form>
                 </div>

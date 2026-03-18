@@ -12,6 +12,7 @@ use App\Models\Notification; // <-- ДОБАВЬ ЭТУ СТРОКУ
 use App\Models\UserSubscription; // <-- ДОБАВЬ ЭТУ СТРОКУ
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -487,6 +488,25 @@ public function updateQualification(Request $request)
     $user->save();
     
     return back()->with('success', 'Квалификация обновлена');
+}
+
+/**
+ * Смена пароля тренера
+ */
+public function updatePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required|current_password',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
+    
+    $user = Auth::user();
+    $user->update([
+        'password' => Hash::make($request->password)
+    ]);
+    
+    return redirect()->route('trainer.profile')
+        ->with('success', 'Пароль успешно изменен');
 }
 
 }

@@ -1,31 +1,35 @@
 /* ========================================
-   СТИЛИ ДЛЯ ПРОФИЛЯ ТРЕНЕРА
+   СТИЛИ ДЛЯ ПРОФИЛЯ КЛИЕНТА
    ======================================== */
 
 /* ----------------------------------------
    1. ОБЩИЕ СТИЛИ
    ---------------------------------------- */
 
-.trainer-profile-page {
+.client-profile-page {
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     min-height: 100vh;
 }
 
 /* ----------------------------------------
-   2. ЗАГОЛОВОК
+   2. ЗАГОЛОВОК - ИСПРАВЛЕННЫЙ
    ---------------------------------------- */
 
-.trainer-profile-header {
-    background: linear-gradient(135deg, #07154e, #3bbdf1);
+.client-profile-header {
+    background: linear-gradient(135deg, #0b34bb, #0e2778);
     border-radius: 20px;
     padding: 1.5rem 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(65, 123, 211, 0.2);
+    box-shadow: 0 10px 30px rgba(49, 40, 167, 0.2);
     position: relative;
     overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap; /* Запрещаем перенос */
 }
 
-.trainer-profile-header::before {
+.client-profile-header::before {
     content: '';
     position: absolute;
     top: 0;
@@ -36,15 +40,16 @@
     transform: skewX(-20deg) translateX(100px);
 }
 
-.trainer-profile-header h1 {
+.client-profile-header h1 {
     color: white;
     font-weight: 700;
     margin: 0;
     font-size: 2rem;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    white-space: nowrap; /* Заголовок в одну строку */
 }
 
-.trainer-profile-header .back-btn {
+.client-profile-header .back-btn {
     background: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: white;
@@ -54,19 +59,26 @@
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
     text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap; /* Текст кнопки в одну строку */
 }
 
-.trainer-profile-header .back-btn:hover {
+.client-profile-header .back-btn:hover {
     background: white;
-    color: #3bbdf1;
+    color: #0b34bb;
     transform: translateX(-3px);
+}
+
+.client-profile-header .back-btn i {
+    margin-right: 0.5rem;
 }
 
 /* ----------------------------------------
    3. АЛЕРТЫ
    ---------------------------------------- */
 
-.trainer-alert {
+.client-alert {
     border-radius: 15px;
     border: none;
     padding: 1rem 1.5rem;
@@ -85,16 +97,21 @@
     }
 }
 
-.trainer-alert.success {
-    background: linear-gradient(135deg, #fa84e6, #8fd3f4);
-    color: #07154e;
+.client-alert.success {
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    color: #00573d;
+}
+
+.client-alert.error {
+    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+    color: #9b1d1d;
 }
 
 /* ----------------------------------------
    4. КАРТОЧКА ПРОФИЛЯ (АВАТАР)
    ---------------------------------------- */
 
-.profile-card {
+.client-profile-card {
     border: none;
     border-radius: 25px;
     overflow: hidden;
@@ -103,51 +120,50 @@
     height: 100%;
 }
 
-.profile-card .card-body {
+.client-profile-card .card-body {
     padding: 2rem;
 }
 
-.trainer-avatar {
+.client-avatar {
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #07154e, #3bbdf1);
+    background: linear-gradient(135deg, #0b34bb, #0e2778);
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 1.5rem;
-    box-shadow: 0 10px 20px #b9bbc5;
+    box-shadow: 0 10px 20px rgba(68, 52, 218, 0.3);
     transition: all 0.3s ease;
 }
 
-.trainer-avatar:hover {
+.client-avatar:hover {
     transform: scale(1.05) rotate(5deg);
 }
 
-.trainer-avatar span {
+.client-avatar span {
     font-size: 3rem;
     font-weight: 700;
     color: white;
     text-transform: uppercase;
 }
 
-.trainer-name {
+.client-name {
     font-size: 1.8rem;
     font-weight: 800;
-    color: #3bbdf1;
+    color: #0b34bb;
     margin-bottom: 0.3rem;
+    text-align: center;
 }
 
-.trainer-title {
+.client-email {
     color: #6c757d;
-    font-size: 1.1rem;
+    font-size: 1rem;
     margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px dashed #e9ecef;
+    text-align: center;
 }
 
-
-.profile-info-grid {
+.client-info-grid {
     background: linear-gradient(135deg, #f8f9fa, #ffffff);
     border-radius: 20px;
     padding: 1.2rem;
@@ -155,7 +171,7 @@
     border: 1px solid #e9ecef;
 }
 
-.profile-info-row {
+.client-info-row {
     display: flex;
     align-items: center;
     padding: 0.8rem;
@@ -166,13 +182,13 @@
     transition: all 0.2s ease;
 }
 
-.profile-info-row:hover {
+.client-info-row:hover {
     transform: translateX(5px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     background: linear-gradient(135deg, #ffffff, #f8f9fa);
 }
 
-.profile-info-icon {
+.client-info-icon {
     width: 40px;
     height: 40px;
     border-radius: 12px;
@@ -183,31 +199,31 @@
     font-size: 1.2rem;
 }
 
-.profile-info-icon.email {
-    background: rgba(13, 110, 253, 0.1);
-    color: #0d6efd;
-}
-
-.profile-info-icon.phone {
+.client-info-icon.phone {
     background: rgba(40, 167, 69, 0.1);
     color: #28a745;
 }
 
-.profile-info-icon.calendar {
+.client-info-icon.calendar {
     background: rgba(23, 162, 184, 0.1);
     color: #17a2b8;
 }
 
-.profile-info-icon.id {
+.client-info-icon.id {
     background: rgba(255, 193, 7, 0.1);
     color: #ffc107;
 }
 
-.profile-info-content {
+.client-info-icon.notes {
+    background: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.client-info-content {
     flex: 1;
 }
 
-.profile-info-label {
+.client-info-label {
     font-size: 0.75rem;
     color: #6c757d;
     text-transform: uppercase;
@@ -216,56 +232,21 @@
     display: block;
 }
 
-.profile-info-value {
+.client-info-value {
     font-size: 1rem;
     font-weight: 600;
     color: #212529;
 }
 
-.profile-info-value.email-value {
-    color: #0d6efd;
-}
-
-.profile-info-value.phone-value {
+.client-info-value.phone-value {
     color: #28a745;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .profile-info-grid {
-        padding: 1rem;
-    }
-    
-    .profile-info-row {
-        padding: 0.6rem;
-    }
-    
-    .profile-info-icon {
-        width: 35px;
-        height: 35px;
-        font-size: 1rem;
-    }
-    
-    .profile-info-value {
-        font-size: 0.95rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .profile-info-row {
-        flex-wrap: wrap;
-    }
-    
-    .profile-info-icon {
-        margin-bottom: 0.3rem;
-    }
 }
 
 /* ----------------------------------------
    5. КАРТОЧКИ ФОРМ
    ---------------------------------------- */
 
-.form-card {
+.client-form-card {
     border: none;
     border-radius: 25px;
     overflow: hidden;
@@ -274,8 +255,8 @@
     margin-bottom: 1.5rem;
 }
 
-.form-card .card-header {
-    background: linear-gradient(135deg, #07154e, #3bbdf1);
+.client-form-card .card-header {
+    background: linear-gradient(135deg, #0b34bb, #0e2778);
     color: white;
     padding: 1.2rem 1.5rem;
     font-weight: 700;
@@ -285,7 +266,7 @@
     overflow: hidden;
 }
 
-.form-card .card-header::before {
+.client-form-card .card-header::before {
     content: '';
     position: absolute;
     top: 0;
@@ -296,14 +277,18 @@
     transform: skewX(-20deg) translateX(50px);
 }
 
-.form-card .card-header i {
+.client-form-card .card-header i {
     margin-right: 0.5rem;
     color: #ffffff;
 }
 
-.form-card .card-body {
+.client-form-card .card-body {
     padding: 2rem;
 }
+
+/* ----------------------------------------
+   6. ФОРМЫ
+   ---------------------------------------- */
 
 .form-label {
     font-weight: 600;
@@ -321,8 +306,8 @@
 }
 
 .form-control:focus {
-    border-color: #4428a7;
-    box-shadow: 0 0 0 0.2rem rgba(40, 116, 167, 0.1);
+    border-color: #0b34bb;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.1);
     outline: none;
 }
 
@@ -342,12 +327,29 @@ textarea.form-control {
     resize: vertical;
 }
 
+.form-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.3rem;
+}
+
+/* Стили для заметок */
+.notes-field {
+    background: #fff8e7;
+    border-left: 4px solid #ffc107;
+}
+
+.notes-field:focus {
+    background: white;
+    border-color: #0b34bb;
+}
+
 /* ----------------------------------------
-   6. КНОПКИ
+   7. КНОПКИ
    ---------------------------------------- */
 
 .btn-save {
-    background: linear-gradient(135deg, #3bbdf1, #3451c7);
+    background: linear-gradient(135deg, #0b34bb, #2f59e2);
     color: white;
     border: none;
     border-radius: 12px;
@@ -355,12 +357,12 @@ textarea.form-control {
     font-weight: 600;
     font-size: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(40, 110, 167, 0.2);
+    box-shadow: 0 4px 15px rgba(59, 40, 167, 0.2);
 }
 
 .btn-save:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
+    box-shadow: 0 6px 20px rgba(49, 40, 167, 0.3);
     color: white;
 }
 
@@ -368,228 +370,151 @@ textarea.form-control {
     margin-right: 0.5rem;
 }
 
-.btn-qualification {
-    background: linear-gradient(135deg, #3bbdf1, #3451c7);
+/* ----------------------------------------
+   8. КАРТОЧКА ИНФОРМАЦИИ ОБ АККАУНТЕ
+   ---------------------------------------- */
+
+.account-info-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    margin-top: 2rem;
+}
+
+.account-info-card .card-header {
+    background: linear-gradient(135deg, #0b34bb, #0e2778);
     color: white;
+    padding: 1rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
     border: none;
-    border-radius: 12px;
-    padding: 0.8rem 2rem;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(23, 162, 184, 0.2);
 }
 
-.btn-qualification:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
-    color: white;
-}
-
-.btn-qualification i {
+.account-info-card .card-header i {
     margin-right: 0.5rem;
-    color: #ffffff;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.info-item .label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.3rem;
+}
+
+.info-item .value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0b34bb;
 }
 
 /* ----------------------------------------
-   7. АДАПТИВНОСТЬ
+   9. АДАПТИВНОСТЬ - ИСПРАВЛЕННАЯ
    ---------------------------------------- */
 
 @media (max-width: 768px) {
-    .trainer-profile-header {
+    .client-profile-header {
         padding: 1.2rem 1.5rem;
     }
     
-    .trainer-profile-header h1 {
+    .client-profile-header h1 {
         font-size: 1.5rem;
     }
     
-    .trainer-profile-header .back-btn {
+    .client-profile-header .back-btn {
         padding: 0.4rem 1rem;
         font-size: 0.9rem;
     }
     
-    .trainer-avatar {
+    .client-avatar {
         width: 100px;
         height: 100px;
     }
     
-    .trainer-avatar span {
+    .client-avatar span {
         font-size: 2.5rem;
     }
     
-    .trainer-name {
+    .client-name {
         font-size: 1.5rem;
     }
     
-    .profile-info-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.3rem;
-    }
-    
-    .profile-info-item i {
-        width: auto;
-    }
-    
-    .profile-info-item .info-label {
-        min-width: auto;
-    }
-    
-    .form-card .card-body {
+    .client-form-card .card-body {
         padding: 1.5rem;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 480px) {
-    .trainer-profile-header {
-        padding: 1rem;
+    .client-profile-header {
+        padding: 1rem 1.2rem;
+        gap: 0.8rem;
     }
     
-    .trainer-profile-header h1 {
+    .client-profile-header h1 {
         font-size: 1.3rem;
+        max-width: 200px; /* Ограничиваем ширину заголовка */
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
-    .trainer-profile-header .back-btn {
-        padding: 0.3rem 0.8rem;
+    .client-profile-header .back-btn {
+        padding: 0.3rem 1rem;
         font-size: 0.85rem;
     }
     
-    .trainer-avatar {
+    .client-avatar {
         width: 80px;
         height: 80px;
     }
     
-    .trainer-avatar span {
+    .client-avatar span {
         font-size: 2rem;
     }
     
-    .trainer-name {
+    .client-name {
         font-size: 1.3rem;
     }
     
-    .btn-save,
-    .btn-qualification {
+    .btn-save {
         width: 100%;
     }
-
-/* ----------------------------------------
-   8. ВКЛАДКИ ПРОФИЛЯ
-   ---------------------------------------- */
-
-.profile-tabs {
-    border-bottom: 2px solid #e9ecef;
-    gap: 0.5rem;
 }
 
-.profile-tabs .nav-link {
-    border: none;
-    color: #6c757d;
-    font-weight: 600;
-    padding: 0.8rem 1.5rem;
-    border-radius: 12px 12px 0 0;
-    transition: all 0.3s ease;
-    background: transparent;
-}
-
-.profile-tabs .nav-link:hover {
-    color: #3bbdf1;
-    background: rgba(59, 189, 241, 0.05);
-}
-
-.profile-tabs .nav-link.active {
-    color: #07154e;
-    background: white;
-    border-bottom: 3px solid #3bbdf1;
-    box-shadow: 0 -4px 10px rgba(0,0,0,0.02);
-}
-
-.profile-tabs .nav-link i {
-    font-size: 1rem;
-}
-
-/* Стили для группы ввода с кнопкой */
-.input-group {
-    display: flex;
-    align-items: center;
-}
-
-.input-group .form-control {
-    border-radius: 12px 0 0 12px;
-    border-right: none;
-}
-
-.input-group .btn-outline-secondary {
-    background: white;
-    border: 2px solid #e9ecef;
-    border-left: none;
-    border-radius: 0 12px 12px 0;
-    padding: 0.7rem 1rem;
-    color: #6c757d;
-    transition: all 0.3s ease;
-}
-
-.input-group .btn-outline-secondary:hover {
-    background: #f8f9fa;
-    color: #3bbdf1;
-}
-
-.input-group .btn-outline-secondary:focus {
-    box-shadow: none;
-}
-
-/* Адаптивность для вкладок */
-@media (max-width: 768px) {
-    .profile-tabs {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: 0.5rem;
+/* Для очень маленьких экранов */
+@media (max-width: 360px) {
+    .client-profile-header h1 {
+        max-width: 150px;
+        font-size: 1.1rem;
     }
     
-    .profile-tabs .nav-link {
-        white-space: nowrap;
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
+    .client-profile-header .back-btn {
+        padding: 0.25rem 0.8rem;
+        font-size: 0.8rem;
     }
-}
-    
-/* ----------------------------------------
-   СТИЛИ ДЛЯ ГРУППЫ ВВОДА С КНОПКОЙ
-   ---------------------------------------- */
-
-.input-group {
-    display: flex;
-    align-items: stretch;
-}
-
-.input-group .form-control {
-    border-radius: 12px 0 0 12px;
-    border-right: none;
-}
-
-.input-group .btn-outline-secondary {
-    background: white;
-    border: 2px solid #e9ecef;
-    border-left: none;
-    border-radius: 0 12px 12px 0;
-    padding: 0.7rem 1rem;
-    color: #6c757d;
-    transition: all 0.3s ease;
-}
-
-.input-group .btn-outline-secondary:hover {
-    background: #f8f9fa;
-    color: #3bbdf1;
-    border-color: #3bbdf1;
-}
-
-.input-group .btn-outline-secondary:focus {
-    box-shadow: none;
-    outline: none;
-}
-
-.input-group .btn-outline-secondary i {
-    font-size: 1rem;
-}
-
 }

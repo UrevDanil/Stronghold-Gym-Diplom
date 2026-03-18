@@ -174,6 +174,7 @@ Route::middleware(['auth', 'active', 'role:trainer'])->prefix('trainer')->name('
     Route::get('/profile', [TrainerDashboardController::class, 'profile'])->name('profile');
     Route::post('/profile', [TrainerDashboardController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/qualification', [TrainerDashboardController::class, 'updateQualification'])->name('profile.qualification');
+    Route::post('/profile/password', [TrainerDashboardController::class, 'updatePassword'])->name('profile.password');
     
     // Уведомления
     Route::get('/notifications', [TrainerDashboardController::class, 'notifications'])->name('notifications');
