@@ -14,14 +14,9 @@
         <h1 class="mb-0">
             <i class="fas fa-user-circle me-3"></i>Профиль клиента
         </h1>
-        <div class="d-flex gap-2">
-            <a href="{{ route('trainer.clients') }}" class="back-btn">
-                <i class="fas fa-arrow-left me-2"></i>К списку клиентов
-            </a>
-            <span class="trainer-info">
-                <i class="fas fa-user me-2"></i>{{ auth()->user()->name }}
-            </span>
-        </div>
+        <a href="{{ route('trainer.clients') }}" class="back-btn">
+            <i class="fas fa-arrow-left me-2"></i>Назад
+        </a>
     </div>
 
     <div class="row">
@@ -111,18 +106,23 @@
                         </div>
                     </div>
 
-                    <!-- Заметки о клиенте (из поля notes) -->
-                    @if($client->notes)
-                    <div class="client-notes">
+                    <!-- Информация от клиента (из поля notes) -->
+                    <div class="client-notes-section {{ !$client->notes ? 'empty' : '' }}">
                         <div class="notes-header">
-                            <i class="fas fa-sticky-note me-2"></i>
-                            <span>Заметки о клиенте</span>
+                            <i class="fas fa-comment-dots me-2"></i>
+                            <span>Информация для тренера</span>
                         </div>
-                        <div class="notes-content">
-                            {{ $client->notes }}
-                        </div>
+                        @if($client->notes)
+                            <div class="notes-content">
+                                {{ $client->notes }}
+                            </div>
+                        @else
+                            <div class="notes-content text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Клиент пока не добавил информацию
+                            </div>
+                        @endif
                     </div>
-                    @endif
                 </div>
             </div>
         </div>
@@ -207,7 +207,7 @@
                 </div>
                 <div class="history-card__body">
                     @if($recentBookings->count() > 0)
-                        <div class="table-responsive">
+                        <div class="table-responsive d-none d-md-block">
                             <table class="history-table">
                                 <thead>
                                     <tr>
@@ -220,28 +220,28 @@
                                 </thead>
                                 <tbody>
                                     @foreach($recentBookings as $booking)
-                                        <tr>
+                                         <tr>
                                             <td data-label="Дата">
                                                 <span class="date-cell">
                                                     {{ \Carbon\Carbon::parse($booking->schedule->date)->format('d.m') }}
                                                     <small>{{ \Carbon\Carbon::parse($booking->schedule->date)->format('Y') }}</small>
                                                 </span>
-                                            </td>
+                                             </td>
                                             <td data-label="Время">
                                                 <span class="time-badge">
                                                     {{ \Carbon\Carbon::parse($booking->schedule->start_time)->format('H:i') }}
                                                 </span>
-                                            </td>
+                                             </td>
                                             <td data-label="Тренировка">
                                                 <span class="workout-name">
                                                     {{ $booking->schedule->workout->name }}
                                                 </span>
-                                            </td>
+                                             </td>
                                             <td data-label="Тренер">
                                                 <span class="trainer-name">
                                                     {{ $booking->schedule->trainer->name ?? '—' }}
                                                 </span>
-                                            </td>
+                                             </td>
                                             <td data-label="Статус">
                                                 @if($booking->status === 'attended')
                                                     <span class="status-badge-mini success">
@@ -260,11 +260,51 @@
                                                         {{ $booking->status }}
                                                     </span>
                                                 @endif
-                                            </td>
+                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Мобильная версия истории (карточки) -->
+                        <div class="history-cards d-md-none">
+                            @foreach($recentBookings as $booking)
+                                <div class="history-card-item">
+                                    <div class="history-card-date">
+                                        <span class="day">{{ \Carbon\Carbon::parse($booking->schedule->date)->format('d') }}</span>
+                                        <span class="month">{{ \Carbon\Carbon::parse($booking->schedule->date)->format('M') }}</span>
+                                    </div>
+                                    <div class="history-card-info">
+                                        <div class="history-card-workout">
+                                            <strong>{{ $booking->schedule->workout->name }}</strong>
+                                            <span class="time">{{ \Carbon\Carbon::parse($booking->schedule->start_time)->format('H:i') }}</span>
+                                        </div>
+                                        <div class="history-card-trainer">
+                                            <i class="fas fa-user"></i> {{ $booking->schedule->trainer->name ?? '—' }}
+                                        </div>
+                                    </div>
+                                    <div class="history-card-status">
+                                        @if($booking->status === 'attended')
+                                            <span class="status-badge-mini success">
+                                                <i class="fas fa-check-circle"></i> Посетил
+                                            </span>
+                                        @elseif($booking->status === 'missed')
+                                            <span class="status-badge-mini danger">
+                                                <i class="fas fa-times-circle"></i> Пропустил
+                                            </span>
+                                        @elseif($booking->status === 'cancelled')
+                                            <span class="status-badge-mini warning">
+                                                <i class="fas fa-ban"></i> Отменено
+                                            </span>
+                                        @else
+                                            <span class="status-badge-mini secondary">
+                                                {{ $booking->status }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     @else
                         <div class="empty-history">

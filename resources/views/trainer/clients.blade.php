@@ -197,10 +197,6 @@
                                class="btn-action btn-profile">
                                 <i class="fas fa-user me-2"></i>Профиль
                             </a>
-                            <a href="{{ route('trainer.schedule') }}?client_id={{ $client->id }}" 
-                               class="btn-action btn-history">
-                                <i class="fas fa-history me-2"></i>История
-                            </a>
                             <button type="button" class="btn-action btn-contact" 
                                     onclick="contactClient({{ $client->id }})"
                                     title="Связаться">
