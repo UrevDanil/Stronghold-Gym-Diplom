@@ -255,6 +255,10 @@
                                                     <span class="status-badge-mini warning">
                                                         <i class="fas fa-ban me-1"></i>Отменено
                                                     </span>
+                                               @elseif($booking->status === 'booked')
+                                                    <span class="status-badge-mini warning">
+                                                        <i class="fas fa-clock me-1"></i>Ожидает
+                                                    </span>
                                                 @else
                                                     <span class="status-badge-mini secondary">
                                                         {{ $booking->status }}
@@ -296,6 +300,10 @@
                                         @elseif($booking->status === 'cancelled')
                                             <span class="status-badge-mini warning">
                                                 <i class="fas fa-ban"></i> Отменено
+                                            </span>
+                                        @elseif($booking->status === 'booked')
+                                            <span class="status-badge-mini warning">
+                                                <i class="fas fa-clock"></i> Ожидает
                                             </span>
                                         @else
                                             <span class="status-badge-mini secondary">

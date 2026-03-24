@@ -1,216 +1,214 @@
 <!-- Кабинет тренера -->
-
 @extends('layouts.app')
 
 @section('title', 'Панель тренера')
 
+@section('styles')
+    <link href="{{ asset('assets/css/dashboard/trainer/trainer-dashboard.css') }}" rel="stylesheet">
+@endsection
+
 @section('content')
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Панель тренера</h1>
-        <div>
-            <span class="text-muted me-3">
-                <i class="fas fa-user me-2"></i>{{ $user->name }}
-            </span>
-            <span class="badge bg-primary">{{ $user->qualification ?? 'Тренер' }}</span>
+<div class="container py-4 trainer-dashboard">
+    <!-- Заголовок -->
+    <div class="dashboard-header d-flex justify-content-between align-items-center">
+        <h1 class="mb-0">
+            <i class="fas fa-chalkboard-user me-3"></i>Панель тренера
+        </h1>
+        <div class="trainer-badge">
+            <i class="fas fa-user-check"></i>
+            {{ $user->name }}
+            @if($user->qualification)
+                <span class="ms-1">({{ $user->qualification }})</span>
+            @endif
         </div>
     </div>
+
+    @if(!auth()->user()->is_active)
+        <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Внимание!</strong> Ваш аккаунт деактивирован. Обратитесь к администратору.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
     <!-- Статистика -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card text-white bg-primary h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-0">Всего тренировок</h6>
-                            <h2 class="mt-2 mb-0">{{ $totalTrainings }}</h2>
+    <div class="stats-row">
+        <div class="row g-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-card bg-primary">
+                    <div class="card-body">
+                        <div class="stat-icon">
+                            <i class="fas fa-dumbbell"></i>
                         </div>
-                        <i class="fas fa-dumbbell fa-3x opacity-50"></i>
+                        <div class="stat-label">Всего тренировок</div>
+                        <div class="stat-value">{{ $totalTrainings }}</div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card text-white bg-success h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-0">Посещений</h6>
-                            <h2 class="mt-2 mb-0">{{ $totalAttendances }}</h2>
+            <div class="col-md-3 col-6">
+                <div class="stat-card bg-info">
+                    <div class="card-body">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
                         </div>
-                        <i class="fas fa-users fa-3x opacity-50"></i>
+                        <div class="stat-label">Клиентов</div>
+                        <div class="stat-value">{{ $uniqueClients }}</div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card text-white bg-info h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-0">Клиентов</h6>
-                            <h2 class="mt-2 mb-0">{{ $uniqueClients }}</h2>
+            <div class="col-md-3 col-6">
+                <div class="stat-card bg-warning">
+                    <div class="card-body">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-day"></i>
                         </div>
-                        <i class="fas fa-user-friends fa-3x opacity-50"></i>
+                        <div class="stat-label">Сегодня</div>
+                        <div class="stat-value">{{ $todaySchedules->count() }}</div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card text-white bg-warning h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-0">Сегодня</h6>
-                            <h2 class="mt-2 mb-0">{{ $todaySchedules->count() }}</h2>
+            <div class="col-md-3 col-6">
+                <div class="stat-card bg-success">
+                    <div class="card-body">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
                         </div>
-                        <i class="fas fa-calendar-day fa-3x opacity-50"></i>
+                        <div class="stat-label">Посещений</div>
+                        <div class="stat-value">{{ $totalAttendances }}</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-4">
         <!-- Сегодняшние тренировки -->
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-calendar-day me-2"></i>Тренировки на сегодня
-                    </h5>
+        <div class="col-md-6">
+            <div class="section-card">
+                <div class="card-header">
+                    <i class="fas fa-calendar-day me-2"></i>Тренировки на сегодня
                 </div>
                 <div class="card-body">
                     @if($todaySchedules->count() > 0)
                         @foreach($todaySchedules as $schedule)
-                            <div class="card mb-3 border-{{ $schedule->isPast() ? 'secondary' : 'primary' }}">
+                            <div class="workout-item-card">
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h6 class="mb-1">
-                                                {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - 
-                                                {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}
-                                            </h6>
-                                            <p class="mb-1">
-                                                <strong>{{ $schedule->workout->name }}</strong>
-                                            </p>
-                                            <p class="mb-0 text-muted small">
-                                                <i class="fas fa-map-marker-alt me-1"></i>{{ $schedule->room ?? 'Зал не указан' }}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <span class="badge bg-{{ $schedule->isPast() ? 'secondary' : 'success' }}">
-                                                {{ $schedule->bookings->count() }}/{{ $schedule->capacity() }}
-                                            </span>
-                                        </div>
+                                    <div class="workout-time {{ $schedule->isPast() ? 'past' : '' }}">
+                                        <i class="fas fa-clock"></i>
+                                        {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - 
+                                        {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}
+                                    </div>
+                                    <div class="workout-name">{{ $schedule->workout->name }}</div>
+                                    <div class="workout-room">
+                                        <i class="fas fa-door-open"></i> {{ $schedule->room ?? 'Основной зал' }}
+                                    </div>
+                                    <div class="workout-capacity {{ $schedule->current_participants >= $schedule->capacity() ? 'full' : 'available' }}">
+                                        <i class="fas fa-users"></i> Записано: {{ $schedule->bookings->count() }}/{{ $schedule->capacity() }}
                                     </div>
                                     
-                                    @if(!$schedule->isPast() && $schedule->bookings->count() > 0)
-                                        <hr>
-                                        <div class="mt-2">
-                                            <p class="mb-2 small fw-bold">Записавшиеся клиенты:</p>
+                                    @if($schedule->bookings->count() > 0)
+                                        <div class="clients-preview">
+                                            <div class="clients-preview-title">
+                                                <i class="fas fa-user-friends"></i> Записавшиеся клиенты
+                                            </div>
                                             @foreach($schedule->bookings->take(3) as $booking)
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <span>
-                                                        <i class="fas fa-user-circle me-1"></i>
-                                                        {{ $booking->user->name }}
-                                                    </span>
-                                                    @if($booking->status === 'booked')
-                                                        <form action="{{ route('trainer.attendance.mark', $schedule) }}" 
-                                                              method="POST" class="d-inline">
-                                                            @csrf
-                                                            <input type="hidden" name="booking_id" value="{{ $booking->id }}">
-                                                            <button type="submit" name="status" value="attended" 
-                                                                    class="btn btn-sm btn-success">
-                                                                <i class="fas fa-check"></i>
-                                                            </button>
-                                                        </form>
+                                                <div class="client-preview-item">
+                                                    <div class="client-info-preview">
+                                                        <div class="client-avatar-mini">
+                                                            {{ strtoupper(substr($booking->user->name, 0, 1)) }}
+                                                        </div>
+                                                        <span class="client-name-preview">{{ $booking->user->name }}</span>
+                                                    </div>
+                                                    @if($booking->status === 'attended')
+                                                        <span class="client-status">
+                                                            <i class="fas fa-check-circle"></i> Посетил
+                                                        </span>
+                                                    @elseif($booking->status === 'missed')
+                                                        <span class="client-status" style="background: rgba(220,53,69,0.1); color:#dc3545;">
+                                                            <i class="fas fa-times-circle"></i> Пропустил
+                                                        </span>
                                                     @else
-                                                        <span class="badge bg-success">Отмечен</span>
+                                                        <span class="client-status" style="background: rgba(255,193,7,0.1); color:#ffc107;">
+                                                            <i class="fas fa-clock"></i> Ожидает
+                                                        </span>
                                                     @endif
                                                 </div>
                                             @endforeach
                                             @if($schedule->bookings->count() > 3)
-                                                <div class="text-center mt-2">
-                                                    <small class="text-muted">
-                                                        И еще {{ $schedule->bookings->count() - 3 }} клиентов
-                                                    </small>
+                                                <div class="more-clients">
+                                                    <i class="fas fa-ellipsis-h"></i> и еще {{ $schedule->bookings->count() - 3 }} клиентов
                                                 </div>
                                             @endif
+                                        </div>
+                                    @else
+                                        <div class="empty-state-mini">
+                                            <i class="fas fa-user-slash"></i>
+                                            <p>Нет записавшихся клиентов</p>
                                         </div>
                                     @endif
                                 </div>
                             </div>
                         @endforeach
                     @else
-                        <div class="text-center py-4">
-                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                            <p class="text-muted mb-0">На сегодня тренировок нет</p>
+                        <div class="empty-state-mini">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>На сегодня тренировок нет</p>
                         </div>
                     @endif
                     
-                    <div class="text-center mt-3">
-                        <a href="{{ route('trainer.schedule') }}" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-calendar-alt me-2"></i>Полное расписание
-                        </a>
+                    <div class="text-center mt-4">
+                        <!--<a href="{{ route('trainer.schedule') }}" class="quick-action-btn primary">
+                            <i class="fas fa-calendar-alt"></i> Полное расписание
+                        </a>-->
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Предстоящие тренировки -->
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-calendar-week me-2"></i>Ближайшие тренировки
-                    </h5>
+        <!-- Ближайшие тренировки -->
+        <div class="col-md-6">
+            <div class="section-card">
+                <div class="card-header success">
+                    <i class="fas fa-calendar-week me-2"></i>Ближайшие тренировки
                 </div>
                 <div class="card-body">
                     @if($upcomingSchedules->count() > 0)
-                        <div class="list-group">
+                        <div class="upcoming-list">
                             @foreach($upcomingSchedules as $schedule)
-                                <div class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <p class="mb-1">
-                                                <strong>{{ \Carbon\Carbon::parse($schedule->date)->isoFormat('D MMMM') }}</strong>
-                                                <span class="mx-2">•</span>
-                                                {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}
-                                            </p>
-                                            <p class="mb-0">
-                                                {{ $schedule->workout->name }}
-                                                <span class="badge bg-info ms-2">{{ $schedule->room ?? 'Зал' }}</span>
-                                            </p>
-                                            <small class="text-muted">
-                                                Записано: {{ $schedule->bookings->count() }}/{{ $schedule->capacity() }}
-                                            </small>
+                                <div class="upcoming-item">
+                                    <div class="upcoming-info">
+                                        <div class="upcoming-date">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            {{ \Carbon\Carbon::parse($schedule->date)->isoFormat('D MMMM, dddd') }}
+                                            <span class="ms-2">{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}</span>
                                         </div>
-                                        <div>
-                                            <a href="{{ route('trainer.schedule') }}?date={{ $schedule->date }}" 
-                                               class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
+                                        <div class="upcoming-workout">{{ $schedule->workout->name }}</div>
+                                        <div class="upcoming-meta">
+                                            <i class="fas fa-door-open"></i> {{ $schedule->room ?? 'Основной зал' }}
+                                            <span class="mx-2">•</span>
+                                            <i class="fas fa-users"></i> {{ $schedule->bookings->count() }}/{{ $schedule->capacity() }}
                                         </div>
                                     </div>
+                                   <!-- <div class="upcoming-capacity">
+                                        <a href="{{ route('trainer.schedule') }}?date={{ $schedule->date }}" 
+                                           class="view-btn">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>-->
                                 </div>
                             @endforeach
                         </div>
                     @else
-                        <div class="text-center py-4">
-                            <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
-                            <p class="text-muted mb-0">Нет предстоящих тренировок</p>
+                        <div class="empty-state-mini">
+                            <i class="fas fa-calendar-plus"></i>
+                            <p>Нет предстоящих тренировок</p>
                         </div>
                     @endif
                     
-                    <div class="text-center mt-3">
-                        <a href="{{ route('trainer.schedule') }}" class="btn btn-outline-success btn-sm">
-                            <i class="fas fa-calendar-plus me-2"></i>Все тренировки
-                        </a>
+                    <div class="text-center mt-4">
+                       <!-- <a href="{{ route('trainer.schedule') }}" class="quick-action-btn primary">
+                            <i class="fas fa-calendar-plus"></i> Все тренировки
+                        </a>-->
                     </div>
                 </div>
             </div>
@@ -218,66 +216,21 @@
     </div>
 
     <!-- Быстрые действия -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Быстрые действия</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <a href="{{ route('trainer.schedule') }}" class="btn btn-outline-primary w-100">
-                                <i class="fas fa-calendar-alt me-2"></i>Расписание
-                            </a>
-                        </div>
-                        <div class="col-md-3">
-                            <a href="{{ route('trainer.clients') }}" class="btn btn-outline-success w-100">
-                                <i class="fas fa-users me-2"></i>Мои клиенты
-                            </a>
-                        </div>
-                        <div class="col-md-3">
-                            <a href="{{ route('trainer.schedule') }}" class="btn btn-outline-info w-100">
-                                <i class="fas fa-clipboard-list me-2"></i>Отметить посещаемость
-                            </a>
-                        </div>
-                        <div class="col-md-3">
-                            <a href="{{ route('trainer.profile') }}" class="btn btn-outline-secondary w-100">
-                                <i class="fas fa-user-cog me-2"></i>Профиль
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="quick-actions-card">
+        <div class="card-header">
+            <i class="fas fa-bolt me-2"></i>Быстрые действия
+        </div>
+        <div class="quick-actions-grid">
+            <a href="{{ route('trainer.schedule') }}" class="quick-action-btn primary">
+                <i class="fas fa-calendar-alt"></i> Мое расписание
+            </a>
+            <a href="{{ route('trainer.clients') }}" class="quick-action-btn success">
+                <i class="fas fa-users"></i> Мои клиенты
+            </a>
+            <a href="{{ route('trainer.profile') }}" class="quick-action-btn secondary">
+                <i class="fas fa-user-cog"></i> Профиль
+            </a>
         </div>
     </div>
 </div>
-
-@if(!auth()->user()->is_active)
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        <strong>Внимание!</strong> Ваш аккаунт деактивирован. 
-        Некоторые функции могут быть недоступны. Обратитесь к администратору.
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-
-<style>
-    .opacity-50 {
-        opacity: 0.5;
-    }
-    .card {
-        transition: transform 0.2s;
-    }
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
-    }
-    .list-group-item {
-        transition: background-color 0.2s;
-    }
-    .list-group-item:hover {
-        background-color: #f8f9fa;
-    }
-</style>
 @endsection

@@ -128,7 +128,7 @@
                                                     <span class="status-badge-small missed">
                                                         <i class="fas fa-times-circle"></i> Пропустил
                                                     </span>
-                                                @elseif($booking->status === 'booked' && !$schedule->isPast())
+                                                @elseif($booking->status === 'booked')
                                                     <form action="{{ route('trainer.attendance.mark', $schedule) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         <input type="hidden" name="booking_id" value="{{ $booking->id }}">
@@ -149,10 +149,6 @@
                                                             <i class="fas fa-times"></i> Не пришел
                                                         </button>
                                                     </form>
-                                                @elseif($schedule->isPast())
-                                                    <span class="status-badge-small past">
-                                                        <i class="fas fa-clock"></i> Тренировка прошла
-                                                    </span>
                                                 @endif
                                             </div>
                                         </div>
