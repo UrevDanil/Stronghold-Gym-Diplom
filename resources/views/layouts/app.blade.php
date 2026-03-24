@@ -134,11 +134,6 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('trainer.attendance') ? 'active' : '' }}" href="{{ route('trainer.attendance') }}">
-                    <i class="fas fa-clipboard-list"></i> Посещаемость
-                </a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('trainer.profile') ? 'active' : '' }}" href="{{ route('trainer.profile') }}">
                     <i class="fas fa-user-circle"></i> Профиль
                 </a>
