@@ -16,7 +16,7 @@
    ---------------------------------------- */
 
 .clients-header {
-    background: linear-gradient(135deg, #ff7077, #70fff8);
+    background: linear-gradient(135deg, #7cacdf, #5682a4);
     border-radius: 20px;
     padding: 1.5rem 2rem;
     margin-bottom: 2rem;
@@ -37,7 +37,7 @@
     right: 0;
     width: 200px;
     height: 100%;
-    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    background: linear-gradient(90deg, rgba(0, 123, 255, 0.2) 0%, rgba(0, 123, 255, 0.2) 100%);
     transform: skewX(-20deg) translateX(100px);
 }
 
@@ -46,7 +46,7 @@
     font-weight: 700;
     margin: 0;
     font-size: 2rem;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    text-shadow: 2px 2px 4px rgba(0, 123, 255, 0.2);
 }
 
 .clients-header .back-btn {
@@ -64,7 +64,7 @@
 
 .clients-header .back-btn:hover {
     background: white;
-    color: #70fff8;
+    color: #5682a4;
     transform: translateX(-3px);
 }
 
@@ -102,7 +102,7 @@
 }
 
 .filters-header {
-    background: linear-gradient(135deg, #ff7077, #70fff8);
+    background: linear-gradient(135deg, #7cacdf, #5682a4);
     color: white;
     padding: 1rem 1.5rem;
     font-weight: 600;
@@ -143,18 +143,18 @@
 
 .filters-body .form-control:focus,
 .filters-body .form-select:focus {
-    border-color: #70fff8;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
+    border-color: #5682a4;
+    box-shadow: 0 0 0 0.2rem rgba(34, 63, 95, 0.1);
     outline: none;
 }
 
 .filters-body .input-group .form-control:focus {
-    border-color: #70fff8;
+    border-color: #5682a4;
     border-left-color: #e9ecef;
 }
 
 .btn-filter {
-    background: linear-gradient(135deg, #ff7077, #ff6d33);
+    background: linear-gradient(135deg, #7cacdf);
     color: white;
     border: none;
     border-radius: 12px;
@@ -171,14 +171,14 @@
 
 .btn-filter:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(212, 116, 52, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
     color: white;
 }
 
 .btn-reset {
     background: white;
-    border: 2px solid #ff7077;
-    color: #ff7077;
+    border: 2px solid #7cacdf;
+    color: #7cacdf;
     border-radius: 12px;
     padding: 0.7rem 1rem;
     font-weight: 600;
@@ -193,7 +193,7 @@
 }
 
 .btn-reset:hover {
-    background: linear-gradient(135deg, #ff7077, #ff6d33);
+    background: linear-gradient(135deg, #7cacdf);
     color: white;
     transform: translateY(-2px);
 }
@@ -269,28 +269,28 @@
     background: white;
     border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    box-shadow: 0 15px 35px rgba(0, 123, 255, 0.2);
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     height: 100%;
     display: flex;
     flex-direction: column;
     position: relative;
-    border: 1px solid rgba(255, 112, 119, 0.1);
+    border: 1px solid rgba(0, 123, 255, 0.2);
 }
 
 .client-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 25px 45px rgba(255, 112, 119, 0.2);
-    border-color: rgba(255, 112, 119, 0.3);
+    box-shadow: 0 25px 45px rgba(0, 123, 255, 0.2);
+    border-color: rgba(0, 123, 255, 0.2);
 }
 
 .client-card__header {
-    background: linear-gradient(135deg, #fff5f5, #fff0f0);
+    background: linear-gradient(135deg, #7cacdf, #667eea);
     padding: 1.5rem 1.5rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    border-bottom: 2px solid rgba(255, 112, 119, 0.1);
+    border-bottom: 2px solid rgba(0, 123, 255, 0.2);
     position: relative;
 }
 
@@ -302,7 +302,7 @@
     transform: translateX(-50%);
     width: 50px;
     height: 2px;
-    background: linear-gradient(90deg, #ff7077, #70fff8);
+    background: linear-gradient(90deg, #7cacdf, #5682a4);
     border-radius: 2px;
 }
 
@@ -310,7 +310,7 @@
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ff7077, #ff8a8f);
+    background: linear-gradient(135deg,#7cacdf);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,17 +318,17 @@
     font-weight: 700;
     font-size: 1.8rem;
     position: relative;
-    box-shadow: 0 10px 20px rgba(255, 112, 119, 0.3);
+    box-shadow: 0 10px 20px rgba(0, 123, 255, 0.2);
     border: 3px solid white;
     transition: all 0.3s ease;
 }
 
 .client-card:hover .client-avatar {
     transform: scale(1.05) rotate(5deg);
-    box-shadow: 0 15px 25px rgba(255, 112, 119, 0.4);
+    box-shadow: 0 15px 25px rgba(0, 123, 255, 0.2);
 }
 
-.client-avatar.active::after {
+/*.client-avatar.active::after
     content: '';
     position: absolute;
     bottom: 5px;
@@ -352,7 +352,7 @@
     border-radius: 50%;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     animation: pulse 2s infinite;
-}
+}*/
 
 @keyframes pulse {
     0% {
@@ -373,13 +373,13 @@
 }
 
 .trainings-badge {
-    background: linear-gradient(135deg, #ff7077, #ff8a8f);
+    background: linear-gradient(135deg, #7cacdf);
     color: white;
     padding: 0.4rem 1rem;
     border-radius: 50px;
     font-size: 0.8rem;
     font-weight: 600;
-    box-shadow: 0 4px 10px rgba(255, 112, 119, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
     letter-spacing: 0.3px;
 }
 
@@ -417,9 +417,9 @@
 .client-name {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #2c3e50;
+    color: #7cacdf;
     margin-bottom: 1.2rem;
-    border-left: 4px solid #ff7077;
+    border-left: 4px solid #7cacdf;
     padding-left: 0.8rem;
 }
 
@@ -437,7 +437,7 @@
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    color: #2c3e50;
+    color: #7cacdf;
     text-decoration: none;
     font-size: 0.9rem;
     transition: all 0.3s ease;
@@ -447,15 +447,15 @@
 
 .contact-item:hover {
     background: white;
-    color: #ff7077;
+    color: #5682a4;
     transform: translateX(5px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
 }
 
 .contact-item i {
     width: 20px;
     font-size: 1rem;
-    color: #ff7077;
+    color: #7cacdf;
     transition: all 0.3s ease;
 }
 
@@ -493,7 +493,7 @@
     background-color: #e9ecef;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: inset 0 1px 3px rgba(0, 123, 255, 0.2);
 }
 
 .progress-bar {
@@ -533,42 +533,42 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.9rem;
-    color: #2c3e50;
+    color: #7cacdf;
     background: linear-gradient(135deg, #f8f9fa, #ffffff);
     padding: 0.8rem 1rem;
     border-radius: 16px;
-    border: 1px solid rgba(255, 112, 119, 0.1);
+    border: 1px solid rgba(0, 123, 255, 0.2);
     flex-wrap: wrap;
     transition: all 0.3s ease;
 }
 
 .last-training:hover {
-    border-color: #ff7077;
-    box-shadow: 0 4px 12px rgba(255, 112, 119, 0.1);
+    border-color: #7cacdf;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
 }
 
 .last-training i {
-    color: #ff7077;
+    color: #7cacdf;
     font-size: 1rem;
 }
 
 .last-training strong {
-    color: #2c3e50;
+    color: #7cacdf;
     font-weight: 700;
-    background: rgba(255, 112, 119, 0.1);
+    background: rgba(0, 123, 255, 0.2);
     padding: 0.2rem 0.6rem;
     border-radius: 50px;
 }
 
 .workout-name {
-    background: linear-gradient(135deg, #ff7077, #ff8a8f);
+    background: linear-gradient(135deg, #7cacdf);
     color: white;
     padding: 0.2rem 0.8rem;
     border-radius: 50px;
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.3px;
-    box-shadow: 0 2px 5px rgba(255, 112, 119, 0.3);
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
 }
 
 /* Футер карточки */
@@ -576,7 +576,7 @@
     padding: 1rem 1.5rem 1.5rem;
     display: flex;
     gap: 0.5rem;
-    border-top: 2px solid rgba(255, 112, 119, 0.1);
+    border-top: 2px solid rgba(0, 123, 255, 0.2);
     background: #f8f9fa;
 }
 
@@ -598,29 +598,40 @@
 }
 
 .btn-profile {
-    background: linear-gradient(135deg, #ff7077, #ff8a8f);
-    color: white;
-    box-shadow: 0 4px 10px rgba(255, 112, 119, 0.3);
+    background: white;
+    border: 2px solid #7cacdf;
+    color: #7cacdf;
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 46px;
+    width: 46px;
 }
 
 .btn-profile:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(255, 112, 119, 0.4);
-    background: linear-gradient(135deg, #ff8a8f, #ff7077);
+    background: linear-gradient(135deg, #7cacdf);
+    color: white;
+    transform: translateY(-2px);
 }
 
 .btn-history {
     background: white;
-    border: 2px solid #ff7077;
-    color: #ff7077;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 2px solid #7cacdf;
+    color: #7cacdf;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
 }
 
 .btn-history:hover {
-    background: #ff7077;
+    background: #7cacdf;
     color: white;
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(255, 112, 119, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.2);
 }
 
 .btn-contact {
@@ -631,7 +642,7 @@
     width: 46px;
     padding: 0.7rem 0;
     border-radius: 14px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
 }
 
 .btn-contact:hover {
@@ -692,7 +703,7 @@
     padding: 4rem 2rem;
     background: white;
     border-radius: 30px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    box-shadow: 0 10px 30px rgba(0, 123, 255, 0.2);
 }
 
 .empty-state-icon {

@@ -322,7 +322,7 @@
 
 .form-control:focus {
     border-color: #4428a7;
-    box-shadow: 0 0 0 0.2rem rgba(40, 116, 167, 0.1);
+    box-shadow: 0 0 0 0.2rem rgba(5, 40, 63, 0.1);
     outline: none;
 }
 
@@ -355,12 +355,12 @@ textarea.form-control {
     font-weight: 600;
     font-size: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(40, 110, 167, 0.2);
+    box-shadow: 0 4px 15px rgba(49, 82, 230, 0.3);
 }
 
 .btn-save:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
+    box-shadow: 0 6px 20px rgba(49, 82, 230, 0.3);
     color: white;
 }
 
@@ -377,12 +377,12 @@ textarea.form-control {
     font-weight: 600;
     font-size: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(23, 162, 184, 0.2);
+    box-shadow: 0 4px 15px rgba(49, 82, 230, 0.3);
 }
 
 .btn-qualification:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
+    box-shadow: 0 6px 20px rgba(49, 82, 230, 0.3);
     color: white;
 }
 
