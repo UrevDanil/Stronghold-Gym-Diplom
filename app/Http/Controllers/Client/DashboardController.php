@@ -19,6 +19,8 @@ class DashboardController extends Controller
     public function dashboard()
 {
     $user = Auth::user();
+
+    $user->refreshSubscriptionStatuses();
     
     if (!$user->is_active) {
         Auth::logout();
@@ -360,21 +362,30 @@ public function resumeSubscription(Request $request)
 {
     $user = Auth::user();
     
-    // Получаем замороженный абонемент
+    // Ищем замороженный абонемент (включая те, у которых уже истекла дата заморозки)
     $userSubscription = $user->userSubscriptions()
         ->where('status', UserSubscription::STATUS_FROZEN)
         ->whereNotNull('paused_at')
         ->whereNotNull('paused_until')
-        ->whereDate('paused_until', '>=', Carbon::today())
-        ->first();
+        ->first(); // Убираем условие по дате
     
     if (!$userSubscription) {
         return back()->with('error', 'У вас нет замороженного абонемента');
     }
     
     try {
-        // Используем метод resume из модели UserSubscription
-        $userSubscription->resume();
+        // Проверяем, если заморозка уже закончилась - просто меняем статус
+        if (!$userSubscription->isPaused()) {
+            // Заморозка закончилась, просто возвращаем статус в active
+            $userSubscription->status = UserSubscription::STATUS_ACTIVE;
+            $userSubscription->paused_at = null;
+            $userSubscription->paused_until = null;
+            $userSubscription->pause_days = null;
+            $userSubscription->save();
+        } else {
+            // Заморозка еще активна - используем метод resume
+            $userSubscription->resume();
+        }
         
         // Создаем уведомление
         \App\Models\Notification::create([

@@ -207,6 +207,36 @@ public function activeSubscription()
     }
 
 /**
+ * Проверка и обновление статусов всех абонементов пользователя
+ */
+public function refreshSubscriptionStatuses()
+{
+    $subscriptions = $this->userSubscriptions()
+        ->whereIn('status', [UserSubscription::STATUS_ACTIVE, UserSubscription::STATUS_FROZEN])
+        ->get();
+    
+    foreach ($subscriptions as $subscription) {
+        // Проверяем и размораживаем, если заморозка закончилась
+        if ($subscription->status === UserSubscription::STATUS_FROZEN && !$subscription->isPaused()) {
+            $subscription->status = UserSubscription::STATUS_ACTIVE;
+            $subscription->paused_at = null;
+            $subscription->paused_until = null;
+            $subscription->pause_days = null;
+            $subscription->save();
+        }
+        
+        // Проверяем на истечение срока
+        if ($subscription->status === UserSubscription::STATUS_ACTIVE && 
+            $subscription->end_date < Carbon::today()) {
+            $subscription->status = UserSubscription::STATUS_EXPIRED;
+            $subscription->save();
+        }
+    }
+    
+    return $this;
+}
+
+/**
  * Предстоящие бронирования (только активные, не посещенные и не пропущенные)
  */
 public function upcomingBookings()
