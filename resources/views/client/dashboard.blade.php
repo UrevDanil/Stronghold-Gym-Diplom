@@ -4,24 +4,21 @@
 @section('title', 'Личный кабинет')
 
 @section('styles')
-    <link href="{{ asset('assets/css/dashboard/common.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/dashboard/client.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/dashboard/client/client-dashboard.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
 <div class="container py-4">
-    <!-- Приветствие с датой -->
-    <div class="row mb-5 fade-in">
-        <div class="col-12">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-                <div>
-                    <h1 class="display-5 fw-bold greeting-title mb-2">
-                        Добро пожаловать, {{ $user->name }}!
-                    </h1>
-                    <div class="date-badge">
-                        <i class="fas fa-calendar-alt me-2"></i>
-                        {{ now()->isoFormat('dddd, D MMMM YYYY') }}
-                    </div>
+    <!-- Приветствие с датой (новый дизайн) -->
+    <div class="welcome-section fade-in">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="greeting-title mb-2">
+                    Добро пожаловать, {{ $user->name }}!
+                </h1>
+                <div class="date-badge">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    {{ now()->isoFormat('dddd, D MMMM YYYY') }}
                 </div>
             </div>
         </div>
@@ -106,7 +103,6 @@
                             <a href="{{ route('client.subscriptions') }}" class="btn-frozen">
                                 <i class="fas fa-play"></i>
                                 Разморозить абонемент
-                                <span class="btn-glow"></span>
                             </a>
                         </div>
                     </div>
@@ -233,7 +229,7 @@
                                             <th>Тренировка</th>
                                             <th>Тренер</th>
                                             <th>Действия</th>
-                                        </tr>
+                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($upcomingBookings as $booking)
@@ -289,7 +285,6 @@
                                             @method('DELETE')
                                             <button type="submit" class="btn-gradient btn-gradient-danger w-100 py-2">
                                                 <i class="fas fa-times me-2"></i>Отменить
-                                                <span class="btn-glow"></span>
                                             </button>
                                         </form>
                                     </div>
@@ -334,11 +329,11 @@
                             <div class="table-responsive">
                                 <table class="table dashboard-table">
                                     <thead>
-                                        <tr>
+                                         <tr>
                                             <th>Дата</th>
                                             <th>Тренировка</th>
                                             <th>Статус</th>
-                                        </tr>
+                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($pastBookings as $booking)
@@ -372,10 +367,10 @@
                             </div>
                         </div>
 
-                        <!-- Мобильная версия карточек -->
+                        <!-- Мобильная версия карточек (уменьшенные) -->
                         <div class="mobile-view">
                             @foreach($pastBookings as $booking)
-                                <div class="mobile-booking-card {{ $booking->status }}">
+                                <div class="mobile-booking-card {{ $booking->status }} history-card">
                                     <div class="booking-row">
                                         <span class="booking-label">Дата:</span>
                                         <span class="booking-value">{{ $booking->schedule->date->format('d.m.Y') }}</span>
