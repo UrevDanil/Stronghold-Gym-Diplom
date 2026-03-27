@@ -11,7 +11,7 @@
 }
 
 .greeting-title {
-    background: linear-gradient(135deg, #0b34bb, #2aa8e2);
+    background: linear-gradient(135deg, #9ea9cc 0%, #7c76b7);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: 2rem;
@@ -96,7 +96,7 @@
 
 /* Градиенты для карточек */
 .bg-primary-gradient {
-    background: linear-gradient(135deg, #0e2778 0%, #0b34bb 100%);
+    background: linear-gradient(135deg, #74dbd3 0%, #9ea9cc 100%);
 }
 
 .bg-success-gradient {
@@ -125,7 +125,7 @@
 
 .main-card .card-header {
     position: relative;
-    background: linear-gradient(135deg, #0b34bb 0%, #0e2778 100%);
+    background: linear-gradient(135deg, #9ea9cc 0%, #7c76b7 100%);
     border: none;
     padding: 1.2rem 1.5rem;
     overflow: hidden;
@@ -162,7 +162,7 @@
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #0e2778 0%, #0b34bb 100%);
+    background: linear-gradient(135deg, #9ea9cc 0%, #7c76b7 100%);
     display: flex;
     align-items: center;
     justify-content: center;
