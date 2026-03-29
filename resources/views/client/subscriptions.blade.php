@@ -4,8 +4,7 @@
 @section('title', 'Мои абонементы')
 
 @section('styles')
-    <link href="{{ asset('assets/css/dashboard/common.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/dashboard/client.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/dashboard/client/client-subscriptions.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')

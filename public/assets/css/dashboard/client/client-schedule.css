@@ -642,13 +642,13 @@
 }
 
 .client-empty-state .client-btn-reset-large {
-    background: linear-gradient(135deg, #0b34bb, #0e2778);
+    background: linear-gradient(135deg, #2aa8e2, #667eea);
     color: white;
     border: none;
     border-radius: 50px;
-    padding: 1rem 2.5rem;
+    padding: 1rem;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1rem;
     transition: all 0.3s ease;
     text-decoration: none;
     display: inline-flex;

@@ -1,0 +1,864 @@
+/* ========================================
+   СТИЛИ ДЛЯ СТРАНИЦЫ МОИ АБОНЕМЕНТЫ
+   ======================================== */
+
+/* ----------------------------------------
+   1. ОБЩИЕ СТИЛИ
+   ---------------------------------------- */
+
+.subscriptions-page {
+    background: linear-gradient(135deg, #f9fafc 0%, #ffffff 100%);
+    min-height: 100vh;
+}
+
+/* ----------------------------------------
+   2. ЗАГОЛОВОК
+   ---------------------------------------- */
+
+.greeting-title {
+    background: linear-gradient(135deg, #a31131fa, #f08e8efa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0;
+}
+
+.back-btn-subscription {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #a31131fa;
+    color: #a31131fa;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.back-btn-subscription:hover {
+    background: #a31131fa;
+    color: white;
+    transform: translateX(-3px);
+    box-shadow: 0 4px 15px rgba(226, 27, 13, 0.3);
+}
+
+.back-btn-subscription i {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.back-btn-subscription:hover i {
+    transform: translateX(-3px);
+}
+
+/* ----------------------------------------
+   3. КАРТОЧКА АБОНЕМЕНТА
+   ---------------------------------------- */
+
+.subscription-card {
+    border: none;
+    border-radius: 25px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    background: white;
+}
+
+.subscription-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+}
+
+.subscription-header {
+    padding: 1.5rem;
+    color: white;
+}
+
+.subscription-header.active {
+    background: linear-gradient(135deg, #a31131fa, #fffffffa);
+}
+
+.subscription-header.frozen {
+    background: linear-gradient(135deg, #3641d8, #a1c4fd);
+}
+
+.subscription-header h4 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+.subscription-header .badge.bg-light.text-dark {
+    background: rgba(255, 255, 255, 0.25) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50px;
+    padding: 0.5rem 1.2rem;
+    color: white !important;
+    font-weight: 500;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.subscription-header .badge.bg-light.text-dark:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.subscription-icon-large {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#a31131fa, #fffffffa);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: 3px solid white;
+    transition: all 0.3s ease;
+    margin: 0 auto;
+}
+
+.subscription-icon-large i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.subscription-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    color: #a31131fa;
+}
+
+.subscription-description {
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+/* ----------------------------------------
+   4. ПРОГРЕСС БАР
+   ---------------------------------------- */
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #495057;
+    margin: 1rem 1rem;
+    width: calc(100% - 2rem);
+}
+
+.progress-percentage {
+    font-weight: 700;
+    color: #a31131fa;
+}
+
+.subscription-progress-large {
+    height: 25px;
+    border-radius: 50px;
+    background-color: #e9ecef;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    margin: 1rem 1rem; /* Добавлен отступ слева и справа */
+    width: calc(100% - 2rem); /* Учитываем отступы */
+}
+
+.subscription-progress-large .progress-bar {
+    height: 100%;
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    border-radius: 50px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.subscription-progress-large .progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: progress-shine 2s infinite;
+}
+
+@keyframes progress-shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* ----------------------------------------
+   5. СТАТИСТИКА В КАРТОЧКЕ
+   ---------------------------------------- */
+
+.subscription-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 1rem 1rem; /* Добавлен отступ слева и справа */
+    width: calc(100% - 2rem); /* Учитываем отступы */
+}
+
+.stat-box {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 16px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.stat-box .stat-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.stat-box .stat-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #495057;
+    line-height: 1.2;
+}
+
+.stat-box .stat-number.success {
+    color: #28a781;
+}
+
+.stat-box .stat-number.info {
+    color: #17a2b8;
+}
+
+.stat-box .stat-number.warning {
+    color: #a31131fa;
+}
+
+/* ----------------------------------------
+   6. КНОПКИ ДЕЙСТВИЙ
+   ---------------------------------------- */
+
+.subscription-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.subscription-actions .btn-gradient {
+    min-width: 150px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 12px 20px;
+}
+
+.btn-gradient {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    gap: 0.5rem;
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-glow {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-gradient:hover .btn-glow {
+    left: 100%;
+}
+
+.btn-gradient-primary {
+    background: linear-gradient(135deg, #a31131fa, #fffffffa);
+}
+
+.btn-gradient-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.btn-gradient-warning {
+    background: linear-gradient(135deg, #3641d8, #a1c4fd);
+    color: white;
+}
+
+.btn-gradient-warning:hover {
+    background: linear-gradient(135deg, #3641d8, #a1c4fd);
+    color: white;
+}
+
+/* ----------------------------------------
+   7. ТАБЛИЦА ИСТОРИИ
+   ---------------------------------------- */
+
+.main-card {
+    border: none;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    background: white;
+}
+
+.main-card .card-header {
+    background: linear-gradient(135deg, #a31131fa, #fffffffa);
+    color: white;
+    padding: 1.2rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.2rem;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.main-card .card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(226, 12, 12, 0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(50px);
+}
+
+.main-card .card-header i {
+    margin-right: 0.5rem;
+}
+
+.main-card .card-body {
+    padding: 1.5rem;
+}
+
+.subscription-history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.subscription-history-table thead th {
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.subscription-history-table tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.subscription-history-table tbody tr:hover {
+    background: rgba(11, 52, 187, 0.05);
+}
+
+/* ----------------------------------------
+   8. БЕЙДЖИ
+   ---------------------------------------- */
+
+.badge-custom {
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.badge-attended {
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    color: #00573d;
+}
+
+.badge-missed {
+    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+    color: #9b1d1d;
+}
+
+.badge-cancelled {
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    color: #4635dc;
+}
+
+.bg-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+/* ----------------------------------------
+   9. МОБИЛЬНЫЕ КАРТОЧКИ
+   ---------------------------------------- */
+
+.mobile-subscription-cards {
+    display: none;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+    color: #495057;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-large {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.empty-state-large i {
+    font-size: 5rem;
+    color: #dee2e6;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-large h3 {
+    color: #212529;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state-large p {
+    color: #6c757d;
+    margin-bottom: 2rem;
+}
+
+/* ----------------------------------------
+   10. АДАПТИВНОСТЬ
+   ---------------------------------------- */
+
+@media (max-width: 768px) {
+    .greeting-title {
+        font-size: 1.5rem;
+    }
+    
+    .back-btn-subscription {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .subscription-stats {
+        gap: 0.5rem;
+    }
+    
+    .stat-box {
+        padding: 0.7rem;
+    }
+    
+    .stat-box .stat-label {
+        font-size: 0.65rem;
+    }
+    
+    .stat-box .stat-number {
+        font-size: 1.1rem;
+    }
+    
+    .subscription-actions {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    
+    .subscription-actions .btn-gradient {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .table-responsive {
+        display: none;
+    }
+    
+    .mobile-subscription-cards {
+        display: block;
+    }
+    
+    .subscription-title {
+        font-size: 1.4rem;
+    }
+    
+    .subscription-icon-large {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .subscription-icon-large i {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .greeting-title {
+        font-size: 1.3rem;
+    }
+    
+    .back-btn-subscription {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .subscription-header h4 {
+        font-size: 1rem;
+    }
+    
+    .subscription-header .badge.bg-light.text-dark {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+    }
+    
+    .subscription-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .stat-box {
+        padding: 0.6rem;
+    }
+    
+    .subscription-title {
+        font-size: 1.2rem;
+    }
+    
+    .empty-state-large {
+        padding: 2rem 1rem;
+    }
+    
+    .empty-state-large i {
+        font-size: 3rem;
+    }
+    
+    .empty-state-large h3 {
+        font-size: 1.2rem;
+    }
+}
+
+/* ----------------------------------------
+   11. МОБИЛЬНЫЕ КАРТОЧКИ ИСТОРИИ
+   ---------------------------------------- */
+
+.subscription-mobile-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-left: 4px solid;
+    transition: all 0.3s ease;
+}
+
+.subscription-mobile-card[data-status="active"] {
+    border-left-color: #28a745;
+}
+
+.subscription-mobile-card[data-status="frozen"] {
+    border-left-color: #2aa8e2;
+}
+
+.subscription-mobile-card[data-status="expired"] {
+    border-left-color: #6c757d;
+}
+
+.subscription-mobile-card[data-status="canceled"] {
+    border-left-color: #dc3545;
+}
+
+.subscription-mobile-card .card-header-mobile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.subscription-mobile-card .card-header-mobile h5 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: #212529;
+}
+
+.subscription-mobile-card .card-header-mobile .price {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0e2778;
+}
+
+.subscription-mobile-card .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.subscription-mobile-card .info-item {
+    background: #f8f9fa;
+    padding: 0.5rem;
+    border-radius: 10px;
+}
+
+.subscription-mobile-card .info-item .label {
+    font-size: 0.65rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+.subscription-mobile-card .info-item .value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+.subscription-mobile-card .status-row {
+    margin-top: 0.5rem;
+}
+
+.subscription-mobile-card .badge-custom {
+    display: inline-flex;
+    width: 100%;
+    justify-content: center;
+    padding: 0.4rem;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 480px) {
+    .subscription-mobile-card .info-grid {
+        gap: 0.4rem;
+    }
+    
+    .subscription-mobile-card .info-item {
+        padding: 0.4rem;
+    }
+    
+    .subscription-mobile-card .info-item .value {
+        font-size: 0.8rem;
+    }
+    
+    .subscription-mobile-card .card-header-mobile h5 {
+        font-size: 0.9rem;
+    }
+    
+    .subscription-mobile-card .card-header-mobile .price {
+        font-size: 0.9rem;
+    }
+}
+
+/* ----------------------------------------
+   12. МОДАЛЬНОЕ ОКНО
+   ---------------------------------------- */
+
+.modal-content {
+    border: none;
+    border-radius: 25px;
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #0b34bb, #2aa8e2);
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.modal-title {
+    color: white;
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+.modal-title i {
+    color: #ffd700;
+    margin-right: 0.5rem;
+}
+
+.btn-close {
+    background-color: white;
+    opacity: 0.8;
+    border-radius: 50%;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-body .form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.modal-body .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.modal-body .form-control:focus {
+    border-color: #0b34bb;
+    box-shadow: 0 0 0 0.2rem rgba(11, 52, 187, 0.1);
+    outline: none;
+}
+
+.modal-body textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modal-body .alert {
+    background: #fff3cd;
+    border: 1px solid #ffecb5;
+    border-radius: 12px;
+    color: #856404;
+    padding: 1rem;
+    margin-top: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 2px solid #e9ecef;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.modal-footer .btn-secondary {
+    background: #6c757d;
+    border: none;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+}
+
+.modal-footer .btn-gradient-warning {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    border: none;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    color: white;
+}
+
+.modal-footer .btn-gradient-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 1rem;
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+    }
+}
+
+/* ----------------------------------------
+   13. АНИМАЦИИ
+   ---------------------------------------- */
+
+.fade-in {
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
