@@ -5,69 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация - Stronghold Gym</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome для иконок -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #0e2778;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-        }
-        .register-card {
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            max-width: 550px;
-            margin: 0 auto;
-        }
-        .password-toggle {
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: #0e2778;
-            padding: 8px 12px;
-            transition: color 0.2s;
-        }
-        .password-toggle:hover {
-            color: #fd9e2e;
-        }
-        .input-group .form-control {
-            border-right: 0;
-        }
-        .input-group .btn-outline-secondary {
-            border-left: 0;
-            border-color: #d9ceda;
-        }
-        .input-group .btn-outline-secondary:hover {
-            background-color: #f8f9fa;
-        }
-        .password-strength {
-            height: 5px;
-            margin-top: 5px;
-            border-radius: 3px;
-            transition: all 0.3s;
-        }
-    </style>
+    <link href="{{ asset('assets/css/auth/register.css') }}" rel="stylesheet">
 </head>
-<body>
+<body class="auth-page">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-12">
-                <div class="card register-card">
-                    <div class="card-header bg-dark text-white">
-                        <h3 class="text-center mb-0">
+                <div class="register-card">
+                    <div class="card-header text-center">
+                        <h3 class="mb-0">
                             <i class="fas fa-dumbbell me-2"></i>Stronghold Gym
                         </h3>
                     </div>
-                    <div class="card-body p-4">
-                        <h4 class="text-center mb-4">Создание аккаунта</h4>
+                    <div class="card-body">
+                        <h4>Создание аккаунта</h4>
                         
                         @if($errors->any())
-                            <div class="alert alert-danger alert-dismissible fade show">
-                                @foreach($errors->all() as $error)
-                                    <p class="mb-1">{{ $error }}</p>
-                                @endforeach
+                            <div class="alert-modern alert-danger alert-dismissible fade show" role="alert">
+                                <div class="d-flex align-items-center">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        @foreach($errors->all() as $error)
+                                            <p class="mb-1">{{ $error }}</p>
+                                        @endforeach
+                                    </div>
+                                </div>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         @endif
@@ -77,7 +44,7 @@
                             
                             <!-- Имя -->
                             <div class="mb-4">
-                                <label for="name" class="form-label fw-bold required-field">Имя</label>
+                                <label for="name" class="form-label required-field">Имя</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="fas fa-user"></i>
@@ -93,14 +60,12 @@
                                         </div>
                                     @enderror
                                 </div>
-                                <small class="form-text text-muted">
-                                    Как к вам обращаться
-                                </small>
+                                <div class="form-text">Как к вам обращаться</div>
                             </div>
                             
                             <!-- Email -->
                             <div class="mb-4">
-                                <label for="email" class="form-label fw-bold required-field">Email</label>
+                                <label for="email" class="form-label required-field">Email</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="fas fa-envelope"></i>
@@ -120,7 +85,7 @@
                             
                             <!-- Телефон -->
                             <div class="mb-4">
-                                <label for="phone" class="form-label fw-bold required-field">Телефон</label>
+                                <label for="phone" class="form-label required-field">Телефон</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="fas fa-phone"></i>
@@ -136,14 +101,12 @@
                                         </div>
                                     @enderror
                                 </div>
-                                <small class="form-text text-muted">
-                                    Для связи с вами
-                                </small>
+                                <div class="form-text">Для связи с вами</div>
                             </div>
                             
                             <!-- Пароль -->
                             <div class="mb-4">
-                                <label for="password" class="form-label fw-bold required-field">Пароль</label>
+                                <label for="password" class="form-label required-field">Пароль</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="fas fa-lock"></i>
@@ -152,9 +115,7 @@
                                            id="password" name="password" 
                                            placeholder="Минимум 8 символов" 
                                            required>
-                                    <button class="btn btn-outline-secondary password-toggle" 
-                                            type="button" 
-                                            id="togglePassword">
+                                    <button class="password-toggle" type="button" id="togglePassword">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     @error('password')
@@ -163,16 +124,15 @@
                                         </div>
                                     @enderror
                                 </div>
-                                <!-- Индикатор сложности пароля -->
-                                <div class="password-strength" id="passwordStrength"></div>
-                                <small class="form-text text-muted d-block mt-1">
-                                    <span id="strengthText">Введите пароль</span>
-                                </small>
+                                <div class="password-strength-container">
+                                    <div class="password-strength" id="passwordStrength"></div>
+                                    <div class="strength-text" id="strengthText">Введите пароль</div>
+                                </div>
                             </div>
                             
                             <!-- Подтверждение пароля -->
                             <div class="mb-4">
-                                <label for="password_confirmation" class="form-label fw-bold required-field">Подтверждение пароля</label>
+                                <label for="password_confirmation" class="form-label required-field">Подтверждение пароля</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="fas fa-lock"></i>
@@ -181,46 +141,42 @@
                                            id="password_confirmation" name="password_confirmation" 
                                            placeholder="Повторите пароль" 
                                            required>
-                                    <button class="btn btn-outline-secondary password-toggle" 
-                                            type="button" 
-                                            id="toggleConfirmPassword">
+                                    <button class="password-toggle" type="button" id="toggleConfirmPassword">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
-                                <small class="form-text text-muted">
-                                    Пароли должны совпадать
-                                </small>
-                            </div>         
-                            <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                                <div class="form-text">Пароли должны совпадать</div>
+                            </div>
+                            
+                            <button type="submit" class="btn-register w-100 py-2 mb-3">
                                 <i class="fas fa-user-plus me-2"></i>Зарегистрироваться
                             </button>
                             
-                            <div class="text-center mt-4">
+                            <div class="text-center">
                                 <p class="mb-0">
                                     Уже есть аккаунт? 
-                                    <a href="{{ route('login') }}" class="text-decoration-none fw-bold">
+                                    <div class="text-center">
+                                    <a href="{{ route('login') }}" class="auth-link">
                                         <i class="fas fa-sign-in-alt me-1"></i>Войти
                                     </a>
+                                    </div>
                                 </p>
                             </div>
                         </form>
                     </div>
                 </div>
                 
-             <div class="text-center mt-4" style="color: white;">
-                 <small>© 2026 Stronghold Gym. Все права защищены.</small>
-             </div>
+                <div class="auth-footer">
+                    <small>© 2026 Stronghold Gym. Все права защищены.</small>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Скрипт для переключения видимости пароля и проверки сложности -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Элементы для паролей
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('password_confirmation');
         const togglePasswordBtn = document.getElementById('togglePassword');
@@ -228,7 +184,6 @@
         const passwordStrength = document.getElementById('passwordStrength');
         const strengthText = document.getElementById('strengthText');
         
-        // Функция для переключения видимости пароля
         function setupPasswordToggle(button, input) {
             if (button && input) {
                 button.addEventListener('click', function() {
@@ -238,28 +193,22 @@
                         input.type = 'text';
                         icon.classList.remove('fa-eye');
                         icon.classList.add('fa-eye-slash');
-                        this.setAttribute('title', 'Скрыть пароль');
                     } else {
                         input.type = 'password';
                         icon.classList.remove('fa-eye-slash');
                         icon.classList.add('fa-eye');
-                        this.setAttribute('title', 'Показать пароль');
                     }
                 });
-                
-                button.setAttribute('title', 'Показать пароль');
             }
         }
         
-        // Настраиваем переключатели
         setupPasswordToggle(togglePasswordBtn, passwordInput);
         setupPasswordToggle(toggleConfirmBtn, confirmPasswordInput);
         
-        // Функция для проверки сложности пароля
         function checkPasswordStrength(password) {
             let strength = 0;
             let text = '';
-            let color = '#dc3545'; // красный
+            let color = '#dc3545';
             
             if (password.length >= 8) strength += 1;
             if (password.length >= 12) strength += 1;
@@ -267,10 +216,10 @@
             if (/[0-9]/.test(password)) strength += 1;
             if (/[^A-Za-z0-9]/.test(password)) strength += 1;
             
-            // Определяем уровень сложности
             if (password.length === 0) {
                 text = 'Введите пароль';
-                color = 'transparent';
+                color = '#6c757d';
+                strength = 0;
             } else if (password.length < 8) {
                 text = 'Слишком короткий';
                 color = '#dc3545';
@@ -285,7 +234,6 @@
                 color = '#198754';
             }
             
-            // Обновляем индикатор
             if (passwordStrength) {
                 passwordStrength.style.backgroundColor = color;
                 passwordStrength.style.width = (strength * 20) + '%';
@@ -297,12 +245,10 @@
             }
         }
         
-        // Проверка при вводе пароля
         if (passwordInput) {
             passwordInput.addEventListener('input', function() {
                 checkPasswordStrength(this.value);
                 
-                // Проверка совпадения паролей
                 if (confirmPasswordInput && confirmPasswordInput.value) {
                     if (this.value !== confirmPasswordInput.value) {
                         confirmPasswordInput.style.borderColor = '#dc3545';
@@ -313,7 +259,6 @@
             });
         }
         
-        // Проверка при вводе подтверждения пароля
         if (confirmPasswordInput && passwordInput) {
             confirmPasswordInput.addEventListener('input', function() {
                 if (this.value !== passwordInput.value) {
@@ -324,9 +269,6 @@
             });
         }
         
-
-        
-        // Простое форматирование телефона (опционально)
         const phoneInput = document.getElementById('phone');
         if (phoneInput) {
             phoneInput.addEventListener('input', function(e) {
@@ -356,11 +298,10 @@
             });
         }
         
-        // Автоматическое скрытие алертов через 5 секунд
         setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+            const alerts = document.querySelectorAll('.alert-modern');
             alerts.forEach(function(alert) {
-                const bsAlert = new bootstrap.Alert(alert);
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
                 bsAlert.close();
             });
         }, 5000);

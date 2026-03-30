@@ -1,0 +1,431 @@
+/* ========================================
+   СТИЛИ ДЛЯ СТРАНИЦЫ ВХОДА
+   ======================================== */
+
+/* ----------------------------------------
+   1. ОБЩИЕ СТИЛИ
+   ---------------------------------------- */
+
+.auth-page {
+    background: linear-gradient(135deg, #0e2778 0%, #1a3a9e 50%, #2a4abe 100%);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-page::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ----------------------------------------
+   2. КАРТОЧКА ВХОДА
+   ---------------------------------------- */
+
+.login-card {
+    border: none;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.98);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3);
+}
+
+/* ----------------------------------------
+   3. ЗАГОЛОВОК КАРТОЧКИ
+   ---------------------------------------- */
+
+.card-header {
+    background: linear-gradient(135deg, #0e2778, #1a3a9e);
+    border: none;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(100px);
+}
+
+.card-header h3 {
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1;
+}
+
+.card-header i {
+    font-size: 1.8rem;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+/* ----------------------------------------
+   4. ТЕЛО КАРТОЧКИ
+   ---------------------------------------- */
+
+.card-body {
+    padding: 2rem;
+}
+
+.card-body h4 {
+    color: #0e2778;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+}
+
+.card-body h4::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(90deg, #0e2778, #2a4abe);
+    border-radius: 3px;
+}
+
+/* ----------------------------------------
+   5. ФОРМА
+   ---------------------------------------- */
+
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.input-group {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.input-group:focus-within {
+    box-shadow: 0 4px 12px rgba(14, 39, 120, 0.15);
+    transform: translateY(-1px);
+}
+
+.input-group-text {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-right: none;
+    color: #0e2778;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-left: none;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #0e2778;
+    box-shadow: none;
+    outline: none;
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    color: #dc3545;
+}
+
+/* ----------------------------------------
+   6. КНОПКА ПОКАЗА ПАРОЛЯ
+   ---------------------------------------- */
+
+.password-toggle {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-left: none;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+}
+
+.password-toggle:hover {
+    background: #f8f9fa;
+    color: #0e2778;
+}
+
+.password-toggle i {
+    font-size: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.password-toggle:hover i {
+    transform: scale(1.1);
+}
+
+/* ----------------------------------------
+   7. КНОПКА ВХОДА
+   ---------------------------------------- */
+
+.btn-login {
+    background: linear-gradient(135deg, #0e2778, #1a3a9e);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(14, 39, 120, 0.3);
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(14, 39, 120, 0.4);
+    background: linear-gradient(135deg, #1a3a9e, #0e2778);
+}
+
+.btn-login:active {
+    transform: translateY(1px);
+}
+
+.btn-login i {
+    transition: transform 0.3s ease;
+}
+
+.btn-login:hover i {
+    transform: translateX(3px);
+}
+
+/* ----------------------------------------
+   8. ССЫЛКИ
+   ---------------------------------------- */
+
+.auth-links {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.auth-link {
+    color: #0e2778;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.auth-link:hover {
+    color: #2a4abe;
+    transform: translateX(3px);
+}
+
+.auth-link i {
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+
+.auth-link:hover i {
+    transform: translateX(2px);
+}
+
+/* ----------------------------------------
+   9. АЛЕРТЫ
+   ---------------------------------------- */
+
+.alert-modern {
+    border: none;
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    animation: slideDown 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-modern::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.alert-modern.alert-danger {
+    background: linear-gradient(135deg, #fff5f5, #ffe8e8);
+    color: #c82333;
+}
+
+.alert-modern.alert-danger::before {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+.alert-modern.alert-success {
+    background: linear-gradient(135deg, #f0fff4, #e6fffa);
+    color: #00573d;
+}
+
+.alert-modern.alert-success::before {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.alert-modern .alert-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    margin-right: 12px;
+    background: rgba(0,0,0,0.05);
+}
+
+.alert-modern .alert-content {
+    flex: 1;
+}
+
+.alert-modern .btn-close {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ----------------------------------------
+   10. ФУТЕР
+   ---------------------------------------- */
+
+.auth-footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+}
+
+/* ----------------------------------------
+   11. АНИМАЦИИ
+   ---------------------------------------- */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-card {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+/* ----------------------------------------
+   12. АДАПТИВНОСТЬ
+   ---------------------------------------- */
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .btn-login {
+        padding: 10px;
+    }
+    
+    .auth-links {
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-header h3 {
+        font-size: 1.3rem;
+    }
+    
+    .card-header i {
+        font-size: 1.3rem;
+    }
+    
+    .card-body h4 {
+        font-size: 1.2rem;
+    }
+    
+    .form-label {
+        font-size: 0.85rem;
+    }
+    
+    .input-group-text,
+    .form-control {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-login {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+}
