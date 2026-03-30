@@ -19,9 +19,16 @@
     
     @if(session('success'))
         <div class="alert-modern success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="alert-content">
+                <div class="alert-title">Отлично!</div>
+                <div class="alert-message">{{ session('success') }}</div>
+            </div>
+            <button type="button" class="alert-close" data-bs-dismiss="alert">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
     @endif
     
@@ -126,7 +133,6 @@
                     </div>
                     <h2 class="subscription-title">{{ $subscription->name ?? 'Абонемент' }}</h2>
                     <p class="subscription-description">{{ $subscription->description ?? '' }}</p>
-                    
                 </div>
                 
                 @if($subscriptionType !== 'frozen')
@@ -143,6 +149,7 @@
                     </div>
                 @endif
                 
+                <!-- Статистика СВЕРХУ (как было) -->
                 <div class="subscription-stats">
                     @if($subscriptionType !== 'frozen')
                         <div class="stat-box">
@@ -162,27 +169,21 @@
                     </div>
                 </div>
                 
+                <!-- Кнопка действия (только заморозка/разморозка, без продлить) -->
                 <div class="subscription-actions">
                     @if($subscriptionType === 'frozen')
-                        {{-- Абонемент заморожен - только кнопка разморозки --}}
-                        <form action="{{ route('client.subscriptions.resume') }}" method="POST" class="w-100">
+                        <form action="{{ route('client.subscriptions.resume') }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn-gradient btn-gradient-success w-100 py-3">
+                            <button type="submit" class="btn-gradient btn-gradient-success">
                                 <i class="fas fa-play me-2"></i>Разморозить абонемент
                                 <span class="btn-glow"></span>
                             </button>
                         </form>
                     @elseif($subscriptionType === 'active')
-                        {{-- Абонемент активен - кнопки заморозки и продления --}}
-                        <div class="d-flex gap-2">
-                            <button class="btn-gradient btn-gradient-warning flex-grow-1" data-bs-toggle="modal" 
-                                    data-bs-target="#freezeModal" {{ $isExpired ? 'disabled' : '' }}>
-                                <i class="fas fa-snowflake me-2"></i>Заморозить
-                            </button>
-                            <a href="{{ route('subscriptions.index') }}" class="btn-gradient btn-gradient-primary flex-grow-1">
-                                <i class="fas fa-sync-alt me-2"></i>Продлить
-                            </a>
-                        </div>
+                        <button class="btn-gradient btn-gradient-warning" data-bs-toggle="modal" 
+                                data-bs-target="#freezeModal" {{ $isExpired ? 'disabled' : '' }}>
+                            <i class="fas fa-snowflake me-2"></i>Заморозить абонемент
+                        </button>
                     @endif
                 </div>
             </div>
@@ -201,192 +202,188 @@
     @endif
     
     <!-- История абонементов (всегда показываем) -->
-<div class="main-card mt-5 fade-in">
-    <div class="card-header">
-        <i class="fas fa-history"></i> История абонементов
-    </div>
-    <div class="card-body">
-        @if(isset($userSubscriptions) && $userSubscriptions->count() > 0)
-            <!-- Десктопная версия таблицы (только на компьютере) -->
-            <div class="table-responsive">
-                <table class="table subscription-history-table">
-                    <thead>
-                        <tr>
-                            <th>Абонемент</th>
-                            <th>Дата активации</th>
-                            <th>Окончание</th>
-                            <th>Тренировок</th>
-                            <th>Статус</th>
-                            <th>Цена</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($userSubscriptions as $userSub)
-                            @php
-                                $isUserSubscription = method_exists($userSub, 'isActive');
-                                
-                                if ($isUserSubscription) {
-                                    $subscriptionName = $userSub->subscription->name ?? 'Абонемент';
-                                    $workoutsCount = $userSub->subscription->workouts_count ?? 0;
-                                    $remainingWorkouts = $userSub->remaining_workouts;
-                                    $status = $userSub->status;
-                                    $startDate = $userSub->start_date;
-                                    $endDate = $userSub->end_date;
-                                    $price = $userSub->subscription->price ?? 0;
-                                } else {
-                                    $subscriptionName = $userSub->name;
-                                    $workoutsCount = $userSub->workouts_count ?? 0;
-                                    $remainingWorkouts = $userSub->pivot->remaining_workouts;
-                                    $status = $userSub->pivot->status;
-                                    $startDate = $userSub->pivot->start_date;
-                                    $endDate = $userSub->pivot->end_date;
-                                    $price = $userSub->price;
-                                }
-                            @endphp
+    <div class="main-card mt-5 fade-in">
+        <div class="card-header">
+            <i class="fas fa-history"></i> История абонементов
+        </div>
+        <div class="card-body">
+            @if(isset($userSubscriptions) && $userSubscriptions->count() > 0)
+                <!-- Десктопная версия таблицы (только на компьютере) -->
+                <div class="table-responsive">
+                    <table class="table subscription-history-table">
+                        <thead>
                             <tr>
-                                <td>
-                                    <strong>{{ $subscriptionName }}</strong>
-                                </td>
-                                <td>{{ \Carbon\Carbon::parse($startDate)->format('d.m.Y') }}</td>
-                                <td>{{ \Carbon\Carbon::parse($endDate)->format('d.m.Y') }}</td>
-                                <td>
-                                    <span class="badge-custom {{ $remainingWorkouts > 0 ? 'badge-attended' : 'badge-missed' }}">
-                                        {{ $remainingWorkouts }}/{{ $workoutsCount }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @if($status === 'active')
-                                        @if($endDate < now()->toDateString())
+                                <th>Абонемент</th>
+                                <th>Дата активации</th>
+                                <th>Окончание</th>
+                                <th>Тренировок</th>
+                                <th>Статус</th>
+                                <th>Цена</th>
+                             </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($userSubscriptions as $userSub)
+                                @php
+                                    $isUserSubscription = method_exists($userSub, 'isActive');
+                                    
+                                    if ($isUserSubscription) {
+                                        $subscriptionName = $userSub->subscription->name ?? 'Абонемент';
+                                        $workoutsCount = $userSub->subscription->workouts_count ?? 0;
+                                        $remainingWorkouts = $userSub->remaining_workouts;
+                                        $status = $userSub->status;
+                                        $startDate = $userSub->start_date;
+                                        $endDate = $userSub->end_date;
+                                        $price = $userSub->subscription->price ?? 0;
+                                    } else {
+                                        $subscriptionName = $userSub->name;
+                                        $workoutsCount = $userSub->workouts_count ?? 0;
+                                        $remainingWorkouts = $userSub->pivot->remaining_workouts;
+                                        $status = $userSub->pivot->status;
+                                        $startDate = $userSub->pivot->start_date;
+                                        $endDate = $userSub->pivot->end_date;
+                                        $price = $userSub->price;
+                                    }
+                                @endphp
+                                <tr>
+                                    <td><strong>{{ $subscriptionName }}</strong></td>
+                                    <td>{{ \Carbon\Carbon::parse($startDate)->format('d.m.Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($endDate)->format('d.m.Y') }}</td>
+                                    <td>
+                                        <span class="badge-custom {{ $remainingWorkouts > 0 ? 'badge-attended' : 'badge-missed' }}">
+                                            {{ $remainingWorkouts }}/{{ $workoutsCount }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if($status === 'active')
+                                            @if($endDate < now()->toDateString())
+                                                <span class="badge-custom bg-secondary">Истек</span>
+                                            @elseif($remainingWorkouts <= 0)
+                                                <span class="badge-custom badge-missed"><i class="fas fa-exclamation-circle me-1"></i>Использован</span>
+                                            @else
+                                                <span class="badge-custom badge-attended">Активен</span>
+                                            @endif
+                                        @elseif($status === 'expired')
                                             <span class="badge-custom bg-secondary">Истек</span>
-                                        @elseif($remainingWorkouts <= 0)
-                                            <span class="badge-custom badge-missed"><i class="fas fa-exclamation-circle me-1"></i>Использован</span>
-                                        @else
-                                            <span class="badge-custom badge-attended">Активен</span>
+                                        @elseif($status === 'frozen')
+                                            <span class="badge-custom badge-cancelled"><i class="fas fa-snowflake me-1"></i>Заморожен</span>
+                                        @elseif($status === 'canceled')
+                                            <span class="badge-custom badge-missed">Отменен</span>
                                         @endif
-                                    @elseif($status === 'expired')
-                                        <span class="badge-custom bg-secondary">Истек</span>
-                                    @elseif($status === 'frozen')
-                                        <span class="badge-custom badge-cancelled"><i class="fas fa-snowflake me-1"></i>Заморожен</span>
-                                    @elseif($status === 'canceled')
-                                        <span class="badge-custom badge-missed">Отменен</span>
-                                    @endif
-                                </td>
-                                <td><strong>{{ number_format($price, 0, ',', ' ') }} ₽</strong></td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                                    </td>
+                                    <td><strong>{{ number_format($price, 0, ',', ' ') }} ₽</strong></td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-            <!-- Мобильная версия карточек -->
-            <div class="mobile-subscription-cards">
-                @foreach($userSubscriptions as $userSub)
-                    @php
-                        $isUserSubscription = method_exists($userSub, 'isActive');
-                        
-                        if ($isUserSubscription) {
-                            $subscriptionName = $userSub->subscription->name ?? 'Абонемент';
-                            $workoutsCount = $userSub->subscription->workouts_count ?? 0;
-                            $remainingWorkouts = $userSub->remaining_workouts;
-                            $status = $userSub->status;
-                            $startDate = $userSub->start_date;
-                            $endDate = $userSub->end_date;
-                            $price = $userSub->subscription->price ?? 0;
-                        } else {
-                            $subscriptionName = $userSub->name;
-                            $workoutsCount = $userSub->workouts_count ?? 0;
-                            $remainingWorkouts = $userSub->pivot->remaining_workouts;
-                            $status = $userSub->pivot->status;
-                            $startDate = $userSub->pivot->start_date;
-                            $endDate = $userSub->pivot->end_date;
-                            $price = $userSub->price;
-                        }
-                        
-                        // ИСПРАВЛЕННАЯ ЛОГИКА СТАТУСА - как на компьютере
-                        if ($status === 'active') {
-                            if ($endDate < now()->toDateString()) {
+                <!-- Мобильная версия карточек -->
+                <div class="mobile-subscription-cards">
+                    @foreach($userSubscriptions as $userSub)
+                        @php
+                            $isUserSubscription = method_exists($userSub, 'isActive');
+                            
+                            if ($isUserSubscription) {
+                                $subscriptionName = $userSub->subscription->name ?? 'Абонемент';
+                                $workoutsCount = $userSub->subscription->workouts_count ?? 0;
+                                $remainingWorkouts = $userSub->remaining_workouts;
+                                $status = $userSub->status;
+                                $startDate = $userSub->start_date;
+                                $endDate = $userSub->end_date;
+                                $price = $userSub->subscription->price ?? 0;
+                            } else {
+                                $subscriptionName = $userSub->name;
+                                $workoutsCount = $userSub->workouts_count ?? 0;
+                                $remainingWorkouts = $userSub->pivot->remaining_workouts;
+                                $status = $userSub->pivot->status;
+                                $startDate = $userSub->pivot->start_date;
+                                $endDate = $userSub->pivot->end_date;
+                                $price = $userSub->price;
+                            }
+                            
+                            if ($status === 'active') {
+                                if ($endDate < now()->toDateString()) {
+                                    $badgeClass = 'bg-secondary';
+                                    $badgeText = 'Истек';
+                                } elseif ($remainingWorkouts <= 0) {
+                                    $badgeClass = 'badge-missed';
+                                    $badgeText = 'Использован';
+                                } else {
+                                    $badgeClass = 'badge-attended';
+                                    $badgeText = 'Активен';
+                                }
+                            } elseif ($status === 'expired') {
                                 $badgeClass = 'bg-secondary';
                                 $badgeText = 'Истек';
-                            } elseif ($remainingWorkouts <= 0) {
+                            } elseif ($status === 'frozen') {
+                                $badgeClass = 'badge-cancelled';
+                                $badgeText = 'Заморожен';
+                            } elseif ($status === 'canceled') {
                                 $badgeClass = 'badge-missed';
-                                $badgeText = 'Использован';
+                                $badgeText = 'Отменен';
                             } else {
-                                $badgeClass = 'badge-attended';
-                                $badgeText = 'Активен';
+                                $badgeClass = 'bg-secondary';
+                                $badgeText = $status;
                             }
-                        } elseif ($status === 'expired') {
-                            $badgeClass = 'bg-secondary';
-                            $badgeText = 'Истек';
-                        } elseif ($status === 'frozen') {
-                            $badgeClass = 'badge-cancelled';
-                            $badgeText = 'Заморожен';
-                        } elseif ($status === 'canceled') {
-                            $badgeClass = 'badge-missed';
-                            $badgeText = 'Отменен';
-                        } else {
-                            $badgeClass = 'bg-secondary';
-                            $badgeText = $status;
-                        }
-                    @endphp
-                    
-                    <div class="subscription-mobile-card" data-status="{{ $status }}">
-                        <div class="card-header-mobile">
-                            <h5>{{ $subscriptionName }}</h5>
-                            <span class="price">{{ number_format($price, 0, ',', ' ') }} ₽</span>
-                        </div>
+                        @endphp
                         
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <span class="label">Активация</span>
-                                <span class="value">{{ \Carbon\Carbon::parse($startDate)->format('d.m.Y') }}</span>
+                        <div class="subscription-mobile-card" data-status="{{ $status }}">
+                            <div class="card-header-mobile">
+                                <h5>{{ $subscriptionName }}</h5>
+                                <span class="price">{{ number_format($price, 0, ',', ' ') }} ₽</span>
                             </div>
-                            <div class="info-item">
-                                <span class="label">Окончание</span>
-                                <span class="value">{{ \Carbon\Carbon::parse($endDate)->format('d.m.Y') }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">Тренировки</span>
-                                <span class="value">
-                                    <span class="badge-custom {{ $remainingWorkouts > 0 ? 'badge-attended' : 'badge-missed' }}">
-                                        {{ $remainingWorkouts }}/{{ $workoutsCount }}
+                            
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="label">Активация</span>
+                                    <span class="value">{{ \Carbon\Carbon::parse($startDate)->format('d.m.Y') }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Окончание</span>
+                                    <span class="value">{{ \Carbon\Carbon::parse($endDate)->format('d.m.Y') }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Тренировки</span>
+                                    <span class="value">
+                                        <span class="badge-custom {{ $remainingWorkouts > 0 ? 'badge-attended' : 'badge-missed' }}">
+                                            {{ $remainingWorkouts }}/{{ $workoutsCount }}
+                                        </span>
                                     </span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Цена</span>
+                                    <span class="value">{{ number_format($price, 0, ',', ' ') }} ₽</span>
+                                </div>
+                            </div>
+                            
+                            <div class="status-row">
+                                <span class="badge-custom {{ $badgeClass }}">
+                                    @if($status === 'frozen')
+                                        <i class="fas fa-snowflake me-1"></i>
+                                    @elseif($status === 'active' && $remainingWorkouts > 0 && $endDate >= now()->toDateString())
+                                        <i class="fas fa-check-circle me-1"></i>
+                                    @elseif($status === 'active' && $remainingWorkouts <= 0)
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                    @elseif($status === 'expired' || ($status === 'active' && $endDate < now()->toDateString()))
+                                        <i class="fas fa-clock me-1"></i>
+                                    @elseif($status === 'canceled')
+                                        <i class="fas fa-times-circle me-1"></i>
+                                    @endif
+                                    {{ $badgeText }}
                                 </span>
                             </div>
-                            <div class="info-item">
-                                <span class="label">Цена</span>
-                                <span class="value">{{ number_format($price, 0, ',', ' ') }} ₽</span>
-                            </div>
                         </div>
-                        
-                        <!-- Статус на отдельной строке -->
-                        <div class="status-row">
-                            <span class="badge-custom {{ $badgeClass }}">
-                                @if($status === 'frozen')
-                                    <i class="fas fa-snowflake me-1"></i>
-                                @elseif($status === 'active' && $remainingWorkouts > 0 && $endDate >= now()->toDateString())
-                                    <i class="fas fa-check-circle me-1"></i>
-                                @elseif($status === 'active' && $remainingWorkouts <= 0)
-                                    <i class="fas fa-exclamation-circle me-1"></i>
-                                @elseif($status === 'expired' || ($status === 'active' && $endDate < now()->toDateString()))
-                                    <i class="fas fa-clock me-1"></i>
-                                @elseif($status === 'canceled')
-                                    <i class="fas fa-times-circle me-1"></i>
-                                @endif
-                                {{ $badgeText }}
-                            </span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @else
-            <div class="empty-state">
-                <i class="fas fa-history"></i>
-                <h4>Нет истории абонементов</h4>
-                <p>У вас пока нет истории покупок</p>
-            </div>
-        @endif
+                    @endforeach
+                </div>
+            @else
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <h4>Нет истории абонементов</h4>
+                    <p>У вас пока нет истории покупок</p>
+                </div>
+            @endif
+        </div>
     </div>
-</div>
     
     <div class="text-center mt-4">
         <a href="{{ route('subscriptions.index') }}" class="btn-gradient btn-gradient-primary btn-lg">
@@ -403,21 +400,23 @@
             <form action="{{ route('freeze-subscription') }}" method="POST">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title">Заморозка абонемента</h5>
+                    <h5 class="modal-title">
+                        <i class="fas fa-snowflake me-2"></i>Заморозка абонемента
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <p>Вы можете заморозить абонемент на срок до 14 дней.</p>
                     <p>Причины заморозки:</p>
                     <ul>
-                        <li>Болезнь</li>
-                        <li>Командировка</li>
-                        <li>Отпуск</li>
+                        <li><i class="fas fa-thermometer-half"></i> Болезнь</li>
+                        <li><i class="fas fa-briefcase"></i> Командировка</li>
+                        <li><i class="fas fa-umbrella-beach"></i> Отпуск</li>
                     </ul>
                     
                     <div class="mb-3">
                         <label for="reason" class="form-label">Причина заморозки</label>
-                        <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
+                        <textarea class="form-control" id="reason" name="reason" rows="3" required placeholder="Укажите причину заморозки..."></textarea>
                     </div>
                     
                     <div class="mb-3">
@@ -425,9 +424,12 @@
                         <input type="number" class="form-control" id="days" name="days" min="1" max="14" value="7" required>
                     </div>
                     
-                    <div class="alert alert-warning">
-                        <i class="fas fa-info-circle me-2"></i>
-                        После заморозки срок действия абонемента будет продлен на указанное количество дней.
+                    <div class="alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Информация</strong><br>
+                            После заморозки срок действия абонемента будет продлен на указанное количество дней.
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
