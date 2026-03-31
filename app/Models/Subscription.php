@@ -13,6 +13,7 @@ class Subscription extends Model
         'duration_days',
         'workouts_count',
         'is_active',
+        'has_trainer',
         'type'
     ];
 
@@ -20,6 +21,7 @@ class Subscription extends Model
         'price' => 'decimal:2',
         'duration_days' => 'integer',
         'workouts_count' => 'integer',
+        'has_trainer' => 'boolean',
         'is_active' => 'boolean'
     ];
 
@@ -108,5 +110,10 @@ class Subscription extends Model
             ->first();
 
         return $userSubscription ? $userSubscription->pivot->remaining_workouts : 0;
+    }
+
+    public function hasTrainer(): bool
+    {
+        return $this->has_trainer;
     }
 }

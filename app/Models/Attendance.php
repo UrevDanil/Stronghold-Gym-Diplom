@@ -10,6 +10,7 @@ class Attendance extends Model
     
     protected $fillable = [
         'booking_id',
+        'user_id',
         'marked_by',
         'attended_at',
         'comment',

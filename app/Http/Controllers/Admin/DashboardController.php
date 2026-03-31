@@ -11,6 +11,7 @@ use App\Models\Booking;
 use App\Models\Schedule;
 use App\Models\Workout;
 use App\Models\Notification;
+use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;  // <-- ДОБАВЬ ДЛЯ ХЭШИРОВАНИЯ ПАРОЛЕЙ
@@ -379,6 +380,125 @@ public function updateUser(Request $request, $id)
     
     return redirect()->route('admin.users.index')
         ->with('success', 'Пользователь успешно обновлен');
+}
+
+/**
+ * Отметка посещаемости клиента (для обычных абонементов)
+ */
+public function markClientAttendance(Request $request, $clientId)
+{
+    $admin = auth()->user();
+    $client = User::findOrFail($clientId);
+    
+    // Проверяем, что это клиент
+    if (!$client->isClient()) {
+        return back()->with('error', 'Пользователь не является клиентом');
+    }
+    
+    $validated = $request->validate([
+        'date' => 'required|date',
+        'workout_name' => 'nullable|string|max:255',
+        'comment' => 'nullable|string',
+    ]);
+    
+    // Получаем активный абонемент клиента
+    $activeSubscription = $client->activeSubscription();
+    
+    if (!$activeSubscription) {
+        return back()->with('error', 'У клиента нет активного абонемента');
+    }
+    
+    // Проверяем, есть ли остаток тренировок
+    if ($activeSubscription->remaining_workouts <= 0 && $activeSubscription->subscription->workouts_count > 0) {
+        return back()->with('error', 'У клиента закончились тренировки в абонементе');
+    }
+    
+    // Создаем запись о посещении
+    $attendance = Attendance::create([
+        'booking_id' => null,  // <-- ДОБАВЬ ЭТУ СТРОКУ
+        'user_id' => $client->id,
+        'marked_by' => $admin->id,
+        'attended_at' => $validated['date'],
+        'comment' => $validated['comment'] ?? null,
+        'attendance_type' => 'attended'
+    ]);
+    
+    // Списываем тренировку из абонемента (если абонемент не безлимитный)
+    if ($activeSubscription->subscription->workouts_count > 0) {
+        $activeSubscription->decrement('remaining_workouts');
+        $workoutsLeft = $activeSubscription->remaining_workouts;
+        
+        // Если тренировки закончились, меняем статус
+        if ($workoutsLeft <= 0) {
+            $activeSubscription->status = UserSubscription::STATUS_EXPIRED;
+            $activeSubscription->save();
+        }
+    }
+    
+    // Создаем уведомление для клиента
+    Notification::create([
+        'user_id' => $client->id,
+        'type' => 'attendance',
+        'message' => "Администратор отметил ваше посещение {$validated['date']}",
+        'is_read' => false,
+        'data' => json_encode([
+            'date' => $validated['date'],
+            'workout' => $validated['workout_name'] ?? 'Тренировка',
+            'remaining_workouts' => $activeSubscription->remaining_workouts ?? 0,
+            'subscription_name' => $activeSubscription->subscription->name ?? 'Абонемент'
+        ])
+    ]);
+    
+    $remainingText = $activeSubscription->subscription->workouts_count > 0 
+        ? "Осталось тренировок: " . ($activeSubscription->remaining_workouts ?? 0)
+        : "Безлимитный абонемент";
+    
+    return back()->with('success', "Посещение клиента {$client->name} отмечено. " . $remainingText);
+}
+
+/**
+ * Страница для отметки посещаемости клиентов
+ */
+public function attendance()
+{
+    // Получаем всех клиентов
+    $clients = User::clients()
+        ->orderBy('name')
+        ->get();
+    
+    // Вручную загружаем активный абонемент для каждого клиента
+    foreach ($clients as $client) {
+        $client->activeSubscription = $client->activeSubscription();
+    }
+    
+    return view('admin.attendance', [
+        'clients' => $clients
+    ]);
+}
+
+/**
+ * Получить информацию о клиенте для быстрой отметки (AJAX)
+ */
+public function getClientInfo($clientId)
+{
+    $client = User::findOrFail($clientId);
+    
+    if (!$client->isClient()) {
+        return response()->json(['error' => 'Не клиент'], 404);
+    }
+    
+    $activeSubscription = $client->activeSubscription();
+    
+    return response()->json([
+        'id' => $client->id,
+        'name' => $client->name,
+        'has_subscription' => $activeSubscription !== null,
+        'subscription_name' => $activeSubscription?->subscription->name ?? null,
+        'remaining_workouts' => $activeSubscription?->remaining_workouts ?? 0,
+        'is_unlimited' => $activeSubscription && $activeSubscription->subscription->workouts_count == 0,
+        'end_date' => $activeSubscription?->end_date?->format('d.m.Y'),
+        'phone' => $client->phone
+    ]);
 }
 
 /**

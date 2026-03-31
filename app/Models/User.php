@@ -149,22 +149,42 @@ public function trainings()
         });
     }
 
-    // =========== HELPERS ===========
+// =========== HELPERS ===========
 
-    // ИСПРАВЛЕНО: теперь используем UserSubscription
-    public function hasActiveSubscription(): bool
-    {
-        return $this->userSubscriptions()
-            ->where('status', UserSubscription::STATUS_ACTIVE)
-            ->whereDate('start_date', '<=', Carbon::today())
-            ->whereDate('end_date', '>=', Carbon::today())
-            ->where('remaining_workouts', '>', 0)
-            ->where(function($q) {
-                $q->whereNull('paused_at')
-                  ->orWhereDate('paused_until', '<', Carbon::today());
-            })
-            ->exists();
-    }
+// ИСПРАВЛЕНО: теперь используем UserSubscription
+public function hasActiveSubscription(): bool
+{
+    return $this->userSubscriptions()
+        ->where('status', UserSubscription::STATUS_ACTIVE)
+        ->whereDate('start_date', '<=', Carbon::today())
+        ->whereDate('end_date', '>=', Carbon::today())
+        ->where('remaining_workouts', '>', 0)
+        ->where(function($q) {
+            $q->whereNull('paused_at')
+              ->orWhereDate('paused_until', '<', Carbon::today());
+        })
+        ->exists();
+}
+
+/**
+ * Проверка, есть ли активный абонемент с тренером
+ */
+public function hasActiveTrainerSubscription(): bool
+{
+    return $this->userSubscriptions()
+        ->where('status', UserSubscription::STATUS_ACTIVE)
+        ->whereDate('start_date', '<=', Carbon::today())
+        ->whereDate('end_date', '>=', Carbon::today())
+        ->where('remaining_workouts', '>', 0)
+        ->whereHas('subscription', function($q) {
+            $q->where('has_trainer', true);
+        })
+        ->where(function($q) {
+            $q->whereNull('paused_at')
+              ->orWhereDate('paused_until', '<', Carbon::today());
+        })
+        ->exists();
+}
 
 /**
  * Получить активный абонемент

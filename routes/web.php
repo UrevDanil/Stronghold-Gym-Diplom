@@ -114,6 +114,11 @@ Route::middleware(['auth', 'active', 'role:admin,owner'])->prefix('admin')->name
     Route::post('/bookings/{id}/cancel', [AdminDashboardController::class, 'cancelBooking'])->name('bookings.cancel');
     Route::post('/bookings/{id}/mark-attended', [AdminDashboardController::class, 'markAttended'])->name('bookings.mark-attended');
     
+    // Управление посещаемостью (админ)
+    Route::get('/attendance', [AdminDashboardController::class, 'attendance'])->name('attendance');
+    Route::post('/attendance/mark/{clientId}', [AdminDashboardController::class, 'markClientAttendance'])->name('attendance.mark');
+    Route::get('/attendance/client/{clientId}', [AdminDashboardController::class, 'getClientInfo'])->name('attendance.client-info');
+
     // Отчеты
     Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');
     Route::get('/reports/attendance', [AdminDashboardController::class, 'attendanceReport'])->name('reports.attendance');

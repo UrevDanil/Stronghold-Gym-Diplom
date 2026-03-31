@@ -28,16 +28,24 @@ class DashboardController extends Controller
             ->withErrors(['email' => 'Ваш аккаунт деактивирован.']);
     }
 
-    // Получаем все абонементы пользователя для проверки замороженных
     $userSubscriptions = $user->userSubscriptions()
         ->with('subscription')
         ->orderBy('created_at', 'desc')
         ->get();
 
+    // Проверяем, есть ли у пользователя абонемент с тренером
+    $hasTrainerSubscription = $user->hasActiveTrainerSubscription();
+    
+    // Показываем предстоящие тренировки только если есть абонемент с тренером
+    $upcomingBookings = $hasTrainerSubscription 
+        ? $user->upcomingBookings()->limit(5)->get() 
+        : collect();
+
     $data = [
         'user' => $user,
-        'userSubscriptions' => $userSubscriptions, // ЭТО ВАЖНО!
-        'upcomingBookings' => $user->upcomingBookings()->limit(5)->get(),
+        'userSubscriptions' => $userSubscriptions,
+        'upcomingBookings' => $upcomingBookings,
+        'hasTrainerSubscription' => $hasTrainerSubscription,
         'pastBookings' => Booking::where('user_id', $user->id)
             ->whereIn('status', ['attended', 'missed'])
             ->with('schedule.workout', 'schedule.trainer')
@@ -53,43 +61,42 @@ class DashboardController extends Controller
 
 public function schedule(Request $request)
 {
+    $user = Auth::user();
+    
+    // Проверяем, есть ли у пользователя абонемент с тренером
+    if (!$user->hasActiveTrainerSubscription()) {
+        return redirect()->route('client.dashboard')
+            ->with('error', 'Для записи на тренировки с тренером необходим абонемент "С тренером"');
+    }
+    
     $workoutId = $request->get('workout_id');
     $date = $request->get('date');
     
     $query = Schedule::with(['workout', 'trainer'])
         ->where('date', '>=', now()->toDateString())
-        ->where('status', 'scheduled') // Используем status = scheduled
+        ->where('status', 'scheduled')
         ->whereHas('workout', function($q) {
             $q->where('is_active', true);
         });
 
-    // Фильтр по типу тренировки
     if ($workoutId && $workoutId != '') {
         $query->where('workout_id', $workoutId);
     }
 
-    // Фильтр по дате
     if ($date && $date != '') {
         $query->where('date', $date);
     } else {
-        // Если дата не выбрана, показываем на 7 дней вперед
         $query->where('date', '<=', now()->addDays(7)->toDateString());
     }
 
     $schedules = $query->orderBy('date')->orderBy('start_time')->get();
-    
-    // Получаем все активные тренировки для фильтра
     $workouts = \App\Models\Workout::where('is_active', true)->get();
     
-    // Получаем ID забронированных тренировок текущего пользователя
     $userBookings = Auth::user()->bookings()
         ->whereIn('schedule_id', $schedules->pluck('id'))
         ->where('status', '!=', 'cancelled')
         ->pluck('schedule_id')
         ->toArray();
-
-    // Для отладки - раскомментируй если нужно проверить данные
-    // dd($schedules, $workouts, $userBookings);
 
     return view('client.schedule', [
         'schedules' => $schedules,
@@ -107,8 +114,9 @@ public function book(Schedule $schedule, Request $request)
 {
     $user = Auth::user();
 
-    if (!$user->hasActiveSubscription()) {
-        return back()->with('error', 'У вас нет активного абонемента');
+    // Проверяем наличие абонемента с тренером
+    if (!$user->hasActiveTrainerSubscription()) {
+        return back()->with('error', 'Для записи на тренировки с тренером необходим абонемент "С тренером"');
     }
 
     if (!$schedule->canBook()) {

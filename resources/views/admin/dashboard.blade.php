@@ -296,6 +296,11 @@
                                 <i class="fas fa-chart-bar me-2"></i>Отчеты
                             </a>
                         </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('admin.attendance') }}" class="btn btn-primary">
+                                <i class="fas fa-clipboard-list me-2"></i>Отметить посещаемость
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

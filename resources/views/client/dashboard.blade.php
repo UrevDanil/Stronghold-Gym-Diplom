@@ -209,7 +209,8 @@
         </div>
     @endif
 
-    <!-- Предстоящие тренировки -->
+<!-- Предстоящие тренировки - показываем только если есть абонемент с тренером -->
+@if($hasTrainerSubscription)
     <div class="row">
         <div class="col-lg-12">
             <div class="main-card fade-in" style="animation-delay: 0.5s">
@@ -314,6 +315,7 @@
             </div>
         </div>
     </div>
+@endif
 
     <!-- История посещений -->
     <div class="row">
