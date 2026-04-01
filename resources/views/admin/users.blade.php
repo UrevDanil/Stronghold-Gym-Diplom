@@ -1,24 +1,31 @@
 <!-- Управление пользователями -->
- @extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Управление пользователями')
 
+@section('styles')
+    <link href="{{ asset('assets/css/dashboard/admin/users.css') }}" rel="stylesheet">
+@endsection
+
 @section('content')
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Управление пользователями</h1>
-        <div>
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary me-2">
+<div class="container-fluid py-4 admin-users-page">
+    <!-- Заголовок -->
+    <div class="admin-header">
+        <h1 class="mb-0">
+            <i class="fas fa-users me-3"></i>Управление пользователями
+        </h1>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.dashboard') }}" class="back-btn">
                 <i class="fas fa-arrow-left me-2"></i>Назад
             </a>
-            <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+            <a href="{{ route('admin.users.create') }}" class="btn-primary">
                 <i class="fas fa-plus me-2"></i>Добавить пользователя
             </a>
         </div>
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
+        <div class="alert admin-alert success alert-dismissible fade show" role="alert">
             <i class="fas fa-check-circle me-2"></i>
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -26,7 +33,7 @@
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show">
+        <div class="alert admin-alert error alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i>
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -34,8 +41,11 @@
     @endif
 
     <!-- Фильтры и поиск -->
-    <div class="card mb-4">
-        <div class="card-body">
+    <div class="filters-card">
+        <div class="filters-header">
+            <i class="fas fa-filter"></i> Фильтры
+        </div>
+        <div class="filters-body">
             <form method="GET" action="{{ route('admin.users.index') }}" class="row g-3">
                 <div class="col-md-3">
                     <label for="search" class="form-label">Поиск</label>
@@ -66,7 +76,7 @@
                     <input type="date" class="form-control" id="date_from" name="date_from" value="{{ request('date_from') }}">
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
+                    <button type="submit" class="btn-search">
                         <i class="fas fa-search me-2"></i>Применить
                     </button>
                 </div>
@@ -75,12 +85,12 @@
     </div>
 
     <!-- Таблица пользователей -->
-    <div class="card">
-        <div class="card-body">
+    <div class="users-card">
+        <div class="card-body p-0">
             @if($users->count() > 0)
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
+                    <table class="users-table">
+                        <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Имя</th>
@@ -91,15 +101,14 @@
                                 <th>Дата рег.</th>
                                 <th>Статус</th>
                                 <th>Действия</th>
-                            </tr>
-                        </thead>
+                            </thead>
                         <tbody>
                             @foreach($users as $user)
                                 <tr>
-                                    <td>#{{ $user->id }}</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-circle bg-{{ $user->role->name == 'client' ? 'primary' : ($user->role->name == 'trainer' ? 'success' : 'warning') }} text-white me-2">
+                                    <td data-label="ID">#{{ $user->id }}</td>
+                                    <td data-label="Имя">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="avatar-circle bg-{{ $user->role->name == 'client' ? 'client' : ($user->role->name == 'trainer' ? 'trainer' : ($user->role->name == 'admin' ? 'admin' : 'owner')) }}">
                                                 {{ strtoupper(substr($user->name, 0, 1)) }}
                                             </div>
                                             <div>
@@ -111,57 +120,57 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>{{ $user->email }}</td>
-                                    <td>{{ $user->phone ?? '—' }}</td>
-                                    <td>
-                                        @if($user->role->name == 'client')
-                                            <span class="badge bg-primary">Клиент</span>
-                                        @elseif($user->role->name == 'trainer')
-                                            <span class="badge bg-success">Тренер</span>
-                                        @elseif($user->role->name == 'admin')
-                                            <span class="badge bg-warning">Админ</span>
-                                        @elseif($user->role->name == 'owner')
-                                            <span class="badge bg-danger">Владелец</span>
-                                        @endif
+                                    <td data-label="Email">{{ $user->email }}</td>
+                                    <td data-label="Телефон">{{ $user->phone ?? '—' }}</td>
+                                    <td data-label="Роль">
+                                        <span class="badge-role {{ $user->role->name }}">
+                                            {{ $user->role->name == 'client' ? 'Клиент' : ($user->role->name == 'trainer' ? 'Тренер' : ($user->role->name == 'admin' ? 'Админ' : 'Владелец')) }}
+                                        </span>
                                     </td>
-                                    <td>
+                                    <td data-label="Абонемент">
                                         @if($user->role->name == 'client')
                                             @php
                                                 $activeSub = $user->activeSubscription();
                                             @endphp
                                             @if($activeSub)
-                                                <span class="badge bg-success">
-                                                    {{ $activeSub->subscription->name ?? 'Абонемент' }}
+                                                <span class="badge-subscription">
+                                                    <i class="fas fa-id-card me-1"></i>{{ $activeSub->subscription->name ?? 'Абонемент' }}
                                                 </span>
                                                 <br>
-                                                <small>до {{ \Carbon\Carbon::parse($activeSub->end_date)->format('d.m.Y') }}</small>
+                                                <small class="text-muted">до {{ \Carbon\Carbon::parse($activeSub->end_date)->format('d.m.Y') }}</small>
                                             @else
-                                                <span class="badge bg-secondary">Нет</span>
+                                                <span class="badge-subscription-expired">
+                                                    <i class="fas fa-times me-1"></i>Нет
+                                                </span>
                                             @endif
                                         @else
                                             <span class="text-muted">—</span>
                                         @endif
                                     </td>
-                                    <td>{{ $user->created_at->format('d.m.Y') }}</td>
-<td>
-    @if($user->deleted_at)
-        <span class="badge bg-danger">Заблокирован</span>
-    @elseif($user->is_active)
-        <span class="badge bg-success">Активен</span>
-    @else
-        <span class="badge bg-warning">Неактивен</span>
-    @endif
-</td>
-                                    <td>
-                                        <div class="btn-group" role="group">
+                                    <td data-label="Дата рег.">{{ $user->created_at->format('d.m.Y') }}</td>
+                                    <td data-label="Статус">
+                                        @if($user->deleted_at)
+                                            <span class="badge-status blocked">
+                                                <i class="fas fa-ban me-1"></i>Заблокирован
+                                            </span>
+                                        @elseif($user->is_active)
+                                            <span class="badge-status active">
+                                                <i class="fas fa-check-circle me-1"></i>Активен
+                                            </span>
+                                        @else
+                                            <span class="badge-status inactive">
+                                                <i class="fas fa-clock me-1"></i>Неактивен
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td data-label="Действия">
+                                        <div class="action-buttons">
                                             <a href="{{ route('admin.users.show', $user->id) }}" 
-                                               class="btn btn-sm btn-outline-info" 
-                                               title="Просмотр">
+                                               class="action-btn view" title="Просмотр">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <a href="{{ route('admin.users.edit', $user->id) }}" 
-                                               class="btn btn-sm btn-outline-primary"
-                                               title="Редактировать">
+                                               class="action-btn edit" title="Редактировать">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             @if($user->id !== auth()->id())
@@ -169,10 +178,10 @@
                                                     <form action="{{ route('admin.users.restore', $user->id) }}" 
                                                           method="POST" class="d-inline">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-sm btn-outline-success" 
+                                                        <button type="submit" class="action-btn restore" 
                                                                 title="Восстановить"
-                                                                onclick="return confirm('Восстановить пользователя?')">
-                                                            <i class="fas fa-undo"></i>
+                                                                onclick="return confirm('Восстановить пользователя {{ $user->name }}?')">
+                                                            <i class="fas fa-undo-alt"></i>
                                                         </button>
                                                     </form>
                                                 @else
@@ -180,10 +189,10 @@
                                                           method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                        <button type="submit" class="action-btn delete" 
                                                                 title="Удалить"
-                                                                onclick="return confirm('Удалить пользователя?')">
-                                                            <i class="fas fa-ban"></i>
+                                                                onclick="return confirm('Удалить пользователя {{ $user->name }}?')">
+                                                            <i class="fas fa-trash-alt"></i>
                                                         </button>
                                                     </form>
                                                 @endif
@@ -197,56 +206,42 @@
                 </div>
 
                 <!-- Пагинация -->
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div>
+                <div class="pagination-wrapper">
+                    <div class="pagination-info">
+                        <i class="fas fa-info-circle me-1"></i>
                         Показано с {{ $users->firstItem() }} по {{ $users->lastItem() }} из {{ $users->total() }} записей
                     </div>
-                    <div>
+                    <div class="pagination-links">
                         {{ $users->withQueryString()->links() }}
                     </div>
                 </div>
             @else
-                <div class="text-center py-5">
-                    <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-users-slash"></i>
+                    </div>
                     <h4>Пользователи не найдены</h4>
-                    <p class="text-muted mb-4">
+                    <p>
                         @if(request('search') || request('role') || request('status'))
                             По вашему запросу ничего не найдено
                         @else
                             В системе пока нет пользователей
                         @endif
                     </p>
-                    @if(request('search') || request('role') || request('status'))
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-primary">
-                            <i class="fas fa-times me-2"></i>Сбросить фильтры
-                        </a>
-                    @else
-                        <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>Добавить пользователя
-                        </a>
-                    @endif
+                    <div class="d-flex gap-3 justify-content-center">
+                        @if(request('search') || request('role') || request('status'))
+                            <a href="{{ route('admin.users.index') }}" class="btn-reset">
+                                <i class="fas fa-times me-2"></i>Сбросить фильтры
+                            </a>
+                        @else
+                            <a href="{{ route('admin.users.create') }}" class="btn-create">
+                                <i class="fas fa-plus me-2"></i>Добавить пользователя
+                            </a>
+                        @endif
+                    </div>
                 </div>
             @endif
         </div>
     </div>
 </div>
-
-<style>
-    .avatar-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        font-weight: bold;
-    }
-    .table td, .table th {
-        vertical-align: middle;
-    }
-    .btn-group .btn {
-        padding: 0.25rem 0.5rem;
-    }
-</style>
 @endsection

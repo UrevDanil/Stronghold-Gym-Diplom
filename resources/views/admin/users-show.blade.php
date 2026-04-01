@@ -1,351 +1,341 @@
+<!-- Профиль пользователя -->
 @extends('layouts.app')
 
 @section('title', 'Профиль пользователя')
 
+@section('styles')
+    <link href="{{ asset('assets/css/dashboard/admin/user-show.css') }}" rel="stylesheet">
+@endsection
+
 @section('content')
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Профиль пользователя</h1>
-        <div>
-            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary me-2">
+<div class="container-fluid py-4 admin-profile-page">
+    <!-- Заголовок -->
+    <div class="profile-header">
+        <h1 class="mb-0">
+            <i class="fas fa-user-circle me-3"></i>Профиль пользователя
+        </h1>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.users.index') }}" class="back-btn">
                 <i class="fas fa-arrow-left me-2"></i>К списку пользователей
             </a>
-            <a href="{{ route('admin.users.edit', $profile->id) }}" class="btn btn-primary">
+            <a href="{{ route('admin.users.edit', $profile->id) }}" class="edit-btn">
                 <i class="fas fa-edit me-2"></i>Редактировать
             </a>
         </div>
     </div>
 
     <div class="row">
-        <!-- Основная информация -->
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Информация о пользователе</h5>
+        <!-- Левая колонка - Основная информация -->
+        <div class="col-lg-4 mb-4">
+            <div class="profile-info-card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Информация о пользователе
                 </div>
                 <div class="card-body">
-                    <div class="text-center mb-4">
-                        <div class="avatar-circle bg-{{ $profile->role->name == 'client' ? 'primary' : ($profile->role->name == 'trainer' ? 'success' : 'warning') }} text-white mx-auto mb-3">
+                    <div class="text-center">
+                        <div class="profile-avatar {{ $profile->role->name }}">
                             {{ strtoupper(substr($profile->name, 0, 1)) }}
                         </div>
-                        <h4>{{ $profile->name }}</h4>
-                        <p class="text-muted">
-                            @if($profile->role->name == 'client')
-                                <span class="badge bg-primary">Клиент</span>
-                            @elseif($profile->role->name == 'trainer')
-                                <span class="badge bg-success">Тренер</span>
-                            @elseif($profile->role->name == 'admin')
-                                <span class="badge bg-warning">Администратор</span>
-                            @elseif($profile->role->name == 'owner')
-                                <span class="badge bg-danger">Владелец</span>
-                            @endif
-                        </p>
+                        <h4 class="profile-name">{{ $profile->name }}</h4>
+                        <div class="profile-role">
+                            <span class="role-badge {{ $profile->role->name }}">
+                                {{ $profile->role->name == 'client' ? 'Клиент' : ($profile->role->name == 'trainer' ? 'Тренер' : ($profile->role->name == 'admin' ? 'Администратор' : 'Владелец')) }}
+                            </span>
+                        </div>
                     </div>
 
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Email:</span>
-                            <strong>{{ $profile->email }}</strong>
-                        </li>
-                        @if($profile->phone)
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Телефон:</span>
-                            <strong>{{ $profile->phone }}</strong>
-                        </li>
-                        @endif
-                        @if($profile->birth_date)
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Дата рождения:</span>
-                            <strong>{{ \Carbon\Carbon::parse($profile->birth_date)->format('d.m.Y') }}</strong>
-                        </li>
-                        @endif
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Дата регистрации:</span>
-                            <strong>{{ $profile->created_at->format('d.m.Y H:i') }}</strong>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                        <span>Статус:</span>
-                        @if($profile->deleted_at)
-                            <span class="badge bg-danger">Заблокирован</span>
-                        @elseif($profile->is_active)
-                            <span class="badge bg-success">Активен</span>
-                        @else
-                            <span class="badge bg-warning">Неактивен</span>
-                        @endif
-                    </li>
-                    </ul>
+                    <div class="info-grid">
+                        <div class="info-row">
+                            <div class="info-icon email">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Email</span>
+                                <span class="info-value">{{ $profile->email }}</span>
+                            </div>
+                        </div>
 
-                    <!-- КВАЛИФИКАЦИЯ ТРЕНЕРА (ИСПРАВЛЕНО) -->
+                        @if($profile->phone)
+                        <div class="info-row">
+                            <div class="info-icon phone">
+                                <i class="fas fa-phone-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Телефон</span>
+                                <span class="info-value">{{ $profile->phone }}</span>
+                            </div>
+                        </div>
+                        @endif
+
+                        @if($profile->birth_date)
+                        <div class="info-row">
+                            <div class="info-icon birthday">
+                                <i class="fas fa-birthday-cake"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Дата рождения</span>
+                                <span class="info-value">{{ \Carbon\Carbon::parse($profile->birth_date)->format('d.m.Y') }}</span>
+                            </div>
+                        </div>
+                        @endif
+
+                        <div class="info-row">
+                            <div class="info-icon register">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Дата регистрации</span>
+                                <span class="info-value">{{ $profile->created_at->format('d.m.Y H:i') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="info-icon status">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Статус</span>
+                                <span class="info-value">
+                                    @if($profile->deleted_at)
+                                        <span class="status-badge blocked">Заблокирован</span>
+                                    @elseif($profile->is_active)
+                                        <span class="status-badge active">Активен</span>
+                                    @else
+                                        <span class="status-badge inactive">Неактивен</span>
+                                    @endif
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Квалификация тренера -->
                     @if($profile->role->name == 'trainer')
-                        <div class="mt-3">
-                            <h6 class="border-bottom pb-2">Квалификация и специализация:</h6>
-                            @if($profile->qualification)
-                                <p class="mb-2">
-                                    <i class="fas fa-certificate text-success me-2"></i>
-                                    <strong>Квалификация:</strong> {{ $profile->qualification }}
-                                </p>
-                            @else
-                                <p class="text-muted mb-2">
-                                    <i class="fas fa-certificate text-muted me-2"></i>
-                                    <strong>Квалификация:</strong> не указана
-                                </p>
-                            @endif
-                            
-                            @if($profile->specialization)
-                                <p class="mb-0">
-                                    <i class="fas fa-dumbbell text-info me-2"></i>
-                                    <strong>Специализация:</strong> {{ $profile->specialization }}
-                                </p>
-                            @else
-                                <p class="text-muted mb-0">
-                                    <i class="fas fa-dumbbell text-muted me-2"></i>
-                                    <strong>Специализация:</strong> не указана
-                                </p>
-                            @endif
+                        <div class="qualification-box">
+                            <h6><i class="fas fa-certificate me-2"></i>Квалификация и специализация</h6>
+                            <div class="qualification-item">
+                                <i class="fas fa-graduation-cap text-success"></i>
+                                <span class="label">Квалификация:</span>
+                                <span class="value">{{ $profile->qualification ?? 'не указана' }}</span>
+                            </div>
+                            <div class="qualification-item">
+                                <i class="fas fa-dumbbell text-info"></i>
+                                <span class="label">Специализация:</span>
+                                <span class="value">{{ $profile->specialization ?? 'не указана' }}</span>
+                            </div>
                         </div>
                     @endif
 
+                    <!-- Заметки клиента -->
                     @if($profile->role->name == 'client' && $profile->notes)
-                    <div class="mt-3">
-                        <h6 class="border-bottom pb-2">Заметки/Здоровье:</h6>
-                        <p class="text-muted">{{ $profile->notes }}</p>
-                    </div>
+                        <div class="qualification-box mt-3">
+                            <h6><i class="fas fa-sticky-note me-2"></i>Заметки / Здоровье</h6>
+                            <p class="mb-0">{{ $profile->notes }}</p>
+                        </div>
                     @endif
                 </div>
             </div>
         </div>
 
-        <!-- Статистика и активность -->
-        <div class="col-md-8 mb-4">
-            <!-- Статистика для клиентов -->
+        <!-- Правая колонка - Статистика и активность -->
+        <div class="col-lg-8 mb-4">
             @if($profile->role->name == 'client')
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="card bg-primary text-white">
-                        <div class="card-body text-center">
-                            <h3>{{ $attendanceStats['total'] }}</h3>
-                            <small>Всего записей</small>
+                <!-- Статистика клиента -->
+                <div class="stats-grid">
+                    <div class="stat-card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="stat-value">{{ $attendanceStats['total'] }}</div>
+                            <div class="stat-label">Всего записей</div>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-success text-white">
+                        <div class="card-body">
+                            <div class="stat-value">{{ $attendanceStats['attended'] }}</div>
+                            <div class="stat-label">Посетил</div>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-danger text-white">
+                        <div class="card-body">
+                            <div class="stat-value">{{ $attendanceStats['missed'] }}</div>
+                            <div class="stat-label">Пропустил</div>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="stat-value">{{ $attendanceRate }}%</div>
+                            <div class="stat-label">Посещаемость</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card bg-success text-white">
-                        <div class="card-body text-center">
-                            <h3>{{ $attendanceStats['attended'] }}</h3>
-                            <small>Посетил</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-danger text-white">
-                        <div class="card-body text-center">
-                            <h3>{{ $attendanceStats['missed'] }}</h3>
-                            <small>Пропустил</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-warning text-white">
-                        <div class="card-body text-center">
-                            <h3>{{ $attendanceRate }}%</h3>
-                            <small>Посещаемость</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- История абонементов (ТОЛЬКО ДЛЯ КЛИЕНТОВ) -->
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">История абонементов</h5>
-                </div>
-                <div class="card-body">
-                    @if($subscriptions->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Абонемент</th>
-                                        <th>Начало</th>
-                                        <th>Окончание</th>
-                                        <th>Статус</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($subscriptions as $sub)
-                                        <tr>
-                                            <td>{{ $sub->subscription->name }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($sub->start_date)->format('d.m.Y') }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($sub->end_date)->format('d.m.Y') }}</td>
-                                            <td>
-                                                @if($sub->status == 'active')
-                                                    <span class="badge bg-success">Активен</span>
-                                                @elseif($sub->status == 'frozen')
-                                                    <span class="badge bg-warning">Заморожен</span>
-                                                @elseif($sub->status == 'expired')
-                                                    <span class="badge bg-secondary">Истек</span>
-                                                @else
-                                                    <span class="badge bg-danger">{{ $sub->status }}</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <p class="text-muted text-center py-3">Нет истории абонементов</p>
-                    @endif
-                </div>
-            </div>
-
-            <!-- Последние бронирования (ТОЛЬКО ДЛЯ КЛИЕНТОВ) -->
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Последние бронирования</h5>
-                </div>
-                <div class="card-body">
-                    @if($recentBookings->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Дата</th>
-                                        <th>Время</th>
-                                        <th>Тренировка</th>
-                                        <th>Тренер</th>
-                                        <th>Статус</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($recentBookings as $booking)
-                                        <tr>
-                                            <td>{{ \Carbon\Carbon::parse($booking->schedule->date)->format('d.m.Y') }}</td>
-                                            <td>{{ substr($booking->schedule->start_time, 0, 5) }}</td>
-                                            <td>{{ $booking->schedule->workout->name }}</td>
-                                            <td>{{ $booking->schedule->trainer->name }}</td>
-                                            <td>
-                                                @if($booking->status == 'booked')
-                                                    <span class="badge bg-success">Забронировано</span>
-                                                @elseif($booking->status == 'attended')
-                                                    <span class="badge bg-info">Посещено</span>
-                                                @elseif($booking->status == 'cancelled')
-                                                    <span class="badge bg-warning">Отменено</span>
-                                                @elseif($booking->status == 'missed')
-                                                    <span class="badge bg-danger">Пропущено</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <p class="text-muted text-center py-3">Нет бронирований</p>
-                    @endif
-                </div>
-            </div>
-            @endif
-
-            <!-- БЛОК ДЛЯ ТРЕНЕРА (вместо статистики клиента) -->
-            @if($profile->role->name == 'trainer')
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-info text-white">
-                                <h5 class="mb-0">Информация о тренере</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="card mb-3">
-                                            <div class="card-body text-center">
-                                                <h3>{{ $profile->trainings_count ?? 0 }}</h3>
-                                                <small class="text-muted">Проведено тренировок</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="card mb-3">
-                                            <div class="card-body text-center">
-                                                <h3>{{ $profile->clients_count ?? 0 }}</h3>
-                                                <small class="text-muted">Уникальных клиентов</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Расписание тренера (ближайшие тренировки) -->
-                                @if(isset($upcomingTrainings) && $upcomingTrainings->count() > 0)
-                                    <h6 class="mt-3 mb-2">Ближайшие тренировки:</h6>
-                                    <div class="table-responsive">
-                                        <table class="table table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Дата</th>
-                                                    <th>Время</th>
-                                                    <th>Тренировка</th>
-                                                    <th>Запись</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($upcomingTrainings as $training)
-                                                    <tr>
-                                                        <td>{{ \Carbon\Carbon::parse($training->date)->format('d.m.Y') }}</td>
-                                                        <td>{{ substr($training->start_time, 0, 5) }}</td>
-                                                        <td>{{ $training->workout->name }}</td>
-                                                        @php
-                                                        // Получаем вместимость из тренировки
-                                                        $capacity = $training->workout->capacity ?? 10;
-                                                        $booked = $training->bookings_count ?? 0;
-                                                    @endphp
-                                                    <td>
-                                                        <span class="badge bg-{{ $booked >= $capacity ? 'danger' : 'success' }}">
-                                                            {{ $booked }}/{{ $capacity }}
-                                                        </span>
-                                                    </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @else
-                                    <p class="text-muted text-center py-3">Нет ближайших тренировок</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
-
-            <!-- БЛОК ДЛЯ АДМИНА/ВЛАДЕЛЬЦА (простая информация) -->
-            @if($profile->role->name == 'admin' || $profile->role->name == 'owner')
-                <div class="card">
-                    <div class="card-header bg-secondary text-white">
-                        <h5 class="mb-0">Информация о сотруднике</h5>
+                <!-- История абонементов -->
+                <div class="data-card">
+                    <div class="card-header subscriptions">
+                        <i class="fas fa-id-card"></i> История абонементов
                     </div>
                     <div class="card-body">
-                        <p class="mb-0">Пользователь является администратором системы.</p>
+                        @if($subscriptions->count() > 0)
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Абонемент</th>
+                                            <th>Начало</th>
+                                            <th>Окончание</th>
+                                            <th>Статус</th>
+                                        </thead>
+                                    <tbody>
+                                        @foreach($subscriptions as $sub)
+                                             <tr>
+                                                <td data-label="Абонемент">{{ $sub->subscription->name }}</td>
+                                                <td data-label="Начало">{{ \Carbon\Carbon::parse($sub->start_date)->format('d.m.Y') }}</td>
+                                                <td data-label="Окончание">{{ \Carbon\Carbon::parse($sub->end_date)->format('d.m.Y') }}</td>
+                                                <td data-label="Статус">
+                                                    @if($sub->status == 'active')
+                                                        <span class="badge-status-sm active">Активен</span>
+                                                    @elseif($sub->status == 'frozen')
+                                                        <span class="badge-status-sm frozen">Заморожен</span>
+                                                    @elseif($sub->status == 'expired')
+                                                        <span class="badge-status-sm expired">Истек</span>
+                                                    @else
+                                                        <span class="badge-status-sm expired">{{ $sub->status }}</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <p class="text-muted text-center py-3">Нет истории абонементов</p>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Последние бронирования -->
+                <div class="data-card">
+                    <div class="card-header bookings">
+                        <i class="fas fa-calendar-alt"></i> Последние бронирования
+                    </div>
+                    <div class="card-body">
+                        @if($recentBookings->count() > 0)
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                         <tr>
+                                            <th>Дата</th>
+                                            <th>Время</th>
+                                            <th>Тренировка</th>
+                                            <th>Тренер</th>
+                                            <th>Статус</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($recentBookings as $booking)
+                                            <tr>
+                                                <td data-label="Дата">{{ \Carbon\Carbon::parse($booking->schedule->date)->format('d.m.Y') }}</td>
+                                                <td data-label="Время">{{ substr($booking->schedule->start_time, 0, 5) }}</td>
+                                                <td data-label="Тренировка">{{ $booking->schedule->workout->name }}</td>
+                                                <td data-label="Тренер">{{ $booking->schedule->trainer->name }}</td>
+                                                <td data-label="Статус">
+                                                    @if($booking->status == 'booked')
+                                                        <span class="badge-status-sm booked">Забронировано</span>
+                                                    @elseif($booking->status == 'attended')
+                                                        <span class="badge-status-sm attended">Посещено</span>
+                                                    @elseif($booking->status == 'cancelled')
+                                                        <span class="badge-status-sm cancelled">Отменено</span>
+                                                    @elseif($booking->status == 'missed')
+                                                        <span class="badge-status-sm missed">Пропущено</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <p class="text-muted text-center py-3">Нет бронирований</p>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
+            <!-- Блок для тренера -->
+            @if($profile->role->name == 'trainer')
+                <div class="data-card">
+                    <div class="card-header trainer">
+                        <i class="fas fa-chalkboard-user"></i> Информация о тренере
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div class="stat-card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <div class="stat-value">{{ $profile->trainings_count ?? 0 }}</div>
+                                        <div class="stat-label">Проведено тренировок</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <div class="stat-value">{{ $profile->clients_count ?? 0 }}</div>
+                                        <div class="stat-label">Уникальных клиентов</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if(isset($upcomingTrainings) && $upcomingTrainings->count() > 0)
+                            <h6 class="mb-3"><i class="fas fa-calendar-week me-2"></i>Ближайшие тренировки</h6>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Дата</th>
+                                            <th>Время</th>
+                                            <th>Тренировка</th>
+                                            <th>Запись</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($upcomingTrainings as $training)
+                                            @php
+                                                $capacity = $training->workout->capacity ?? 10;
+                                                $booked = $training->bookings_count ?? 0;
+                                            @endphp
+                                            <tr>
+                                                <td data-label="Дата">{{ \Carbon\Carbon::parse($training->date)->format('d.m.Y') }}</td>
+                                                <td data-label="Время">{{ substr($training->start_time, 0, 5) }}</td>
+                                                <td data-label="Тренировка">{{ $training->workout->name }}</td>
+                                                <td data-label="Запись">
+                                                    <span class="badge-status-sm {{ $booked >= $capacity ? 'expired' : 'active' }}">
+                                                        {{ $booked }}/{{ $capacity }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <p class="text-muted text-center py-3">Нет ближайших тренировок</p>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
+            <!-- Блок для админа/владельца -->
+            @if($profile->role->name == 'admin' || $profile->role->name == 'owner')
+                <div class="data-card">
+                    <div class="card-header" style="background: linear-gradient(135deg, #6c757d, #5a6268); color: white;">
+                        <i class="fas fa-shield-alt"></i> Информация о сотруднике
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0 text-center">Пользователь является {{ $profile->role->name == 'admin' ? 'администратором' : 'владельцем' }} системы.</p>
                     </div>
                 </div>
             @endif
         </div>
     </div>
 </div>
-
-<style>
-    .avatar-circle {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 32px;
-        font-weight: bold;
-    }
-    .card .card-header {
-        font-weight: 600;
-    }
-</style>
 @endsection

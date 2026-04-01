@@ -1,0 +1,418 @@
+/* ========================================
+   СТИЛИ ДЛЯ РЕДАКТИРОВАНИЯ ПОЛЬЗОВАТЕЛЯ (АДМИН)
+   ======================================== */
+
+/* ----------------------------------------
+   1. ОБЩИЕ СТИЛИ
+   ---------------------------------------- */
+
+.admin-edit-page {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    min-height: 100vh;
+}
+
+/* ----------------------------------------
+   2. ЗАГОЛОВОК
+   ---------------------------------------- */
+
+.edit-header {
+    background: linear-gradient(135deg, #41ece9, #084d4c);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(14, 39, 120, 0.3);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.edit-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(100px);
+}
+
+.edit-header h1 {
+    color: white;
+    font-weight: 700;
+    margin: 0;
+    font-size: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    white-space: nowrap;
+}
+
+.edit-header .back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.edit-header .back-btn:hover {
+    background: white;
+    color: #084d4c;
+    transform: translateX(-3px);
+}
+
+.edit-header .back-btn i {
+    margin-right: 0.5rem;
+}
+
+.edit-header .view-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.edit-header .view-btn:hover {
+    background: white;
+    color: #084d4c;
+    transform: translateX(-3px);
+}
+
+.edit-header .view-btn i {
+    margin-right: 0.5rem;
+}
+
+/* ----------------------------------------
+   3. АЛЕРТЫ
+   ---------------------------------------- */
+
+.edit-alert {
+    border-radius: 15px;
+    border: none;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.edit-alert.danger {
+    background: linear-gradient(135deg, #fff5f5, #ffe8e8);
+    border-left: 4px solid #dc3545;
+    color: #c82333;
+}
+
+.edit-alert.danger h5 {
+    color: #dc3545;
+}
+
+/* ----------------------------------------
+   4. КАРТОЧКА ФОРМЫ
+   ---------------------------------------- */
+
+.form-card {
+    border: none;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    background: white;
+}
+
+.form-card .card-header {
+    background: linear-gradient(135deg, #41ece9, #084d4c);
+    color: white;
+    padding: 1.2rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.2rem;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.form-card .card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(50px);
+}
+
+.form-card .card-header i {
+    margin-right: 0.5rem;
+}
+
+.form-card .card-body {
+    padding: 2rem;
+}
+
+/* ----------------------------------------
+   5. ФОРМА
+   ---------------------------------------- */
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.required-field::after {
+    content: '*';
+    color: #dc3545;
+    margin-left: 4px;
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-control:focus {
+    border-color: #084d4c;
+    box-shadow: 0 0 0 0.2rem rgba(5, 54, 52, 0.1);
+    outline: none;
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+    background-image: none;
+}
+
+.invalid-feedback {
+    color: #dc3545;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}
+
+.form-check {
+    padding-left: 1.5rem;
+}
+
+.form-check-input {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.15rem;
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: #084d4c;
+    border-color: #084d4c;
+}
+
+.form-check-label {
+    cursor: pointer;
+    margin-left: 0.3rem;
+}
+
+.form-text {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.3rem;
+}
+
+/* ----------------------------------------
+   6. РАЗДЕЛИТЕЛИ
+   ---------------------------------------- */
+
+.section-divider {
+    margin: 1.5rem 0;
+    border-top: 2px solid #e9ecef;
+    position: relative;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    display: inline-block;
+    background: white;
+    padding-right: 1rem;
+}
+
+.section-title i {
+    margin-right: 0.5rem;
+    color: #084d4c;
+}
+
+.section-description {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+/* ----------------------------------------
+   7. ДОПОЛНИТЕЛЬНЫЕ ПОЛЯ
+   ---------------------------------------- */
+
+.trainer-fields,
+.client-fields {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* ----------------------------------------
+   8. КНОПКИ
+   ---------------------------------------- */
+
+.btn-save {
+    background: linear-gradient(135deg, #084d4c);
+    border: none;
+    border-radius: 50px;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    color: white;
+    box-shadow: 0 4px 15px rgba(2, 41, 29, 0.3);
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(2, 41, 29, 0.3);
+    background: white;
+    color: #084d4c;
+}
+
+.btn-save i {
+    margin-right: 0.5rem;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    border: none;
+    border-radius: 50px;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-cancel:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* ----------------------------------------
+   9. АДАПТИВНОСТЬ
+   ---------------------------------------- */
+
+@media (max-width: 768px) {
+    .edit-header {
+        padding: 1rem 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .edit-header h1 {
+        font-size: 1.3rem;
+        white-space: nowrap;
+    }
+    
+    .edit-header .back-btn,
+    .edit-header .view-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .btn-save,
+    .btn-cancel {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-cancel {
+        margin-left: 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .edit-header {
+        padding: 0.8rem 1rem;
+    }
+    
+    .edit-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .edit-header .back-btn,
+    .edit-header .view-btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    
+    .form-card .card-body {
+        padding: 1.2rem;
+    }
+    
+    .form-label {
+        font-size: 0.85rem;
+    }
+    
+    .form-control {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .section-title {
+        font-size: 1rem;
+    }
+}
