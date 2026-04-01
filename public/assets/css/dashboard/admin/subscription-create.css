@@ -1,12 +1,12 @@
 /* ========================================
-   СТИЛИ ДЛЯ РЕДАКТИРОВАНИЯ АБОНЕМЕНТА (АДМИН)
+   СТИЛИ ДЛЯ СОЗДАНИЯ АБОНЕМЕНТА (АДМИН)
    ======================================== */
 
 /* ----------------------------------------
    1. ОБЩИЕ СТИЛИ
    ---------------------------------------- */
 
-.admin-edit-subscription-page {
+.admin-create-subscription-page {
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     min-height: 100vh;
 }
@@ -15,7 +15,7 @@
    2. ЗАГОЛОВОК
    ---------------------------------------- */
 
-.edit-header {
+.create-header {
     background: linear-gradient(135deg, #667eea, #764ba2);
     border-radius: 20px;
     padding: 1.5rem 2rem;
@@ -29,7 +29,7 @@
     flex-wrap: nowrap;
 }
 
-.edit-header::before {
+.create-header::before {
     content: '';
     position: absolute;
     top: 0;
@@ -40,7 +40,7 @@
     transform: skewX(-20deg) translateX(100px);
 }
 
-.edit-header h1 {
+.create-header h1 {
     color: white;
     font-weight: 700;
     margin: 0;
@@ -49,7 +49,7 @@
     white-space: nowrap;
 }
 
-.edit-header .back-btn {
+.create-header .back-btn {
     background: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: white;
@@ -64,13 +64,13 @@
     white-space: nowrap;
 }
 
-.edit-header .back-btn:hover {
+.create-header .back-btn:hover {
     background: white;
     color: #764ba2;
     transform: translateX(-3px);
 }
 
-.edit-header .back-btn i {
+.create-header .back-btn i {
     margin-right: 0.5rem;
 }
 
@@ -78,7 +78,7 @@
    3. АЛЕРТЫ
    ---------------------------------------- */
 
-.edit-alert {
+.create-alert {
     border-radius: 15px;
     border: none;
     padding: 1rem 1.5rem;
@@ -97,13 +97,13 @@
     }
 }
 
-.edit-alert.danger {
+.create-alert.danger {
     background: linear-gradient(135deg, #fff5f5, #ffe8e8);
     border-left: 4px solid #dc3545;
     color: #c82333;
 }
 
-.edit-alert.danger h5 {
+.create-alert.danger h5 {
     color: #dc3545;
 }
 
@@ -194,6 +194,23 @@
     margin-top: 0.3rem;
 }
 
+.input-group {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.input-group .input-group-text {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-right: none;
+    color: #764ba2;
+}
+
+.input-group .form-control {
+    border-radius: 0 12px 12px 0;
+    border-left: none;
+}
+
 .form-check {
     padding-left: 1.5rem;
 }
@@ -226,11 +243,11 @@
    ---------------------------------------- */
 
 .info-block {
-    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    background: linear-gradient(135deg, #e3f2fd, #bbdef5);
     border-radius: 16px;
     padding: 1rem 1.2rem;
     margin-top: 1rem;
-    border: 1px solid #e9ecef;
+    border-left: 4px solid #2196f3;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -238,7 +255,7 @@
 
 .info-block i {
     font-size: 1.5rem;
-    color: #17a2b8;
+    color: #2196f3;
 }
 
 .info-block .info-content {
@@ -247,48 +264,20 @@
 
 .info-block .info-title {
     font-weight: 700;
-    color: #2c3e50;
+    color: #0b5e7e;
     margin-bottom: 0.2rem;
 }
 
 .info-block .info-text {
     font-size: 0.9rem;
-    color: #6c757d;
-}
-
-.info-stats {
-    display: flex;
-    gap: 1.5rem;
-    margin-top: 0.5rem;
-}
-
-.info-stat {
-    background: white;
-    padding: 0.3rem 0.8rem;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #495057;
-}
-
-.info-stat i {
-    font-size: 0.8rem;
-    margin-right: 0.3rem;
-}
-
-.info-stat.total {
-    color: #667eea;
-}
-
-.info-stat.active {
-    color: #28a745;
+    color: #0b5e7e;
 }
 
 /* ----------------------------------------
    7. КНОПКИ
    ---------------------------------------- */
 
-.btn-save {
+.btn-create {
     background: linear-gradient(135deg, white);
     color: #764ba2;
     border: 2px solid #764ba2 ;
@@ -300,14 +289,14 @@
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-.btn-save:hover {
+.btn-create:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
     color: white;
     background: #764ba2;
 }
 
-.btn-save i {
+.btn-create i {
     margin-right: 0.5rem;
 }
 
@@ -337,18 +326,18 @@
    ---------------------------------------- */
 
 @media (max-width: 768px) {
-    .edit-header {
+    .create-header {
         padding: 1rem 1.5rem;
         flex-wrap: wrap;
         gap: 1rem;
     }
     
-    .edit-header h1 {
+    .create-header h1 {
         font-size: 1.3rem;
         white-space: nowrap;
     }
     
-    .edit-header .back-btn {
+    .create-header .back-btn {
         padding: 0.4rem 1rem;
         font-size: 0.9rem;
     }
@@ -357,7 +346,7 @@
         padding: 1.5rem;
     }
     
-    .btn-save,
+    .btn-create,
     .btn-cancel {
         width: 100%;
         margin-bottom: 0.5rem;
@@ -371,23 +360,18 @@
         flex-direction: column;
         text-align: center;
     }
-    
-    .info-stats {
-        justify-content: center;
-        flex-wrap: wrap;
-    }
 }
 
 @media (max-width: 480px) {
-    .edit-header {
+    .create-header {
         padding: 0.8rem 1rem;
     }
     
-    .edit-header h1 {
+    .create-header h1 {
         font-size: 1.1rem;
     }
     
-    .edit-header .back-btn {
+    .create-header .back-btn {
         padding: 0.3rem 0.8rem;
         font-size: 0.8rem;
     }
@@ -410,8 +394,11 @@
         font-size: 1.2rem;
     }
     
-    .info-stat {
-        font-size: 0.7rem;
-        padding: 0.2rem 0.6rem;
+    .info-block .info-title {
+        font-size: 0.9rem;
+    }
+    
+    .info-block .info-text {
+        font-size: 0.8rem;
     }
 }

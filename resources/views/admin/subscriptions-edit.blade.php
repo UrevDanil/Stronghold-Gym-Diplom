@@ -129,10 +129,7 @@
                         <div class="form-check mt-2">
                             <input class="form-check-input" type="checkbox" id="is_active" 
                                    name="is_active" value="1" {{ old('is_active', $subscription->is_active) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_active">
-                                <i class="fas fa-check-circle text-success me-1"></i>
-                                Абонемент активен и доступен для покупки
-                            </label>
+                            <label class="form-check-label" for="is_active">Абонемент активен и доступен для покупки</label>
                         </div>
                     </div>
                 </div>
