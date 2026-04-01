@@ -1,0 +1,511 @@
+/* ========================================
+   СТИЛИ ДЛЯ УПРАВЛЕНИЯ РАСПИСАНИЕМ (АДМИН)
+   ======================================== */
+
+/* ----------------------------------------
+   1. ОБЩИЕ СТИЛИ
+   ---------------------------------------- */
+
+.admin-schedule-page {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    min-height: 100vh;
+}
+
+/* ----------------------------------------
+   2. ЗАГОЛОВОК
+   ---------------------------------------- */
+
+.schedule-header {
+    background: linear-gradient(135deg, #f94da6, #4dc8f8);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(14, 39, 120, 0.3);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.schedule-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(100px);
+}
+
+.schedule-header h1 {
+    color: white;
+    font-weight: 700;
+    margin: 0;
+    font-size: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    white-space: nowrap;
+}
+
+.schedule-header .back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.schedule-header .back-btn:hover {
+    background: white;
+    color: #4dc8f8;
+    transform: translateX(-3px);
+}
+
+.schedule-header .back-btn i {
+    margin-right: 0.5rem;
+}
+
+.schedule-header .create-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.schedule-header .create-btn:hover {
+    background: white;
+    color: #4dc8f8;
+    transform: translateX(-3px);
+}
+
+.schedule-header .create-btn i {
+    margin-right: 0.5rem;
+}
+
+/* ----------------------------------------
+   3. АЛЕРТЫ
+   ---------------------------------------- */
+
+.schedule-alert {
+    border-radius: 15px;
+    border: none;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.schedule-alert.success {
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    color: #00573d;
+    border-left: 4px solid #28a745;
+}
+
+.schedule-alert.error {
+    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+    color: #9b1d1d;
+    border-left: 4px solid #dc3545;
+}
+
+/* ----------------------------------------
+   4. КАРТОЧКА ФИЛЬТРОВ
+   ---------------------------------------- */
+
+.filters-card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    background: white;
+}
+
+.filters-card .card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+}
+
+.filters-card .card-header h5 {
+    margin: 0;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.filters-card .card-header i {
+    color: #f94da6;
+}
+
+.filters-card .card-body {
+    padding: 1.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.form-control,
+.form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #4dc8f8;
+    box-shadow: 0 0 0 0.2rem rgba(17, 191, 235, 0.1);
+    outline: none;
+}
+
+.btn-filter {
+    background: white;
+    color: #4dc8f8;
+    border: 2px solid #4dc8f8;
+    border-radius: 12px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 46px;
+}
+
+.btn-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(17, 191, 235, 0.1);
+    background: #4dc8f8;
+    color: white;
+}
+
+/* ----------------------------------------
+   5. КАРТОЧКА РАСПИСАНИЯ
+   ---------------------------------------- */
+
+.schedule-card {
+    border: none;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    background: white;
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.schedule-table thead th {
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.schedule-table tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.schedule-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.schedule-table tbody tr:hover {
+    background: rgba(14, 39, 120, 0.05);
+}
+
+/* ----------------------------------------
+   6. БЕЙДЖИ
+   ---------------------------------------- */
+
+.badge-custom {
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.badge-scheduled {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.badge-cancelled {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+}
+
+.badge-completed {
+    background: linear-gradient(135deg, #6c757d, #5a6268);
+    color: white;
+}
+
+.badge-capacity {
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.badge-capacity.available {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.badge-capacity.full {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+/* ----------------------------------------
+   7. КНОПКИ ДЕЙСТВИЙ
+   ---------------------------------------- */
+
+.action-buttons {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.action-btn.edit {
+    background: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.action-btn.edit:hover {
+    background: #0d6efd;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.action-btn.cancel {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.action-btn.cancel:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.action-btn.disabled {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* ----------------------------------------
+   8. ПУСТОЕ СОСТОЯНИЕ
+   ---------------------------------------- */
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-state-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 3rem;
+    color: #adb5bd;
+}
+
+.empty-state h4 {
+    color: #495057;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state .btn-create {
+    background: linear-gradient(135deg, #0e2778, #1a3a9e);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.empty-state .btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(14, 39, 120, 0.3);
+}
+
+/* ----------------------------------------
+   9. АДАПТИВНОСТЬ
+   ---------------------------------------- */
+
+@media (max-width: 768px) {
+    .schedule-header {
+        padding: 1rem 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .schedule-header h1 {
+        font-size: 1.3rem;
+        white-space: nowrap;
+    }
+    
+    .schedule-header .back-btn,
+    .schedule-header .create-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .filters-card .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-filter {
+        margin-top: 0.5rem;
+    }
+    
+    .schedule-table thead {
+        display: none;
+    }
+    
+    .schedule-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        background: white;
+        border: 1px solid #e9ecef;
+    }
+    
+    .schedule-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .schedule-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #495057;
+        width: 40%;
+        font-size: 0.8rem;
+    }
+    
+    .schedule-table tbody td:last-child {
+        border-bottom: none;
+    }
+    
+    .action-buttons {
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .schedule-header {
+        padding: 0.8rem 1rem;
+    }
+    
+    .schedule-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .schedule-header .back-btn,
+    .schedule-header .create-btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    
+    .schedule-table tbody td::before {
+        width: 45%;
+        font-size: 0.7rem;
+    }
+    
+    .action-btn {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .empty-state-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 2rem;
+    }
+    
+    .empty-state h4 {
+        font-size: 1.1rem;
+    }
+}

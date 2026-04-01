@@ -1,0 +1,383 @@
+/* ========================================
+   СТИЛИ ДЛЯ ДОБАВЛЕНИЯ ЗАНЯТИЯ (АДМИН)
+   ======================================== */
+
+/* ----------------------------------------
+   1. ОБЩИЕ СТИЛИ
+   ---------------------------------------- */
+
+.admin-schedule-create-page {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    min-height: 100vh;
+}
+
+/* ----------------------------------------
+   2. ЗАГОЛОВОК
+   ---------------------------------------- */
+
+.create-header {
+    background: linear-gradient(135deg, #f94da6, #4dc8f8);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(14, 39, 120, 0.3);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.create-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(100px);
+}
+
+.create-header h1 {
+    color: white;
+    font-weight: 700;
+    margin: 0;
+    font-size: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    white-space: nowrap;
+}
+
+.create-header .back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.create-header .back-btn:hover {
+    background: white;
+    color: #4dc8f8;
+    transform: translateX(-3px);
+}
+
+.create-header .back-btn i {
+    margin-right: 0.5rem;
+}
+
+/* ----------------------------------------
+   3. АЛЕРТЫ
+   ---------------------------------------- */
+
+.create-alert {
+    border-radius: 15px;
+    border: none;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.create-alert.danger {
+    background: linear-gradient(135deg, #fff5f5, #ffe8e8);
+    border-left: 4px solid #dc3545;
+    color: #c82333;
+}
+
+.create-alert.danger h5 {
+    color: #dc3545;
+}
+
+/* ----------------------------------------
+   4. КАРТОЧКА ФОРМЫ
+   ---------------------------------------- */
+
+.form-card {
+    border: none;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    background: white;
+}
+
+.form-card .card-header {
+    background: linear-gradient(135deg, #f94da6, #4dc8f8);
+    color: white;
+    padding: 1.2rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.2rem;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.form-card .card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(50px);
+}
+
+.form-card .card-header i {
+    margin-right: 0.5rem;
+}
+
+.form-card .card-body {
+    padding: 2rem;
+}
+
+/* ----------------------------------------
+   5. ФОРМА
+   ---------------------------------------- */
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.required-field::after {
+    content: '*';
+    color: #dc3545;
+    margin-left: 4px;
+}
+
+.form-control,
+.form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #4dc8f8;
+    box-shadow: 0 0 0 0.2rem rgba(17, 191, 235, 0.1);
+    outline: none;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545;
+    background-image: none;
+}
+
+.invalid-feedback {
+    color: #dc3545;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}
+
+.input-group {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.input-group .input-group-text {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-right: none;
+    color: #0e2778;
+}
+
+.input-group .form-control {
+    border-radius: 0 12px 12px 0;
+    border-left: none;
+}
+
+.form-text {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.3rem;
+}
+
+/* ----------------------------------------
+   6. ИНФОРМАЦИОННЫЙ БЛОК
+   ---------------------------------------- */
+
+.info-block {
+    background: linear-gradient(135deg, #e3f2fd, #bbdef5);
+    border-radius: 16px;
+    padding: 1rem 1.2rem;
+    margin-top: 1rem;
+    border-left: 4px solid #2196f3;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.info-block i {
+    font-size: 1.5rem;
+    color: #2196f3;
+}
+
+.info-block .info-content {
+    flex: 1;
+}
+
+.info-block .info-title {
+    font-weight: 700;
+    color: #0b5e7e;
+    margin-bottom: 0.2rem;
+}
+
+.info-block .info-text {
+    font-size: 0.9rem;
+    color: #0b5e7e;
+}
+
+/* ----------------------------------------
+   7. КНОПКИ
+   ---------------------------------------- */
+
+.btn-create {
+    background: white;
+    color: #f94da6;
+    border: 2px solid #f94da6;
+    border-radius: 50px;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(235, 17, 224, 0.185);
+}
+
+.btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(235, 17, 224, 0.185);
+    background: #f94da6;
+    color: white;
+}
+
+.btn-create i {
+    margin-right: 0.5rem;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    border: none;
+    border-radius: 50px;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-cancel:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* ----------------------------------------
+   8. АДАПТИВНОСТЬ
+   ---------------------------------------- */
+
+@media (max-width: 768px) {
+    .create-header {
+        padding: 1rem 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .create-header h1 {
+        font-size: 1.3rem;
+        white-space: nowrap;
+    }
+    
+    .create-header .back-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .btn-create,
+    .btn-cancel {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-cancel {
+        margin-left: 0 !important;
+    }
+    
+    .info-block {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .create-header {
+        padding: 0.8rem 1rem;
+    }
+    
+    .create-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .create-header .back-btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    
+    .form-card .card-body {
+        padding: 1.2rem;
+    }
+    
+    .form-label {
+        font-size: 0.85rem;
+    }
+    
+    .form-control,
+    .form-select {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .info-block i {
+        font-size: 1.2rem;
+    }
+    
+    .info-block .info-title {
+        font-size: 0.9rem;
+    }
+    
+    .info-block .info-text {
+        font-size: 0.8rem;
+    }
+}

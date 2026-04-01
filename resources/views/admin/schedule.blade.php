@@ -1,37 +1,52 @@
+<!-- Управление расписаниями -->
 @extends('layouts.app')
 
 @section('title', 'Управление расписанием')
 
+@section('styles')
+    <link href="{{ asset('assets/css/dashboard/admin/schedule.css') }}" rel="stylesheet">
+@endsection
+
 @section('content')
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Управление расписанием</h1>
-        <div>
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary me-2">
+<div class="container-fluid py-4 admin-schedule-page">
+    <!-- Заголовок -->
+    <div class="schedule-header">
+        <h1 class="mb-0">
+            <i class="fas fa-calendar-alt me-3"></i>Управление расписанием
+        </h1>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.dashboard') }}" class="back-btn">
                 <i class="fas fa-arrow-left me-2"></i>Назад
             </a>
-            <a href="{{ route('admin.schedule.create') }}" class="btn btn-primary">
+            <a href="{{ route('admin.schedule.create') }}" class="create-btn">
                 <i class="fas fa-plus me-2"></i>Добавить занятие
             </a>
         </div>
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
+        <div class="alert schedule-alert success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show">
+        <div class="alert schedule-alert error alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
     <!-- Фильтры -->
-    <div class="card mb-4">
+    <div class="filters-card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-filter me-2"></i>Фильтры
+            </h5>
+        </div>
         <div class="card-body">
             <form method="GET" action="{{ route('admin.schedule.index') }}" class="row g-3">
                 <div class="col-md-3">
@@ -62,7 +77,7 @@
                     </select>
                 </div>
                 <div class="col-md-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
+                    <button type="submit" class="btn-filter w-100">
                         <i class="fas fa-search me-2"></i>Применить
                     </button>
                 </div>
@@ -71,11 +86,11 @@
     </div>
 
     <!-- Расписание -->
-    <div class="card">
-        <div class="card-body">
+    <div class="schedule-card">
+        <div class="card-body p-0">
             @if($schedules->count() > 0)
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
+                    <table class="schedule-table">
                         <thead>
                             <tr>
                                 <th>Дата</th>
@@ -86,76 +101,96 @@
                                 <th>Запись</th>
                                 <th>Статус</th>
                                 <th>Действия</th>
-                            </tr>
-                        </thead>
+                            </thead>
                         <tbody>
                             @foreach($schedules as $schedule)
                                 @php
-                                    // Получаем вместимость из связанной тренировки
                                     $capacity = $schedule->workout->capacity ?? 10;
                                     $isFull = $schedule->current_participants >= $capacity;
                                 @endphp
                                 <tr>
-                                    <td>{{ \Carbon\Carbon::parse($schedule->date)->format('d.m.Y') }}</td>
-                                    <td>{{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }}</td>
-                                    <td>{{ $schedule->workout->name }}</td>
-                                    <td>{{ $schedule->trainer->name }}</td>
-                                    <td>{{ $schedule->room ?? '—' }}</td>
-                                    <td>
-                                        <span class="badge bg-{{ $isFull ? 'danger' : 'success' }}">
+                                    <td data-label="Дата">
+                                        <strong>{{ \Carbon\Carbon::parse($schedule->date)->format('d.m.Y') }}</strong>
+                                    </td>
+                                    <td data-label="Время">
+                                        <span class="badge-custom" style="background: #e9ecef; color: #495057;">
+                                            <i class="fas fa-clock me-1"></i>
+                                            {{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }}
+                                        </span>
+                                    </td>
+                                    <td data-label="Тренировка">
+                                        <strong>{{ $schedule->workout->name }}</strong>
+                                    </td>
+                                    <td data-label="Тренер">
+                                        <i class="fas fa-user-circle me-1 text-primary"></i>
+                                        {{ $schedule->trainer->name }}
+                                    </td>
+                                    <td data-label="Зал">
+                                        <i class="fas fa-door-open me-1 text-muted"></i>
+                                        {{ $schedule->room ?? '—' }}
+                                    </td>
+                                    <td data-label="Запись">
+                                        <span class="badge-capacity {{ $isFull ? 'full' : 'available' }}">
+                                            <i class="fas fa-users me-1"></i>
                                             {{ $schedule->current_participants }}/{{ $capacity }}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td data-label="Статус">
                                         @if($schedule->status == 'scheduled')
-                                            <span class="badge bg-success">Запланировано</span>
+                                            <span class="badge-custom badge-scheduled">
+                                                <i class="fas fa-check-circle me-1"></i>Запланировано
+                                            </span>
                                         @elseif($schedule->status == 'cancelled')
-                                            <span class="badge bg-danger">Отменено</span>
+                                            <span class="badge-custom badge-cancelled">
+                                                <i class="fas fa-ban me-1"></i>Отменено
+                                            </span>
                                         @elseif($schedule->status == 'completed')
-                                            <span class="badge bg-secondary">Завершено</span>
+                                            <span class="badge-custom badge-completed">
+                                                <i class="fas fa-check-double me-1"></i>Завершено
+                                            </span>
                                         @endif
                                     </td>
-                                    <td>
-                                        <div class="btn-group" role="group">
+                                    <td data-label="Действия">
+                                        <div class="action-buttons">
                                             <a href="{{ route('admin.schedule.edit', $schedule->id) }}" 
-                                            class="btn btn-sm btn-outline-primary" title="Редактировать">
+                                               class="action-btn edit" title="Редактировать">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             
                                             @if($schedule->status == 'scheduled')
-                                                {{-- Только для запланированных --}}
                                                 <form action="{{ route('admin.schedule.cancel', $schedule->id) }}" 
-                                                    method="POST" class="d-inline">
+                                                      method="POST" class="d-inline">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-sm btn-outline-warning" 
+                                                    <button type="submit" class="action-btn cancel" 
                                                             title="Отменить занятие"
                                                             onclick="return confirm('Отменить занятие? Все бронирования будут отменены, тренировки вернутся в абонементы.')">
                                                         <i class="fas fa-ban"></i>
                                                     </button>
                                                 </form>
                                             @elseif($schedule->status == 'cancelled')
-                                                {{-- Для отмененных --}}
-                                                <span class="btn btn-sm btn-outline-secondary disabled" title="Занятие уже отменено">
+                                                <span class="action-btn disabled" title="Занятие уже отменено">
                                                     <i class="fas fa-check"></i>
                                                 </span>
                                             @elseif($schedule->status == 'completed')
-                                                {{-- Для завершенных --}}
-                                                <span class="btn btn-sm btn-outline-secondary disabled" title="Занятие завершено">
+                                                <span class="action-btn disabled" title="Занятие завершено">
                                                     <i class="fas fa-check-circle"></i>
                                                 </span>
                                             @endif
                                         </div>
-                                    </td>
+                                     </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             @else
-                <div class="text-center py-5">
-                    <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
                     <h4>Нет занятий в расписании</h4>
-                    <p class="text-muted mb-4">На выбранные даты нет запланированных тренировок</p>
-                    <a href="{{ route('admin.schedule.create') }}" class="btn btn-primary">
+                    <p>На выбранные даты нет запланированных тренировок</p>
+                    <a href="{{ route('admin.schedule.create') }}" class="btn-create">
                         <i class="fas fa-plus me-2"></i>Добавить занятие
                     </a>
                 </div>
@@ -163,17 +198,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    .table td, .table th {
-        vertical-align: middle;
-    }
-    .btn-group .btn {
-        padding: 0.25rem 0.5rem;
-    }
-    .badge {
-        font-size: 0.85rem;
-        padding: 0.35em 0.65em;
-    }
-</style>
 @endsection
