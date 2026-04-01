@@ -181,11 +181,11 @@
 }
 
 .btn-search {
-    background: linear-gradient(135deg,  #084d4c);
-    color: white;
-    border: none;
+    background: white;
+    color: #084d4c;
+    border: 2px solid #084d4c;
     border-radius: 12px;
-    padding: 0.7rem 1.5rem;
+    padding: 0.5rem 1.2rem;
     font-weight: 600;
     transition: all 0.3s ease;
     height: 46px;
@@ -196,9 +196,8 @@
 .btn-search:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(8, 49, 28, 0.3);
-    color: #084d4c;
-    background:white;
-    text-decoration: none;
+    background: #084d4c;
+    color: white;
 }
 
 /* ----------------------------------------

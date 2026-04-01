@@ -279,22 +279,22 @@ textarea.form-control {
    ---------------------------------------- */
 
 .btn-create {
-    background: linear-gradient(135deg, #084d4c);
-    border: none;
+    background: white;
+    color: #084d4c;
+    border: 2px solid #084d4c;
     border-radius: 50px;
     padding: 0.8rem 2rem;
     font-weight: 600;
     font-size: 1rem;
     transition: all 0.3s ease;
-    color: white;
     box-shadow: 0 4px 15px rgba(2, 41, 29, 0.3);
 }
 
 .btn-create:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(2, 41, 29, 0.3);
-    background: white;
-    color: #084d4c;
+    box-shadow: 0 6px 20px rgba(8, 49, 28, 0.3);
+    background: #084d4c;
+    color: white;
 }
 
 .btn-create i {
