@@ -4,88 +4,23 @@
 @section('title', 'Отметка посещаемости')
 
 @section('styles')
-<style>
-    .attendance-card {
-        transition: all 0.3s ease;
-        border: none;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    }
-    .attendance-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-    }
-    .client-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: white;
-    }
-    .subscription-badge {
-        background: linear-gradient(135deg, #28a745, #20c997);
-        color: white;
-        padding: 0.2rem 0.6rem;
-        border-radius: 50px;
-        font-size: 0.7rem;
-    }
-    .remaining-badge {
-        background: linear-gradient(135deg, #ffc107, #fd7e14);
-        color: white;
-        padding: 0.2rem 0.6rem;
-        border-radius: 50px;
-        font-size: 0.7rem;
-    }
-    .btn-mark {
-        background: linear-gradient(135deg, #0b34bb, #2aa8e2);
-        border: none;
-        border-radius: 50px;
-        padding: 0.5rem 1.2rem;
-        transition: all 0.3s ease;
-    }
-    .btn-mark:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(11, 52, 187, 0.3);
-    }
-    .btn-mark-disabled {
-        background: #6c757d;
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-    .search-input {
-        border-radius: 50px;
-        padding: 0.7rem 1rem;
-        border: 2px solid #e9ecef;
-        transition: all 0.3s ease;
-    }
-    .search-input:focus {
-        border-color: #0b34bb;
-        box-shadow: none;
-        outline: none;
-    }
-</style>
+    <link href="{{ asset('assets/css/dashboard/admin/attendance.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container-fluid py-4 admin-attendance-page">
+    <!-- Заголовок -->
+    <div class="attendance-header">
         <h1 class="mb-0">
             <i class="fas fa-clipboard-list me-3"></i>Отметка посещаемости
         </h1>
-        <div>
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Назад
-            </a>
-        </div>
+        <a href="{{ route('admin.dashboard') }}" class="back-btn">
+            <i class="fas fa-arrow-left me-2"></i>Назад
+        </a>
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
+        <div class="alert attendance-alert success alert-dismissible fade show" role="alert">
             <i class="fas fa-check-circle me-2"></i>
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -93,7 +28,7 @@
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show">
+        <div class="alert attendance-alert error alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i>
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -101,17 +36,15 @@
     @endif
 
     <!-- Поиск -->
-    <div class="card mb-4">
+    <div class="search-card">
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-6 mx-auto">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="fas fa-search text-primary"></i>
-                        </span>
-                        <input type="text" id="searchInput" class="form-control search-input border-start-0" 
-                               placeholder="Поиск по имени, email или телефону...">
-                    </div>
+            <div class="search-wrapper">
+                <div class="search-input-group">
+                    <span class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" class="search-input" 
+                           placeholder="Поиск по имени, email или телефону...">
                 </div>
             </div>
         </div>
@@ -127,50 +60,58 @@
                 $isUnlimited = $hasSubscription && $activeSub->subscription && $activeSub->subscription->workouts_count == 0;
                 $canMark = $hasSubscription && ($isUnlimited || $remaining > 0);
             @endphp
-            <div class="col-md-6 col-lg-4 mb-4 client-card" data-name="{{ strtolower($client->name) }}" 
-                 data-email="{{ strtolower($client->email) }}" data-phone="{{ $client->phone ?? '' }}">
-                <div class="card attendance-card h-100">
+            <div class="col-md-6 col-lg-4 client-card" 
+                 data-name="{{ strtolower($client->name) }}" 
+                 data-email="{{ strtolower($client->email) }}" 
+                 data-phone="{{ $client->phone ?? '' }}">
+                <div class="attendance-card">
                     <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="client-avatar bg-primary me-3">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="client-avatar">
                                 {{ strtoupper(substr($client->name, 0, 1)) }}
                             </div>
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1">{{ $client->name }}</h5>
-                                <small class="text-muted">
-                                    <i class="fas fa-envelope me-1"></i>{{ $client->email }}
-                                </small>
+                            <div class="client-info">
+                                <div class="client-name">{{ $client->name }}</div>
+                                <div class="client-email">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>{{ $client->email }}</span>
+                                </div>
                                 @if($client->phone)
-                                    <br><small class="text-muted">
-                                        <i class="fas fa-phone me-1"></i>{{ $client->phone }}
-                                    </small>
+                                    <div class="client-phone">
+                                        <i class="fas fa-phone-alt"></i>
+                                        <span>{{ $client->phone }}</span>
+                                    </div>
                                 @endif
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mt-3">
                             @if($hasSubscription)
-                                <span class="subscription-badge me-2">
-                                    <i class="fas fa-id-card me-1"></i>{{ $activeSub->subscription->name ?? 'Абонемент' }}
-                                </span>
-                                @if(!$isUnlimited)
-                                    <span class="remaining-badge">
-                                        <i class="fas fa-dumbbell me-1"></i>{{ $remaining }} тренировок
+                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                    <span class="badge-subscription">
+                                        <i class="fas fa-id-card"></i> {{ $activeSub->subscription->name ?? 'Абонемент' }}
                                     </span>
-                                @else
-                                    <span class="remaining-badge" style="background: linear-gradient(135deg, #28a745, #20c997);">
-                                        <i class="fas fa-infinity me-1"></i>Безлимит
-                                    </span>
-                                @endif
-                                <div class="mt-2 small text-muted">
-                                    <i class="fas fa-calendar-alt me-1"></i>До {{ \Carbon\Carbon::parse($activeSub->end_date)->format('d.m.Y') }}
+                                    @if(!$isUnlimited)
+                                        <span class="badge-remaining">
+                                            <i class="fas fa-dumbbell"></i> {{ $remaining }} тренировок
+                                        </span>
+                                    @else
+                                        <span class="badge-unlimited">
+                                            <i class="fas fa-infinity"></i> Безлимит
+                                        </span>
+                                    @endif
+                                </div>
+                                <div class="subscription-date">
+                                    <i class="fas fa-calendar-alt"></i> До {{ \Carbon\Carbon::parse($activeSub->end_date)->format('d.m.Y') }}
                                 </div>
                             @else
-                                <span class="badge bg-secondary">Нет активного абонемента</span>
+                                <span class="badge-no-subscription">
+                                    <i class="fas fa-times-circle"></i> Нет активного абонемента
+                                </span>
                             @endif
                         </div>
 
-                        <button type="button" class="btn btn-mark w-100 {{ !$canMark ? 'btn-mark-disabled' : '' }}"
+                        <button type="button" class="btn-mark mt-3 {{ !$canMark ? 'btn-mark-disabled' : '' }}"
                                 data-bs-toggle="modal" data-bs-target="#markAttendanceModal"
                                 data-client-id="{{ $client->id }}"
                                 data-client-name="{{ $client->name }}"
@@ -180,7 +121,7 @@
                                 data-is-unlimited="{{ $isUnlimited ? 'true' : 'false' }}"
                                 data-subscription-name="{{ $hasSubscription ? ($activeSub->subscription->name ?? 'Абонемент') : '' }}"
                                 {{ !$canMark ? 'disabled' : '' }}>
-                            <i class="fas fa-check-circle me-2"></i>Отметить посещение
+                            <i class="fas fa-check-circle"></i> Отметить посещение
                         </button>
                     </div>
                 </div>
@@ -195,9 +136,9 @@
         <div class="modal-content">
             <form method="POST" action="" id="markAttendanceForm">
                 @csrf
-                <div class="modal-header bg-primary text-white">
+                <div class="modal-header">
                     <h5 class="modal-title">
-                        <i class="fas fa-check-circle me-2"></i>Отметить посещение
+                        <i class="fas fa-check-circle"></i> Отметить посещение
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -231,7 +172,7 @@
                                   placeholder="Дополнительная информация..."></textarea>
                     </div>
                     
-                    <div class="alert alert-info" id="remainingInfo">
+                    <div class="alert" id="remainingInfo">
                         <i class="fas fa-info-circle me-2"></i>
                         <span id="remainingText"></span>
                     </div>
@@ -253,21 +194,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const clientCards = document.querySelectorAll('.client-card');
     
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        
-        clientCards.forEach(card => {
-            const name = card.dataset.name || '';
-            const email = card.dataset.email || '';
-            const phone = card.dataset.phone || '';
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
             
-            if (name.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm)) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
+            clientCards.forEach(card => {
+                const name = card.dataset.name || '';
+                const email = card.dataset.email || '';
+                const phone = card.dataset.phone || '';
+                
+                if (name.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         });
-    });
+    }
     
     // Модальное окно
     const modal = document.getElementById('markAttendanceModal');
@@ -276,48 +219,54 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalClientPhone = document.getElementById('modalClientPhone');
     const modalSubscription = document.getElementById('modalSubscription');
     const remainingText = document.getElementById('remainingText');
+    const remainingInfo = document.getElementById('remainingInfo');
     
-    modal.addEventListener('show.bs.modal', function(event) {
-        const button = event.relatedTarget;
-        const clientId = button.getAttribute('data-client-id');
-        const clientName = button.getAttribute('data-client-name');
-        const clientPhone = button.getAttribute('data-client-phone');
-        const hasSubscription = button.getAttribute('data-has-subscription') === 'true';
-        const remaining = button.getAttribute('data-remaining');
-        const isUnlimited = button.getAttribute('data-is-unlimited') === 'true';
-        const subscriptionName = button.getAttribute('data-subscription-name');
-        
-        // Устанавливаем action формы
-        form.action = `/admin/attendance/mark/${clientId}`;
-        
-        // Заполняем данные
-        modalClientName.textContent = clientName;
-        modalClientPhone.textContent = clientPhone ? `📞 ${clientPhone}` : '';
-        
-        if (hasSubscription) {
-            modalSubscription.textContent = subscriptionName;
-            if (isUnlimited) {
-                remainingText.innerHTML = 'У клиента безлимитный абонемент. Тренировка не будет списываться.';
-                remainingText.closest('.alert').className = 'alert alert-success';
+    if (modal) {
+        modal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const clientId = button.getAttribute('data-client-id');
+            const clientName = button.getAttribute('data-client-name');
+            const clientPhone = button.getAttribute('data-client-phone');
+            const hasSubscription = button.getAttribute('data-has-subscription') === 'true';
+            const remaining = parseInt(button.getAttribute('data-remaining'));
+            const isUnlimited = button.getAttribute('data-is-unlimited') === 'true';
+            const subscriptionName = button.getAttribute('data-subscription-name');
+            
+            // Устанавливаем action формы
+            form.action = `/admin/attendance/mark/${clientId}`;
+            
+            // Заполняем данные
+            modalClientName.textContent = clientName;
+            modalClientPhone.textContent = clientPhone ? `📞 ${clientPhone}` : '';
+            
+            if (hasSubscription) {
+                modalSubscription.textContent = subscriptionName;
+                if (isUnlimited) {
+                    remainingText.innerHTML = 'У клиента безлимитный абонемент. Тренировка не будет списываться.';
+                    remainingInfo.className = 'alert alert-success';
+                } else {
+                    const newRemaining = remaining - 1;
+                    if (newRemaining >= 0) {
+                        remainingText.innerHTML = `После отметки у клиента останется ${newRemaining} тренировок из абонемента.`;
+                    } else {
+                        remainingText.innerHTML = `У клиента закончились тренировки! Осталось 0 из ${remaining + newRemaining + 1}.`;
+                    }
+                    remainingInfo.className = 'alert alert-warning';
+                }
+                document.querySelector('#markAttendanceModal .btn-primary').disabled = false;
             } else {
-                remainingText.innerHTML = `После отметки у клиента останется ${remaining - 1} тренировок из абонемента.`;
-                remainingText.closest('.alert').className = 'alert alert-warning';
+                modalSubscription.textContent = 'Нет активного абонемента';
+                remainingText.innerHTML = 'У клиента нет активного абонемента! Отметка невозможна.';
+                remainingInfo.className = 'alert alert-danger';
+                document.querySelector('#markAttendanceModal .btn-primary').disabled = true;
             }
-        } else {
-            modalSubscription.textContent = 'Нет активного абонемента';
-            remainingText.innerHTML = 'У клиента нет активного абонемента! Отметка невозможна.';
-            remainingText.closest('.alert').className = 'alert alert-danger';
-            document.querySelector('#markAttendanceModal .btn-primary').disabled = true;
-            return;
-        }
+        });
         
-        document.querySelector('#markAttendanceModal .btn-primary').disabled = false;
-    });
-    
-    modal.addEventListener('hidden.bs.modal', function() {
-        form.action = '';
-        document.querySelector('#markAttendanceModal .btn-primary').disabled = false;
-    });
+        modal.addEventListener('hidden.bs.modal', function() {
+            form.action = '';
+            document.querySelector('#markAttendanceModal .btn-primary').disabled = false;
+        });
+    }
 });
 </script>
 @endsection

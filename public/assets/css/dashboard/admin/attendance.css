@@ -1,0 +1,716 @@
+/* ========================================
+   СТИЛИ ДЛЯ ОТМЕТКИ ПОСЕЩАЕМОСТИ (АДМИН)
+   ======================================== */
+
+/* ----------------------------------------
+   1. ОБЩИЕ СТИЛИ
+   ---------------------------------------- */
+
+.admin-attendance-page {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+/* ----------------------------------------
+   2. ЗАГОЛОВОК
+   ---------------------------------------- */
+
+.attendance-header {
+    background: linear-gradient(135deg, #198cf7, #17dd8b);
+    border-radius: 24px;
+    padding: 1.8rem 2.2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 15px 35px rgba(14, 39, 120, 0.25);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+    transition: all 0.3s ease;
+}
+
+.attendance-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(100px);
+    pointer-events: none;
+}
+
+.attendance-header h1 {
+    color: white;
+    font-weight: 800;
+    margin: 0;
+    font-size: 1.8rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    white-space: nowrap;
+    letter-spacing: -0.3px;
+}
+
+.attendance-header h1 i {
+    font-size: 1.8rem;
+    margin-right: 0.8rem;
+    color: rgba(255,255,255,0.9);
+}
+
+.attendance-header .back-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: white;
+    border-radius: 60px;
+    padding: 0.7rem 1.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.attendance-header .back-btn:hover {
+    background: white;
+    color: #17dd8b;
+    transform: translateX(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.attendance-header .back-btn i {
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+
+.attendance-header .back-btn:hover i {
+    transform: translateX(-3px);
+}
+
+/* ----------------------------------------
+   3. АЛЕРТЫ
+   ---------------------------------------- */
+
+.attendance-alert {
+    border-radius: 18px;
+    border: none;
+    padding: 1.2rem 1.8rem;
+    margin-bottom: 1.8rem;
+    animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.attendance-alert::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.attendance-alert.success {
+    background: linear-gradient(135deg, #f0fff4, #e6fffa);
+    color: #0a5c3e;
+}
+
+.attendance-alert.success::before {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.attendance-alert.error {
+    background: linear-gradient(135deg, #fff5f5, #ffe8e8);
+    color: #a12a2a;
+}
+
+.attendance-alert.error::before {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ----------------------------------------
+   4. ПОИСК
+   ---------------------------------------- */
+
+.search-card {
+    border: none;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.search-card .card-body {
+    padding: 1.8rem;
+}
+
+.search-wrapper {
+    max-width: 550px;
+    margin: 0 auto;
+}
+
+.search-input-group {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 60px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.search-input-group:focus-within {
+    border-color: #17dd8b;
+    box-shadow: 0 4px 15px rgba(14, 39, 120, 0.12);
+    transform: translateY(-1px);
+}
+
+.search-icon {
+    padding: 0.9rem 1rem 0.9rem 1.5rem;
+    color: #17dd8b;
+    font-size: 1rem;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    padding: 0.9rem 0;
+    font-size: 1rem;
+    background: transparent;
+    color: #2c3e50;
+}
+
+.search-input::placeholder {
+    color: #adb5bd;
+    font-weight: 400;
+}
+
+.search-input:focus {
+    outline: none;
+}
+
+/* ----------------------------------------
+   5. КАРТОЧКА КЛИЕНТА
+   ---------------------------------------- */
+
+.client-card {
+    margin-bottom: 1.8rem;
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.attendance-card {
+    border: none;
+    border-radius: 24px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    background: white;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.attendance-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #198cf7, #17dd8b);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.attendance-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+.attendance-card:hover::before {
+    opacity: 1;
+}
+
+.attendance-card .card-body {
+    padding: 1.8rem;
+}
+
+.client-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    background: linear-gradient(135deg, #198cf7, #17dd8b);
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(14, 39, 120, 0.2);
+}
+
+.client-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(14, 39, 120, 0.3);
+}
+
+.client-info {
+    flex: 1;
+    padding-left: 1rem;
+}
+
+.client-name {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #1e2a3a;
+    margin-bottom: 0.3rem;
+    line-height: 1.3;
+}
+
+.client-email {
+    font-size: 0.8rem;
+    color: #6c757d;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.2rem;
+}
+
+.client-email i {
+    font-size: 0.7rem;
+    color: #198cf7;
+}
+
+.client-phone {
+    font-size: 0.8rem;
+    color: #6c757d;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.client-phone i {
+    font-size: 0.7rem;
+    color: #28a745;
+}
+
+/* ----------------------------------------
+   6. БЕЙДЖИ АБОНЕМЕНТА
+   ---------------------------------------- */
+
+.subscription-info {
+    margin-top: 1.2rem;
+    margin-bottom: 1.2rem;
+    padding: 0.8rem;
+    background: #f8f9fa;
+    border-radius: 16px;
+}
+
+.badge-subscription,
+.badge-remaining,
+.badge-unlimited,
+.badge-no-subscription {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 1rem;
+    border-radius: 60px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.badge-subscription {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+}
+
+.badge-remaining {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+}
+
+.badge-unlimited {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+    box-shadow: 0 2px 8px rgba(23, 162, 184, 0.2);
+}
+
+.badge-no-subscription {
+    background: #6c757d;
+    color: white;
+}
+
+.subscription-date {
+    font-size: 0.7rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.subscription-date i {
+    font-size: 0.65rem;
+    color: #198cf7;
+}
+
+/* ----------------------------------------
+   7. КНОПКА ОТМЕТКИ
+   ---------------------------------------- */
+
+.btn-mark {
+    background: linear-gradient(135deg, #198cf7, #17dd8b);
+    border: none;
+    border-radius: 60px;
+    padding: 0.8rem 1.5rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: white;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-mark::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-mark:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-mark:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(14, 39, 120, 0.4);
+    color: white;
+}
+
+.btn-mark i {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-mark:hover i {
+    transform: scale(1.1);
+}
+
+.btn-mark-disabled {
+    background: #adb5bd;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-mark-disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-mark-disabled:hover::before {
+    display: none;
+}
+
+/* ----------------------------------------
+   8. МОДАЛЬНОЕ ОКНО
+   ---------------------------------------- */
+
+.modal-content {
+    border: none;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #0e2778, #1a3a9e);
+    border-bottom: none;
+    padding: 1.5rem 2rem;
+}
+
+.modal-title {
+    color: white;
+    font-weight: 800;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.modal-title i {
+    font-size: 1.3rem;
+}
+
+.btn-close-white {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.btn-close-white:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-body .form-label {
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.modal-body .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 14px;
+    padding: 0.8rem 1.2rem;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.modal-body .form-control:focus {
+    border-color: #0e2778;
+    box-shadow: 0 0 0 4px rgba(14, 39, 120, 0.1);
+    outline: none;
+}
+
+.modal-body .bg-light {
+    background-color: #f8f9fa !important;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.modal-body textarea.form-control {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.modal-body .alert {
+    border-radius: 16px;
+    padding: 1rem 1.2rem;
+    margin-top: 1.2rem;
+    margin-bottom: 0;
+    border: none;
+}
+
+.modal-body .alert-success {
+    background: linear-gradient(135deg, #e8f5e9, #e0f2e9);
+    border-left: 4px solid #28a745;
+    color: #1e5a3a;
+}
+
+.modal-body .alert-warning {
+    background: linear-gradient(135deg, #fff8e7, #fff3df);
+    border-left: 4px solid #ffc107;
+    color: #9b6f0b;
+}
+
+.modal-body .alert-danger {
+    background: linear-gradient(135deg, #fee, #fdd);
+    border-left: 4px solid #dc3545;
+    color: #a12a2a;
+}
+
+.modal-footer {
+    border-top: 2px solid #e9ecef;
+    padding: 1.2rem 2rem;
+    background: #f8f9fa;
+    gap: 0.8rem;
+}
+
+.modal-footer .btn-secondary {
+    background: #6c757d;
+    border: none;
+    border-radius: 60px;
+    padding: 0.7rem 1.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.modal-footer .btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+.modal-footer .btn-primary {
+    background: linear-gradient(135deg, #0e2778, #1a3a9e);
+    border: none;
+    border-radius: 60px;
+    padding: 0.7rem 2rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(14, 39, 120, 0.2);
+}
+
+.modal-footer .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(14, 39, 120, 0.3);
+}
+
+/* ----------------------------------------
+   9. АДАПТИВНОСТЬ
+   ---------------------------------------- */
+
+@media (max-width: 768px) {
+    .admin-attendance-page {
+        padding: 1rem;
+    }
+    
+    .attendance-header {
+        padding: 1.2rem 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .attendance-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .attendance-header h1 i {
+        font-size: 1.3rem;
+        margin-right: 0.5rem;
+    }
+    
+    .attendance-header .back-btn {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    
+    .search-card .card-body {
+        padding: 1.2rem;
+    }
+    
+    .search-icon {
+        padding: 0.7rem 0.8rem 0.7rem 1.2rem;
+    }
+    
+    .search-input {
+        padding: 0.7rem 0;
+    }
+    
+    .attendance-card .card-body {
+        padding: 1.2rem;
+    }
+    
+    .client-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+    
+    .client-name {
+        font-size: 1rem;
+    }
+    
+    .btn-mark {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .modal-body {
+        padding: 1.2rem;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .attendance-header {
+        padding: 1rem;
+    }
+    
+    .attendance-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .attendance-header .back-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .client-avatar {
+        width: 45px;
+        height: 45px;
+        font-size: 1rem;
+    }
+    
+    .badge-subscription,
+    .badge-remaining,
+    .badge-unlimited {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.8rem;
+    }
+    
+    .subscription-date {
+        font-size: 0.65rem;
+    }
+}
