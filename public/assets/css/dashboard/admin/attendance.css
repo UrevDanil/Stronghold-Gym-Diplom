@@ -276,7 +276,7 @@
     background: linear-gradient(135deg, #198cf7, #17dd8b);
     flex-shrink: 0;
     transition: all 0.3s ease;
-    box-shadow: 0 8px 20px rgba(14, 39, 120, 0.2);
+    box-shadow: 0 0 0 4px rgba(14, 120, 85, 0.1);
 }
 
 .client-avatar:hover {
@@ -430,7 +430,7 @@
 
 .btn-mark:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(14, 39, 120, 0.4);
+    box-shadow: 0 0 0 4px rgba(14, 120, 85, 0.1);
     color: white;
 }
 
@@ -482,7 +482,7 @@
 }
 
 .modal-header {
-    background: linear-gradient(135deg, #0e2778, #1a3a9e);
+    background: linear-gradient(135deg, #198cf7, #17dd8b);
     border-bottom: none;
     padding: 1.5rem 2rem;
 }
@@ -531,8 +531,8 @@
 }
 
 .modal-body .form-control:focus {
-    border-color: #0e2778;
-    box-shadow: 0 0 0 4px rgba(14, 39, 120, 0.1);
+    border-color: #17dd8b;
+    box-shadow: 0 0 0 4px rgba(14, 120, 85, 0.1);
     outline: none;
 }
 
@@ -595,18 +595,21 @@
 }
 
 .modal-footer .btn-primary {
-    background: linear-gradient(135deg, #0e2778, #1a3a9e);
-    border: none;
+    background: white;
+    color: #17dd8b;
+    border: 2px solid #17dd8b;
     border-radius: 60px;
     padding: 0.7rem 2rem;
     font-weight: 700;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(14, 39, 120, 0.2);
+    box-shadow: 0 0 0 4px rgba(14, 120, 85, 0.1);
 }
 
 .modal-footer .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(14, 39, 120, 0.3);
+    box-shadow: 0 0 0 4px rgba(14, 120, 85, 0.1);
+    background: #17dd8b;
+    color: white;
 }
 
 /* ----------------------------------------
