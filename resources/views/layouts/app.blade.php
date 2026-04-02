@@ -80,16 +80,11 @@
                     <i class="fas fa-chart-pie"></i> Дашборд
                 </a>
             </li>
-            
+
             @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.clients') ? 'active' : '' }}" href="{{ route('admin.clients') }}">
-                    <i class="fas fa-users"></i> Клиенты
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.trainers') ? 'active' : '' }}" href="{{ route('admin.trainers') }}">
-                    <i class="fas fa-user-tie"></i> Тренеры
+                <a class="nav-link {{ request()->routeIs('admin.users') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
+                    <i class="fas fa-users"></i> Управление пользователями
                 </a>
             </li>
             <li class="nav-item">
@@ -100,6 +95,16 @@
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.subscriptions*') ? 'active' : '' }}" href="{{ route('admin.subscriptions.index') }}">
                     <i class="fas fa-id-card"></i> Абонементы
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.reports') ? 'active' : '' }}" href="{{ route('admin.reports') }}">
+                    <i class="fas fa-chart-bar"></i> Отчеты
+                </a>
+            </li>
+                <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.attendance') ? 'active' : '' }}" href="{{ route('admin.attendance') }}">
+                    <i class="fas fa-clipboard-list"></i> Отметить посещаемость
                 </a>
             </li>
             @endif

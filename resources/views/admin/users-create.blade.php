@@ -139,19 +139,6 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label for="is_active" class="form-label">Статус пользователя</label>
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" id="is_active" 
-                                   name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_active">
-                                Пользователь активен
-                            </label>
-                        </div>
-                        <div class="form-text">Если отмечено - пользователь может входить в систему</div>
-                    </div>
-                </div>
-
                 <!-- Дополнительные поля для тренера -->
                 <div class="trainer-fields" style="display: none;">
                     <div class="section-divider"></div>

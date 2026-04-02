@@ -89,7 +89,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    /**
+/**
  * Удаление (блокировка) пользователя
  */
 public function deleteUser($id)
@@ -102,6 +102,12 @@ public function deleteUser($id)
     
     $user = User::findOrFail($id);
     
+    // Не даем удалить владельца
+    if ($user->isOwner()) {
+        return redirect()->route('admin.users.index')
+            ->with('error', 'Вы не можете заблокировать владельца системы');
+    }
+    
     // Мягкое удаление (поле deleted_at заполняется)
     $user->delete();
     
@@ -110,33 +116,53 @@ public function deleteUser($id)
 }
 
 /**
- * Восстановление пользователя
- */
-public function restoreUser($id)
-{
-    $user = User::withTrashed()->findOrFail($id);
-    $user->restore();
-    
-    return redirect()->route('admin.users.index')
-        ->with('success', "Пользователь {$user->name} успешно восстановлен");
-}
-
-/**
  * Полное удаление пользователя из БД (осторожно!)
  */
 public function forceDeleteUser($id)
 {
-    // Только для админов с особыми правами
+    // Только для владельца
     if (!auth()->user()->isOwner()) {
         abort(403, 'Только владелец может полностью удалять пользователей');
     }
     
     $user = User::withTrashed()->findOrFail($id);
+    
+    // Не даем удалить владельца (даже владельцу нельзя удалить самого себя)
+    if ($user->isOwner()) {
+        return redirect()->route('admin.users.index')
+            ->with('error', 'Нельзя удалить владельца системы');
+    }
+    
+    // Не даем удалить самого себя (дополнительная защита)
+    if ($id == auth()->id()) {
+        return redirect()->route('admin.users.index')
+            ->with('error', 'Вы не можете удалить самого себя');
+    }
+    
     $userName = $user->name;
     $user->forceDelete();
     
     return redirect()->route('admin.users.index')
         ->with('success', "Пользователь {$userName} полностью удален из системы");
+}
+
+/**
+ * Восстановление пользователя
+ */
+public function restoreUser($id)
+{
+    $user = User::withTrashed()->findOrFail($id);
+    
+    // Восстанавливать владельца может только владелец
+    if ($user->isOwner() && !auth()->user()->isOwner()) {
+        return redirect()->route('admin.users.index')
+            ->with('error', 'Только владелец может восстанавливать владельца');
+    }
+    
+    $user->restore();
+    
+    return redirect()->route('admin.users.index')
+        ->with('success', "Пользователь {$user->name} успешно восстановлен");
 }
 
     /**
@@ -272,12 +298,21 @@ public function showUser($id)
             })
             ->distinct('user_id')
             ->count('user_id');
-            
-    // Ближайшие тренировки тренера с количеством бронирований
-        $upcomingTrainings = Schedule::with('workout')
-            ->withCount('bookings') // ЭТО ВАЖНО!
+        
+        // Тренировки на сегодня
+        $todayTrainings = Schedule::with(['workout', 'bookings'])
+            ->withCount('bookings')
             ->where('trainer_id', $user->id)
-            ->where('date', '>=', now())
+            ->whereDate('date', Carbon::today())
+            ->where('status', 'scheduled')
+            ->orderBy('start_time')
+            ->get();
+        
+        // Ближайшие тренировки тренера с количеством бронирований
+        $upcomingTrainings = Schedule::with('workout')
+            ->withCount('bookings')
+            ->where('trainer_id', $user->id)
+            ->where('date', '>', Carbon::today())
             ->where('status', 'scheduled')
             ->orderBy('date')
             ->orderBy('start_time')
@@ -316,6 +351,7 @@ public function showUser($id)
         'subscriptions' => $subscriptions ?? collect(),
         'attendanceStats' => $attendanceStats ?? ['total' => 0, 'attended' => 0, 'missed' => 0, 'cancelled' => 0],
         'attendanceRate' => $attendanceRate ?? 0,
+        'todayTrainings' => $todayTrainings ?? collect(),      // <-- НОВОЕ
         'upcomingTrainings' => $upcomingTrainings ?? collect()
     ]);
 }

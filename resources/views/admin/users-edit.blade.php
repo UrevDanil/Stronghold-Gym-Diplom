@@ -45,7 +45,9 @@
                 @csrf
                 @method('PUT')
 
-                <!-- Основные поля -->
+                <!-- Скрытое поле с ролью (чтобы не потерять) -->
+                <input type="hidden" name="role_id" value="{{ $user->role_id }}">
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="name" class="form-label required-field">Имя</label>
@@ -88,27 +90,7 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="role_id" class="form-label required-field">Роль</label>
-                        <select class="form-select @error('role_id') is-invalid @enderror" 
-                                id="role_id" name="role_id" required>
-                            @foreach($roles as $role)
-                                <option value="{{ $role->id }}" {{ (old('role_id', $user->role_id) == $role->id) ? 'selected' : '' }}>
-                                    @if($role->name == 'client') 👤 Клиент
-                                    @elseif($role->name == 'trainer') 💪 Тренер
-                                    @elseif($role->name == 'admin') 👑 Администратор
-                                    @elseif($role->name == 'owner') 🏢 Владелец
-                                    @else {{ $role->name }}
-                                    @endif
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('role_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-12 mb-3">
                         <label for="is_active" class="form-label">Статус пользователя</label>
                         <div class="form-check mt-2">
                             <input class="form-check-input" type="checkbox" id="is_active" 
@@ -151,7 +133,7 @@
                 </div>
 
                 <!-- Дополнительные поля для тренера -->
-                <div class="trainer-fields" style="{{ $user->role->name == 'trainer' ? 'display:block' : 'display:none' }}">
+                @if($user->role->name == 'trainer')
                     <div class="section-divider"></div>
                     <h5 class="section-title">
                         <i class="fas fa-chalkboard-user"></i> Информация для тренера
@@ -172,10 +154,10 @@
                                    placeholder="Например: Пауэрлифтинг, Кроссфит">
                         </div>
                     </div>
-                </div>
+                @endif
 
                 <!-- Дополнительные поля для клиента -->
-                <div class="client-fields" style="{{ $user->role->name == 'client' ? 'display:block' : 'display:none' }}">
+                @if($user->role->name == 'client')
                     <div class="section-divider"></div>
                     <h5 class="section-title">
                         <i class="fas fa-heartbeat"></i> Информация для клиента
@@ -189,7 +171,7 @@
                             <div class="form-text">Эта информация будет видна тренерам</div>
                         </div>
                     </div>
-                </div>
+                @endif
 
                 <div class="mt-4 d-flex gap-2 flex-wrap">
                     <button type="submit" class="btn-save">
@@ -203,29 +185,4 @@
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const roleSelect = document.getElementById('role_id');
-        
-        function toggleRoleFields() {
-            const selectedOption = roleSelect.options[roleSelect.selectedIndex];
-            const roleText = selectedOption.text.toLowerCase();
-            
-            document.querySelector('.trainer-fields').style.display = 'none';
-            document.querySelector('.client-fields').style.display = 'none';
-            
-            if (roleText.includes('тренер')) {
-                document.querySelector('.trainer-fields').style.display = 'block';
-            } else if (roleText.includes('клиент')) {
-                document.querySelector('.client-fields').style.display = 'block';
-            }
-        }
-        
-        if (roleSelect) {
-            roleSelect.addEventListener('change', toggleRoleFields);
-            toggleRoleFields(); // Вызываем при загрузке
-        }
-    });
-</script>
 @endsection

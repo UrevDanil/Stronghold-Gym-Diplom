@@ -196,14 +196,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (searchInput) {
         searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
+            const searchTerm = this.value.toLowerCase().trim();
             
             clientCards.forEach(card => {
-                const name = card.dataset.name || '';
-                const email = card.dataset.email || '';
-                const phone = card.dataset.phone || '';
+                // Получаем данные из dataset
+                const name = (card.dataset.name || '').toLowerCase();
+                const email = (card.dataset.email || '').toLowerCase();
+                const phone = (card.dataset.phone || '').toLowerCase();
                 
-                if (name.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm)) {
+                // Проверяем совпадение
+                const matches = name.includes(searchTerm) || 
+                               email.includes(searchTerm) || 
+                               phone.includes(searchTerm);
+                
+                // Если поиск пустой - показываем все карточки
+                if (searchTerm === '') {
+                    card.style.display = '';
+                } else if (matches) {
                     card.style.display = '';
                 } else {
                     card.style.display = 'none';

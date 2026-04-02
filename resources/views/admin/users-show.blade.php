@@ -259,70 +259,132 @@
                 </div>
             @endif
 
-            <!-- Блок для тренера -->
-            @if($profile->role->name == 'trainer')
-                <div class="data-card">
-                    <div class="card-header trainer">
-                        <i class="fas fa-chalkboard-user"></i> Информация о тренере
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-6">
-                                <div class="stat-card bg-primary text-white">
-                                    <div class="card-body text-center">
-                                        <div class="stat-value">{{ $profile->trainings_count ?? 0 }}</div>
-                                        <div class="stat-label">Проведено тренировок</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="stat-card bg-success text-white">
-                                    <div class="card-body text-center">
-                                        <div class="stat-value">{{ $profile->clients_count ?? 0 }}</div>
-                                        <div class="stat-label">Уникальных клиентов</div>
-                                    </div>
-                                </div>
-                            </div>
+<!-- Блок для тренера -->
+@if($profile->role->name == 'trainer')
+    <div class="data-card">
+        <div class="card-header trainer">
+            <i class="fas fa-chalkboard-user"></i> Информация о тренере
+        </div>
+        <div class="card-body">
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="stat-card bg-primary text-white">
+                        <div class="card-body text-center">
+                            <div class="stat-value">{{ $profile->trainings_count ?? 0 }}</div>
+                            <div class="stat-label">Проведено тренировок</div>
                         </div>
-
-                        @if(isset($upcomingTrainings) && $upcomingTrainings->count() > 0)
-                            <h6 class="mb-3"><i class="fas fa-calendar-week me-2"></i>Ближайшие тренировки</h6>
-                            <div class="table-responsive">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Дата</th>
-                                            <th>Время</th>
-                                            <th>Тренировка</th>
-                                            <th>Запись</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($upcomingTrainings as $training)
-                                            @php
-                                                $capacity = $training->workout->capacity ?? 10;
-                                                $booked = $training->bookings_count ?? 0;
-                                            @endphp
-                                            <tr>
-                                                <td data-label="Дата">{{ \Carbon\Carbon::parse($training->date)->format('d.m.Y') }}</td>
-                                                <td data-label="Время">{{ substr($training->start_time, 0, 5) }}</td>
-                                                <td data-label="Тренировка">{{ $training->workout->name }}</td>
-                                                <td data-label="Запись">
-                                                    <span class="badge-status-sm {{ $booked >= $capacity ? 'expired' : 'active' }}">
-                                                        {{ $booked }}/{{ $capacity }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <p class="text-muted text-center py-3">Нет ближайших тренировок</p>
-                        @endif
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="stat-card bg-success text-white">
+                        <div class="card-body text-center">
+                            <div class="stat-value">{{ $profile->clients_count ?? 0 }}</div>
+                            <div class="stat-label">Уникальных клиентов</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Тренировки на сегодня -->
+            @if(isset($todayTrainings) && $todayTrainings->count() > 0)
+                <h6 class="mb-3"><i class="fas fa-calendar-day me-2"></i>Тренировки на сегодня</h6>
+                <div class="table-responsive mb-4">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Время</th>
+                                <th>Тренировка</th>
+                                <th>Зал</th>
+                                <th>Запись</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($todayTrainings as $training)
+                                @php
+                                    $capacity = $training->workout->capacity ?? 10;
+                                    $booked = $training->bookings_count ?? 0;
+                                    $isFull = $booked >= $capacity;
+                                @endphp
+                                <tr>
+                                    <td data-label="Время">
+                                        <span class="time-badge">
+                                            {{ substr($training->start_time, 0, 5) }} - {{ substr($training->end_time, 0, 5) }}
+                                        </span>
+                                    </td>
+                                    <td data-label="Тренировка">
+                                        <strong>{{ $training->workout->name }}</strong>
+                                    </td>
+                                    <td data-label="Зал">{{ $training->room ?? 'Основной зал' }}</td>
+                                    <td data-label="Запись">
+                                        <span class="badge-status-sm {{ $isFull ? 'full' : 'available' }}">
+                                            <i class="fas fa-users me-1"></i>{{ $booked }}/{{ $capacity }}
+                                        </span>
+                                    </td>
+                                    <td data-label="Статус">
+                                        <span class="badge-status-sm active">
+                                            <i class="fas fa-play-circle me-1"></i>Сегодня
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="alert alert-info mb-4 py-2">
+                    <i class="fas fa-info-circle me-2"></i>На сегодня нет запланированных тренировок
+                </div>
             @endif
+
+            <!-- Ближайшие тренировки -->
+            @if(isset($upcomingTrainings) && $upcomingTrainings->count() > 0)
+                <h6 class="mb-3"><i class="fas fa-calendar-week me-2"></i>Ближайшие тренировки</h6>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Время</th>
+                                <th>Тренировка</th>
+                                <th>Зал</th>
+                                <th>Запись</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($upcomingTrainings as $training)
+                                @php
+                                    $capacity = $training->workout->capacity ?? 10;
+                                    $booked = $training->bookings_count ?? 0;
+                                    $isFull = $booked >= $capacity;
+                                @endphp
+                                <tr>
+                                    <td data-label="Дата">{{ \Carbon\Carbon::parse($training->date)->format('d.m.Y') }}</td>
+                                    <td data-label="Время">
+                                        <span class="time-badge">
+                                            {{ substr($training->start_time, 0, 5) }} - {{ substr($training->end_time, 0, 5) }}
+                                        </span>
+                                    </td>
+                                    <td data-label="Тренировка">
+                                        <strong>{{ $training->workout->name }}</strong>
+                                    </td>
+                                    <td data-label="Зал">{{ $training->room ?? 'Основной зал' }}</td>
+                                    <td data-label="Запись">
+                                        <span class="badge-status-sm {{ $isFull ? 'full' : 'available' }}">
+                                            <i class="fas fa-users me-1"></i>{{ $booked }}/{{ $capacity }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @elseif(isset($todayTrainings) && $todayTrainings->count() == 0)
+                <p class="text-muted text-center py-3">Нет предстоящих тренировок</p>
+            @endif
+        </div>
+    </div>
+@endif
 
             <!-- Блок для админа/владельца -->
             @if($profile->role->name == 'admin' || $profile->role->name == 'owner')
