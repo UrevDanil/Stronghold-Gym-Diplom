@@ -18,6 +18,7 @@ class Schedule extends Model
         'end_time',
         'status',
         'room',
+        'capacity',
         'current_participants',
         'notes'
     ];
@@ -53,11 +54,16 @@ class Schedule extends Model
         return $this->hasMany(Attendance::class);
     }
 
-    // Вместимость (можно добавить в модель Workout)
-    public function capacity()
-    {
-        return $this->workout->capacity ?? 10; // Значение по умолчанию
+// Вместимость - сначала проверяем поле schedules, потом из workout
+public function capacity()
+{
+    // Если в таблице schedules есть свое значение capacity, используем его
+    if (isset($this->capacity) && $this->capacity > 0) {
+        return $this->capacity;
     }
+    // Иначе берем из тренировки
+    return $this->workout->capacity ?? 10;
+}
 
     // Проверка доступности мест
     public function hasAvailableSlots()

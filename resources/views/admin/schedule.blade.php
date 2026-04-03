@@ -105,7 +105,8 @@
                         <tbody>
                             @foreach($schedules as $schedule)
                                 @php
-                                    $capacity = $schedule->workout->capacity ?? 10;
+                                    // Используем метод capacity() который берет значение из schedules или workout
+                                    $capacity = $schedule->capacity();
                                     $isFull = $schedule->current_participants >= $capacity;
                                 @endphp
                                 <tr>

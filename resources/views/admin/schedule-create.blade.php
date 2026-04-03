@@ -121,19 +121,38 @@
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="room" class="form-label">Зал</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0">
-                            <i class="fas fa-door-open text-info"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0 @error('room') is-invalid @enderror" 
-                               id="room" name="room" value="{{ old('room') }}" 
-                               placeholder="Основной зал">
+                <!-- Вместимость и Зал -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="capacity" class="form-label required-field">Вместимость (макс. участников)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-users text-primary"></i>
+                            </span>
+                            <input type="number" class="form-control border-start-0 @error('capacity') is-invalid @enderror" 
+                                   id="capacity" name="capacity" value="{{ old('capacity', 10) }}" 
+                                   min="1" max="100" required>
+                        </div>
+                        @error('capacity')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div class="form-text">Максимальное количество участников, которые могут записаться на занятие</div>
                     </div>
-                    @error('room')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+
+                    <div class="col-md-6 mb-3">
+                        <label for="room" class="form-label">Зал</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-door-open text-info"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0 @error('room') is-invalid @enderror" 
+                                   id="room" name="room" value="{{ old('room') }}" 
+                                   placeholder="Основной зал">
+                        </div>
+                        @error('room')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="info-block">
@@ -141,8 +160,7 @@
                     <div class="info-content">
                         <div class="info-title">Информация</div>
                         <div class="info-text">
-                            Вместимость занятия берется из типа тренировки 
-                            ({{ $workouts->first()->capacity ?? '?' }} мест).
+                            Вы можете задать количество мест для этого занятия.
                             После создания занятия клиенты смогут записываться через расписание.
                         </div>
                     </div>

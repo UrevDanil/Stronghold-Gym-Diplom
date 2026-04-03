@@ -124,6 +124,21 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
+                        <label for="capacity" class="form-label required-field">Вместимость (макс. участников)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-users text-primary"></i>
+                            </span>
+                            <input type="number" class="form-control border-start-0 @error('capacity') is-invalid @enderror" 
+                                   id="capacity" name="capacity" value="{{ old('capacity', $schedule->capacity) }}" 
+                                   min="1" max="100" required>
+                        </div>
+                        @error('capacity')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6 mb-3">
                         <label for="room" class="form-label">Зал</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0">
@@ -137,7 +152,9 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                </div>
 
+                <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="status" class="form-label required-field">Статус</label>
                         <select class="form-select @error('status') is-invalid @enderror" 
@@ -158,19 +175,9 @@
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="notes" class="form-label">Примечания</label>
-                    <textarea class="form-control @error('notes') is-invalid @enderror" 
-                              id="notes" name="notes" rows="3" 
-                              placeholder="Дополнительная информация о занятии...">{{ old('notes', $schedule->notes) }}</textarea>
-                    @error('notes')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
                 <!-- Информация о занятии -->
                 @php
-                    $capacity = $schedule->workout->capacity ?? 10;
+                    $capacity = $schedule->capacity();
                     $booked = $schedule->bookings->where('status', 'booked')->count();
                     $attended = $schedule->bookings->where('status', 'attended')->count();
                     $available = $capacity - $booked;

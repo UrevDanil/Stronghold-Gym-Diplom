@@ -609,7 +609,7 @@ public function storeSchedule(Request $request)
         'start_time' => 'required',
         'end_time' => 'required|after:start_time',
         'room' => 'nullable|string|max:255',
-        // Убираем capacity и notes - их нет в таблице
+        'capacity' => 'required|integer|min:1|max:100',
     ]);
     
     Schedule::create([
@@ -619,6 +619,7 @@ public function storeSchedule(Request $request)
         'start_time' => $validated['start_time'],
         'end_time' => $validated['end_time'],
         'room' => $validated['room'] ?? null,
+        'capacity' => $validated['capacity'],
         'status' => 'scheduled',
         'current_participants' => 0,
     ]);
@@ -626,6 +627,7 @@ public function storeSchedule(Request $request)
     return redirect()->route('admin.schedule.index')
         ->with('success', 'Занятие успешно добавлено в расписание');
 }
+
 /**
  * Редактирование занятия
  */
@@ -658,6 +660,7 @@ public function updateSchedule(Request $request, $id)
         'start_time' => 'required',
         'end_time' => 'required|after:start_time',
         'room' => 'nullable|string|max:255',
+        'capacity' => 'required|integer|min:1|max:100',
         'status' => 'required|in:scheduled,cancelled,completed',
     ]);
     
