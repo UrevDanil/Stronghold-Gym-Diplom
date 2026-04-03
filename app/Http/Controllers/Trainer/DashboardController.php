@@ -18,81 +18,89 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
     public function dashboard()
-    {
-        $user = auth()->user();
+{
+    $user = auth()->user();
 
-        if (!$user->is_active) {
+    if (!$user->is_active) {
         Auth::logout();
         return redirect()->route('login')
             ->withErrors(['email' => 'Ваш аккаунт деактивирован.']);
     }
+    
+    // Сегодняшние тренировки - ТОЛЬКО ЗАПЛАНИРОВАННЫЕ
+    $todaySchedules = $user->trainings()
+        ->with(['workout', 'bookings.user'])
+        ->whereDate('date', Carbon::today())
+        ->where('status', Schedule::STATUS_SCHEDULED) // <-- ДОБАВЛЕНО
+        ->orderBy('start_time')
+        ->get();
         
-        // ИСПРАВЛЕНО: используем trainings() вместо scheduledTrainings()
-        $todaySchedules = $user->trainings()  // <-- ИЗМЕНЕНО
-            ->with(['workout', 'bookings.user'])
-            ->whereDate('date', Carbon::today())
-            ->orderBy('start_time')
-            ->get();
-            
-        $upcomingSchedules = $user->trainings()  // <-- ИЗМЕНЕНО
-            ->with(['workout', 'bookings.user'])
-            ->whereDate('date', '>', Carbon::today())
-            ->orderBy('date')
-            ->orderBy('start_time')
-            ->limit(10)
-            ->get();
-            
-        // Статистика для тренера
-        $totalTrainings = $user->trainings()->count();
-        $totalAttendances = Attendance::whereHas('booking.schedule', function($q) use ($user) {
+    // Ближайшие тренировки - ТОЛЬКО ЗАПЛАНИРОВАННЫЕ
+    $upcomingSchedules = $user->trainings()
+        ->with(['workout', 'bookings.user'])
+        ->whereDate('date', '>', Carbon::today())
+        ->where('status', Schedule::STATUS_SCHEDULED) // <-- ДОБАВЛЕНО
+        ->orderBy('date')
+        ->orderBy('start_time')
+        ->limit(10)
+        ->get();
+        
+    // Статистика для тренера (только запланированные и завершенные)
+    $totalTrainings = $user->trainings()
+        ->whereIn('status', [Schedule::STATUS_SCHEDULED, Schedule::STATUS_COMPLETED])
+        ->count();
+        
+    $totalAttendances = Attendance::whereHas('booking.schedule', function($q) use ($user) {
+        $q->where('trainer_id', $user->id);
+    })->count();
+    
+    $uniqueClients = \App\Models\Booking::whereHas('schedule', function($q) use ($user) {
             $q->where('trainer_id', $user->id);
-        })->count();
-        
-        $uniqueClients = \App\Models\Booking::whereHas('schedule', function($q) use ($user) {
-                $q->where('trainer_id', $user->id);
-            })
-            ->distinct('user_id')
-            ->count('user_id');
-        
-        return view('trainer.dashboard', [
-            'user' => $user,
-            'todaySchedules' => $todaySchedules,
-            'upcomingSchedules' => $upcomingSchedules,
-            'totalTrainings' => $totalTrainings,
-            'totalAttendances' => $totalAttendances,
-            'uniqueClients' => $uniqueClients
-        ]);
-    }
+        })
+        ->distinct('user_id')
+        ->count('user_id');
+    
+    return view('trainer.dashboard', [
+        'user' => $user,
+        'todaySchedules' => $todaySchedules,
+        'upcomingSchedules' => $upcomingSchedules,
+        'totalTrainings' => $totalTrainings,
+        'totalAttendances' => $totalAttendances,
+        'uniqueClients' => $uniqueClients
+    ]);
+}
 
     public function schedule(Request $request)
-    {
-        $user = auth()->user();
-        
-        $date = $request->get('date', now()->toDateString());
-        
-        // Тренировки на выбранный день
-        $schedules = $user->trainings()
-            ->with(['workout', 'bookings.user'])
-            ->whereDate('date', $date)
-            ->orderBy('start_time')
-            ->get();
-        
-        // Тренировки на неделю для краткого обзора
-        $weekSchedules = $user->trainings()
-            ->with('workout')
-            ->whereDate('date', '>=', now()->toDateString())
-            ->whereDate('date', '<=', now()->addDays(7)->toDateString())
-            ->orderBy('date')
-            ->orderBy('start_time')
-            ->get();
-        
-        return view('trainer.schedule', [
-            'user' => $user,
-            'schedules' => $schedules,
-            'weekSchedules' => $weekSchedules,
-            'currentDate' => $date
-        ]);
-    }
+{
+    $user = auth()->user();
+    
+    $date = $request->get('date', now()->toDateString());
+    
+    // Тренировки на выбранный день - ТОЛЬКО ЗАПЛАНИРОВАННЫЕ
+    $schedules = $user->trainings()
+        ->with(['workout', 'bookings.user'])
+        ->whereDate('date', $date)
+        ->where('status', Schedule::STATUS_SCHEDULED) // <-- ДОБАВЛЕНО
+        ->orderBy('start_time')
+        ->get();
+    
+    // Тренировки на неделю для краткого обзора - ТОЛЬКО ЗАПЛАНИРОВАННЫЕ
+    $weekSchedules = $user->trainings()
+        ->with('workout')
+        ->whereDate('date', '>=', now()->toDateString())
+        ->whereDate('date', '<=', now()->addDays(7)->toDateString())
+        ->where('status', Schedule::STATUS_SCHEDULED) // <-- ДОБАВЛЕНО
+        ->orderBy('date')
+        ->orderBy('start_time')
+        ->get();
+    
+    return view('trainer.schedule', [
+        'user' => $user,
+        'schedules' => $schedules,
+        'weekSchedules' => $weekSchedules,
+        'currentDate' => $date
+    ]);
+}
 
 public function clients(Request $request)
 {
@@ -319,9 +327,14 @@ public function clientDetails($id)
  */
 public function markAttendance(Request $request, Schedule $schedule)
 {
-    // Проверяем, что тренировка принадлежит этому тренеру
+    // Проверяем, что тренировка принадлежит этому тренеру и не отменена
     if ($schedule->trainer_id !== auth()->id()) {
         abort(403);
+    }
+    
+    // Проверяем, что тренировка не отменена
+    if ($schedule->status !== Schedule::STATUS_SCHEDULED) {
+        return back()->with('error', 'Нельзя отмечать посещаемость на отмененной тренировке');
     }
     
     $validated = $request->validate([
@@ -395,17 +408,18 @@ public function markAttendance(Request $request, Schedule $schedule)
     return back()->with('success', 'Посещаемость отмечена');
 }
 
-    public function attendance(Request $request)
+   public function attendance(Request $request)
 {
     $user = auth()->user();
     
     $date = $request->get('date', now()->toDateString());
     $scheduleId = $request->get('schedule_id');
     
-    // Получаем все тренировки тренера на выбранную дату
+    // Получаем все тренировки тренера на выбранную дату - ТОЛЬКО ЗАПЛАНИРОВАННЫЕ
     $query = Schedule::with(['workout', 'bookings.user'])
         ->where('trainer_id', $user->id)
-        ->whereDate('date', $date);
+        ->whereDate('date', $date)
+        ->where('status', Schedule::STATUS_SCHEDULED); // <-- ДОБАВЛЕНО
     
     if ($scheduleId) {
         $query->where('id', $scheduleId);
@@ -507,6 +521,82 @@ public function updatePassword(Request $request)
     
     return redirect()->route('trainer.profile')
         ->with('success', 'Пароль успешно изменен');
+}
+
+/**
+ * Удаление тренировки (даже если есть записи, с уведомлением клиентов)
+ */
+public function deleteSchedule($id)
+{
+    $schedule = Schedule::findOrFail($id);
+    
+    // Проверяем, что тренировка принадлежит этому тренеру
+    if ($schedule->trainer_id !== auth()->id()) {
+        return back()->with('error', 'У вас нет прав на удаление этой тренировки');
+    }
+    
+    // Проверяем, что тренировка в будущем
+    if ($schedule->isPast()) {
+        return back()->with('error', 'Нельзя удалить прошедшую тренировку');
+    }
+    
+    $trainer = auth()->user();
+    $bookingsCount = 0;
+    $notifiedCount = 0;
+    
+    // Отправляем уведомления клиентам, которые записаны на эту тренировку
+    foreach ($schedule->bookings as $booking) {
+        // Если бронирование активное (не отменено)
+        if ($booking->status !== 'cancelled') {
+            $bookingsCount++;
+            
+            // Возвращаем тренировку в абонемент
+            $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
+                ->where('status', 'active')
+                ->first();
+            if ($activeSubscription) {
+                $activeSubscription->increment('remaining_workouts');
+            }
+            
+            // Создаем уведомление для клиента
+            \App\Models\Notification::create([
+                'user_id' => $booking->user_id,
+                'type' => 'booking_cancelled',
+                'message' => "Тренировка '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} была удалена тренером. Тренировка возвращена в ваш абонемент.",
+                'is_read' => false,
+                'data' => json_encode([
+                    'schedule_id' => $schedule->id,
+                    'workout_name' => $schedule->workout->name,
+                    'date' => $schedule->date->format('d.m.Y'),
+                    'time' => $schedule->start_time,
+                    'deleted_by_trainer' => true,
+                    'trainer_name' => $trainer->name
+                ])
+            ]);
+            
+            $notifiedCount++;
+        }
+    }
+    
+    // 1. Сначала удаляем записи о посещениях (attendances), связанные с бронированиями
+    $bookingIds = $schedule->bookings()->pluck('id');
+    if ($bookingIds->count() > 0) {
+        \App\Models\Attendance::whereIn('booking_id', $bookingIds)->delete();
+    }
+    
+    // 2. Затем удаляем все бронирования
+    $schedule->bookings()->delete();
+    
+    // 3. В конце удаляем саму тренировку
+    $schedule->delete();
+    
+    $message = "Тренировка успешно удалена.";
+    if ($notifiedCount > 0) {
+        $message .= " Уведомления отправлены {$notifiedCount} клиентам. Тренировки возвращены в их абонементы.";
+    }
+    
+    return redirect()->route('trainer.schedule', ['date' => $schedule->date->format('Y-m-d')])
+        ->with('success', $message);
 }
 
 }

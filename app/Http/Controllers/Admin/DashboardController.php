@@ -713,10 +713,13 @@ public function cancelSchedule($id)
             $activeSubscription->increment('remaining_workouts');
         }
         
-        // СОЗДАЕМ УВЕДОМЛЕНИЕ ДЛЯ КЛИЕНТА
-        \App\Models\Notification::create([ // <-- ИСПОЛЬЗУЕМ ПОЛНЫЙ ПУТЬ
+        // Уменьшаем счетчик занятых мест
+        $schedule->decrement('current_participants');
+        
+        // Уведомляем клиента об отмене
+        \App\Models\Notification::create([
             'user_id' => $booking->user_id,
-            'type' => 'booking', // Используем строку вместо константы
+            'type' => 'booking',
             'message' => "Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} отменено администратором. Тренировка возвращена в абонемент.",
             'is_read' => false,
             'data' => json_encode([
@@ -740,50 +743,57 @@ public function restoreSchedule($id)
 {
     $schedule = Schedule::findOrFail($id);
     
-    // Меняем статус обратно на запланировано
+    // Сбрасываем счетчик участников на 0 (все места свободны)
+    $schedule->current_participants = 0;
     $schedule->status = 'scheduled';
     $schedule->save();
     
-    // Восстанавливаем бронирования (опционально)
-    $bookingsToRestore = $schedule->bookings()
+    // Получаем все отмененные бронирования этого занятия
+    $cancelledBookings = $schedule->bookings()
         ->where('status', 'cancelled')
-        ->where('cancelled_at', '>', now()->subHours(24)) // Только за последние 24 часа
         ->get();
     
-    foreach ($bookingsToRestore as $booking) {
-        $booking->status = 'booked';
-        $booking->cancelled_at = null;
-        $booking->save();
-        
-        // Возвращаем счетчик мест
-        $schedule->increment('current_participants');
-        
-        // Забираем тренировку из абонемента
+    $restoredCount = 0;
+    
+    foreach ($cancelledBookings as $booking) {
+        // Возвращаем тренировку в абонемент (если она была списана)
         $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
             ->where('status', 'active')
             ->first();
         if ($activeSubscription) {
-            $activeSubscription->decrement('remaining_workouts');
+            $activeSubscription->increment('remaining_workouts');
         }
         
-        // Уведомляем клиента о восстановлении
+        // Удаляем бронирование (оно больше не актуально)
+        $booking->delete();
+        $restoredCount++;
+        
+        // Уведомляем клиента, что занятие восстановлено и нужно записаться заново
         \App\Models\Notification::create([
             'user_id' => $booking->user_id,
             'type' => 'booking',
-            'message' => "Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} было восстановлено администратором.",
+            'message' => "Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} было восстановлено. Вы можете записаться заново через расписание.",
             'is_read' => false,
             'data' => json_encode([
                 'schedule_id' => $schedule->id,
                 'workout_name' => $schedule->workout->name,
                 'date' => $schedule->date->format('d.m.Y'),
                 'time' => $schedule->start_time,
-                'restored_by' => 'admin'
+                'restored_by' => 'admin',
+                'requires_new_booking' => true
             ])
         ]);
     }
     
+    $message = "Занятие восстановлено. Свободных мест: {$schedule->capacity()}. ";
+    if ($restoredCount > 0) {
+        $message .= "Отмененные бронирования ({$restoredCount}) удалены. Клиенты уведомлены о необходимости повторной записи.";
+    } else {
+        $message .= "Не было отмененных бронирований.";
+    }
+    
     return redirect()->route('admin.schedule.index')
-        ->with('success', 'Занятие восстановлено. Восстановлено бронирований: ' . $bookingsToRestore->count());
+        ->with('success', $message);
 }
 
 /**

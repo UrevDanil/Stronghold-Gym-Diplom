@@ -162,6 +162,9 @@ Route::middleware(['auth', 'active', 'role:trainer'])->prefix('trainer')->name('
     // Статистика тренировок
     Route::get('/statistics', [TrainerDashboardController::class, 'statistics'])->name('statistics');
     Route::get('/statistics/export', [TrainerDashboardController::class, 'exportStatistics'])->name('statistics.export');
+
+    // Удаление тренировки
+    Route::delete('/schedule/{schedule}', [TrainerDashboardController::class, 'deleteSchedule'])->name('schedule.delete');
     
     // Работа с расписанием
     Route::get('/schedule/week', [TrainerDashboardController::class, 'weekSchedule'])->name('schedule.week');

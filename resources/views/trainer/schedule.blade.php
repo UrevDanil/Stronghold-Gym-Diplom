@@ -65,7 +65,22 @@
         <div class="row g-4">
             @foreach($schedules as $schedule)
                 <div class="col-lg-6 col-md-12">
-                    <div class="workout-card {{ $schedule->isPast() ? 'past' : '' }}">
+                    <div class="workout-card {{ $schedule->isPast() ? 'past' : '' }}" style="position: relative;">
+                        <!-- Кнопка удаления (для будущих тренировок) -->
+@if(!$schedule->isPast())
+    <div class="card-delete-btn">
+        <form action="{{ route('trainer.schedule.delete', $schedule->id) }}" 
+              method="POST" 
+              onsubmit="return confirm('Вы уверены, что хотите удалить эту тренировку? Все записанные клиенты получат уведомление, тренировки будут возвращены в их абонементы.')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn-delete" title="Удалить тренировку">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </form>
+    </div>
+@endif
+                        
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="time-badge">
