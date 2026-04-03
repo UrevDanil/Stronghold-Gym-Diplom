@@ -218,15 +218,12 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td data-label="Продажи">
+                                    <<td data-label="Продажи">
                                         @php
-                                            $activeCount = \App\Models\UserSubscription::where('subscription_id', $subscription->id)
-                                                ->where('status', 'active')
-                                                ->count();
                                             $totalCount = \App\Models\UserSubscription::where('subscription_id', $subscription->id)->count();
                                         @endphp
                                         <span class="badge-custom badge-sales">
-                                            <i class="fas fa-users me-1"></i>{{ $activeCount }}/{{ $totalCount }}
+                                            <i class="fas fa-shopping-cart me-1"></i>{{ $totalCount }} шт.
                                         </span>
                                     </td>
                                     <td data-label="Действия" class="text-end">

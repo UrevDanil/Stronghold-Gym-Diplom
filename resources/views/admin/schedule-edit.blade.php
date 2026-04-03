@@ -180,7 +180,9 @@
                     $capacity = $schedule->capacity();
                     $booked = $schedule->bookings->where('status', 'booked')->count();
                     $attended = $schedule->bookings->where('status', 'attended')->count();
-                    $available = $capacity - $booked;
+                    $missed = $schedule->bookings->where('status', 'missed')->count();
+                    $totalParticipants = $booked + $attended + $missed;
+                    $available = $capacity - $totalParticipants;
                 @endphp
                 <div class="info-block">
                     <i class="fas fa-chart-line"></i>
@@ -191,10 +193,13 @@
                                 <i class="fas fa-users"></i> Вместимость: <strong>{{ $capacity }}</strong>
                             </span>
                             <span class="info-stat booked">
-                                <i class="fas fa-check-circle"></i> Записано: <strong>{{ $booked }}</strong>
+                                <i class="fas fa-clock"></i> Записано: <strong>{{ $booked }}</strong>
                             </span>
                             <span class="info-stat">
-                                <i class="fas fa-user-check"></i> Посетило: <strong>{{ $attended }}</strong>
+                                <i class="fas fa-check-circle"></i> Посетило: <strong>{{ $attended }}</strong>
+                            </span>
+                            <span class="info-stat missed">
+                                <i class="fas fa-times-circle"></i> Пропустило: <strong>{{ $missed }}</strong>
                             </span>
                             <span class="info-stat available">
                                 <i class="fas fa-chair"></i> Свободно: <strong>{{ $available }}</strong>

@@ -71,25 +71,28 @@ class Booking extends Model
     }
 
     public function cancel($reason = null)
-    {
-        // Проверяем, не было ли посещения
-        $attendanceExists = Attendance::where('booking_id', $this->id)->exists();
-        if ($attendanceExists) {
-            throw new \Exception('Нельзя отменить тренировку, которая уже была посещена');
-        }
-        
-        $this->update([
-            'status' => self::STATUS_CANCELLED,
-            'cancelled_at' => now(),
-        ]);
-
-        // Уменьшаем счетчик участников в расписании
-        if ($this->schedule) {
-            $this->schedule->decrement('current_participants');
-        }
-
-        return $this;
+{
+    // Проверяем, не было ли посещения
+    $attendanceExists = Attendance::where('booking_id', $this->id)->exists();
+    if ($attendanceExists) {
+        throw new \Exception('Нельзя отменить тренировку, которая уже была посещена');
     }
+    
+    // Если бронирование было активным (не отменено и не посещено)
+    $wasActive = $this->status === self::STATUS_BOOKED;
+    
+    $this->update([
+        'status' => self::STATUS_CANCELLED,
+        'cancelled_at' => now(),
+    ]);
+
+    // Если бронирование было активным, возвращаем место
+    if ($wasActive && $this->schedule) {
+        $this->schedule->decrement('current_participants');
+    }
+
+    return $this;
+}
 
     // Отметить как посещенное
     public function markAttended()

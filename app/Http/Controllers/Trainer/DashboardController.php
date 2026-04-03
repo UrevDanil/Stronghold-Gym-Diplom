@@ -322,7 +322,7 @@ public function clientDetails($id)
     ]);
 }
 
-    /**
+/**
  * Отметка посещаемости
  */
 public function markAttendance(Request $request, Schedule $schedule)
@@ -344,23 +344,33 @@ public function markAttendance(Request $request, Schedule $schedule)
     
     $booking = Booking::find($validated['booking_id']);
     
-    if ($validated['status'] === 'attended') {
-    // Отмечаем как посещенное
-    $booking->markAttended();
+    // Проверяем, что бронирование еще не отмечено
+    if ($booking->status !== Booking::STATUS_BOOKED) {
+        return back()->with('error', 'Это бронирование уже отмечено');
+    }
     
-    // Создаем запись о посещении - используем 'attended' (разрешено)
-    Attendance::create([
-        'booking_id' => $booking->id,
-        'marked_by' => auth()->id(),
-        'attended_at' => now(),
-        'attendance_type' => 'attended' // Допустимое значение
-    ]);
+    if ($validated['status'] === 'attended') {
+        // Отмечаем как посещенное
+        $booking->markAttended();
         
-        // Уменьшаем количество тренировок в абонементе (если еще не уменьшено)
-        // Обычно это делается при бронировании, но на всякий случай проверим
+        // Создаем запись о посещении
+        Attendance::create([
+            'booking_id' => $booking->id,
+            'marked_by' => auth()->id(),
+            'attended_at' => now(),
+            'attendance_type' => 'attended'
+        ]);
+        
+        // Уменьшаем количество тренировок в абонементе
         $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
             ->where('status', 'active')
             ->first();
+        if ($activeSubscription && $activeSubscription->remaining_workouts > 0) {
+            $activeSubscription->decrement('remaining_workouts');
+        }
+        
+        // НЕ уменьшаем счетчик участников! Клиент уже занял место.
+        // current_participants остается прежним
         
         // Отправляем уведомление клиенту
         \App\Models\Notification::create([
@@ -378,16 +388,18 @@ public function markAttendance(Request $request, Schedule $schedule)
         ]);
         
     } else {
-    // Отмечаем как пропущенное
-    $booking->markMissed();
-    
-    // ИСПРАВЛЕНО: для пропуска используем 'left_early' или другое допустимое значение
-    Attendance::create([
-        'booking_id' => $booking->id,
-        'marked_by' => auth()->id(),
-        'attended_at' => now(),
-        'attendance_type' => 'left_early' // или 'late' - одно из допустимых значений
-    ]);
+        // Отмечаем как пропущенное
+        $booking->markMissed();
+        
+        // Создаем запись о посещении как пропуск
+        Attendance::create([
+            'booking_id' => $booking->id,
+            'marked_by' => auth()->id(),
+            'attended_at' => now(),
+            'attendance_type' => 'left_early'
+        ]);
+        
+        // Для пропуска НЕ списываем тренировку и НЕ уменьшаем счетчик участников
         
         // Отправляем уведомление клиенту
         \App\Models\Notification::create([
