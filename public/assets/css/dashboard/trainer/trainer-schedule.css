@@ -20,7 +20,7 @@
     border-radius: 20px;
     padding: 1.5rem 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 10px 30px rgba(55, 61, 85, 0.3);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -136,20 +136,22 @@
     width: 45px;
     height: 45px;
     border-radius: 50%;
+    border: 2px solid #cc222a;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #9c121e, #cc222a);
-    color: white;
+    background: white;
+    color: #cc222a;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(233, 50, 75, 0.3);
+    box-shadow: 0 6px 20px rgba(194, 93, 93, 0.048);
     text-decoration: none;
     flex-shrink: 0;
 }
 
 .nav-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 15px rgba(185, 24, 24, 0.4);
+    box-shadow: 0 6px 20px rgba(194, 93, 93, 0.048);
+    background: linear-gradient(135deg, #9c121e, #cc222a );
     color: white;
 }
 
@@ -166,7 +168,7 @@
 }
 
 .trainings-count {
-    background: linear-gradient(135deg, #3d2d69, #cc222a);
+    background: linear-gradient(135deg, #9c121e, #cc222a);
     color: white;
     padding: 0.3rem 1rem;
     border-radius: 50px;
@@ -219,7 +221,7 @@
 
 .workout-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 25px 45px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 10px 30px rgba(55, 61, 85, 0.3);
 }
 
 .workout-card.past {
@@ -379,9 +381,9 @@
 }
 
 .btn-mark-attend {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    border: none;
-    color: white;
+    background: white;
+    border: 1px solid #28a745;
+    color: #28a745;
     border-radius: 10px;
     padding: 0.4rem 0.8rem;
     font-size: 0.75rem;
@@ -391,12 +393,13 @@
 .btn-mark-attend:hover {
     transform: scale(1.05);
     background: linear-gradient(135deg, #20c997, #28a745);
+    color: white;
 }
 
 .btn-mark-miss {
-    background: linear-gradient(135deg, #dc3545, #c82333);
-    border: none;
-    color: white;
+    background: white;
+    border: 1px solid #cc222a;
+    color: #cc222a;
     border-radius: 10px;
     padding: 0.4rem 0.8rem;
     font-size: 0.75rem;
@@ -406,6 +409,7 @@
 .btn-mark-miss:hover {
     transform: scale(1.05);
     background: linear-gradient(135deg, #c82333, #dc3545);
+    color: white;
 }
 
 .status-badge-small {

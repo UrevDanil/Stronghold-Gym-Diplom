@@ -247,14 +247,6 @@ Route::middleware(['auth'])->group(function () {
            ->name('subscriptions.renew');
 });
 
-// Админ маршруты
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('subscriptions', SubscriptionController::class)->except(['show']);
-        Route::get('/subscriptions', [AdminDashboardController::class, 'subscriptions'])->name('subscriptions.index');
-    Route::get('/subscriptions/create', [AdminDashboardController::class, 'createSubscription'])->name('subscriptions.create');
-    Route::post('/subscriptions', [AdminDashboardController::class, 'storeSubscription'])->name('subscriptions.store');
-});
-
 // Уведомления
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', function () {
