@@ -1,0 +1,573 @@
+/* ========================================
+   СТИЛИ ДЛЯ СТРАНИЦЫ ОТЧЕТОВ
+   ======================================== */
+
+/* ----------------------------------------
+   1. ОБЩИЕ СТИЛИ
+   ---------------------------------------- */
+
+.admin-reports-page {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    min-height: 100vh;
+}
+
+/* ----------------------------------------
+   2. ЗАГОЛОВОК
+   ---------------------------------------- */
+
+.reports-header {
+    background: linear-gradient(135deg, #460b40, #95acf1);
+    border-radius: 24px;
+    padding: 1.8rem 2.2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 15px 35px rgba(61, 88, 175, 0.25);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.reports-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(100px);
+    pointer-events: none;
+}
+
+.reports-header h1 {
+    color: white;
+    font-weight: 800;
+    margin: 0;
+    font-size: 1.8rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    white-space: nowrap;
+    letter-spacing: -0.3px;
+}
+
+.reports-header h1 i {
+    font-size: 1.8rem;
+    margin-right: 0.8rem;
+    color: rgba(255,255,255,0.9);
+}
+
+.reports-header .back-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: white;
+    border-radius: 60px;
+    padding: 0.7rem 1.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.reports-header .back-btn:hover {
+    background: white;
+    color: #95acf1;
+    transform: translateX(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.reports-header .back-btn i {
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+
+.reports-header .back-btn:hover i {
+    transform: translateX(-3px);
+}
+
+/* ----------------------------------------
+   3. КАРТОЧКА ФИЛЬТРОВ
+   ---------------------------------------- */
+
+.filters-card {
+    border: none;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.filters-card .card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem 1.8rem;
+}
+
+.filters-card .card-header h5 {
+    margin: 0;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.filters-card .card-header i {
+    color: #460b40;
+}
+
+.filters-card .card-body {
+    padding: 1.8rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.form-control,
+.form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 14px;
+    padding: 0.7rem 1rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #460b40;
+    box-shadow: 0 0 0 0.2rem rgba(14, 39, 120, 0.1);
+    outline: none;
+}
+
+.btn-filter {
+    background: white;
+    color: #460b40;
+    border: 2px solid #460b40;
+    border-radius: 14px;
+    padding: 0.7rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 48px;
+    width: 100%;
+}
+
+.btn-filter:hover {
+   transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 36, 96, 0.185);
+    background: #460b40;
+    color: white;
+}
+
+/* ----------------------------------------
+   4. КАРТОЧКИ СТАТИСТИКИ
+   ---------------------------------------- */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+
+.stat-card .card-body {
+    padding: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    width: 55px;
+    height: 55px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+}
+
+.stat-icon.bg-primary-soft {
+    background: rgba(14, 39, 120, 0.1);
+    color: #0e2778;
+}
+
+.stat-icon.bg-success-soft {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.stat-icon.bg-info-soft {
+    background: rgba(23, 162, 184, 0.1);
+    color: #17a2b8;
+}
+
+.stat-icon.bg-warning-soft {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.7rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.2rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #2c3e50;
+    line-height: 1.2;
+}
+
+/* ----------------------------------------
+   5. КАРТОЧКИ ДАННЫХ
+   ---------------------------------------- */
+
+.data-card {
+    border: none;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    background: white;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.data-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+}
+
+.data-card .card-header {
+    background: #460b40;
+    color: white;
+    padding: 1rem 1.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.data-card .card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-20deg) translateX(50px);
+}
+
+.data-card .card-header i {
+    margin-right: 0.5rem;
+}
+
+.data-card .card-body {
+    padding: 1.5rem;
+}
+
+/* ----------------------------------------
+   6. ТАБЛИЦЫ
+   ---------------------------------------- */
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead th {
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    padding: 0.8rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.data-table tbody td {
+    padding: 0.8rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.data-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.data-table tbody tr:hover {
+    background: rgba(14, 39, 120, 0.05);
+}
+
+/* ----------------------------------------
+   7. СТАТИСТИЧЕСКИЕ БЛОКИ
+   ---------------------------------------- */
+
+.stats-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-mini {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.stat-mini:hover {
+    transform: translateY(-3px);
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.stat-mini-label {
+    display: block;
+    font-size: 0.65rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.3rem;
+}
+
+.stat-mini-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.stat-mini-value.text-primary { color: #0e2778; }
+.stat-mini-value.text-success { color: #28a745; }
+.stat-mini-value.text-danger { color: #dc3545; }
+.stat-mini-value.text-warning { color: #ffc107; }
+
+/* ----------------------------------------
+   8. ПРОГРЕСС-БАР
+   ---------------------------------------- */
+
+.attendance-progress {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.85rem;
+}
+
+.progress-percent {
+    color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+}
+
+.progress {
+    height: 10px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #28a745, #20c997);
+    border-radius: 10px;
+    transition: width 0.8s ease;
+}
+
+/* ----------------------------------------
+   9. ПУСТОЕ СОСТОЯНИЕ
+   ---------------------------------------- */
+
+.empty-state-mini {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state-mini i {
+    font-size: 3rem;
+    color: #dee2e6;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-mini p {
+    color: #6c757d;
+    margin: 0;
+}
+
+/* ----------------------------------------
+   10. АДАПТИВНОСТЬ
+   ---------------------------------------- */
+
+@media (max-width: 992px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .stats-mini-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .reports-header {
+        padding: 1rem 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .reports-header h1 {
+        font-size: 1.3rem;
+        white-space: nowrap;
+    }
+    
+    .reports-header h1 i {
+        font-size: 1.3rem;
+        margin-right: 0.5rem;
+    }
+    
+    .reports-header .back-btn {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    
+    .filters-card .card-body {
+        padding: 1.2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .stat-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+    }
+    
+    .data-table thead {
+        display: none;
+    }
+    
+    .data-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        background: white;
+        border: 1px solid #e9ecef;
+    }
+    
+    .data-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .data-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #495057;
+        width: 40%;
+        font-size: 0.8rem;
+    }
+    
+    .data-table tbody td:last-child {
+        border-bottom: none;
+    }
+    
+    .stats-mini-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+    }
+    
+    .stat-mini-value {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .reports-header {
+        padding: 0.8rem 1rem;
+    }
+    
+    .reports-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .reports-header .back-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-mini-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-mini {
+        padding: 0.8rem;
+    }
+    
+    .stat-mini-value {
+        font-size: 1rem;
+    }
+    
+    .data-table tbody td::before {
+        width: 45%;
+        font-size: 0.7rem;
+    }
+}

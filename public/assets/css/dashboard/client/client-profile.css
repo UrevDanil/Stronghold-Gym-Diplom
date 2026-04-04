@@ -349,9 +349,9 @@ textarea.form-control {
    ---------------------------------------- */
 
 .btn-save {
-    background: linear-gradient(135deg, #0b34bb, #2f59e2);
-    color: white;
-    border: none;
+    background: white;
+    color: #0b34bbe2;
+    border: 2px solid #0b34bb;
     border-radius: 12px;
     padding: 0.8rem 2rem;
     font-weight: 600;
@@ -363,6 +363,7 @@ textarea.form-control {
 .btn-save:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(49, 40, 167, 0.3);
+    background: #0b34bb;
     color: white;
 }
 

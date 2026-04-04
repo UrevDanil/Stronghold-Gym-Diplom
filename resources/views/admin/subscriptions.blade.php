@@ -116,13 +116,8 @@
             <form method="GET" action="{{ route('admin.subscriptions.index') }}" class="row g-3">
                 <div class="col-md-6">
                     <label for="search" class="form-label">Поиск</label>
-                    <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="fas fa-search"></i>
-                        </span>
-                        <input type="text" class="form-control" id="search" name="search" 
-                               placeholder="Название или описание..." value="{{ request('search') }}">
-                    </div>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           placeholder="Название или описание..." value="{{ request('search') }}">
                 </div>
                 <div class="col-md-3">
                     <label for="status" class="form-label">Статус</label>
@@ -159,28 +154,25 @@
                         <thead>
                             <tr>
                                 <th style="width: 5%">ID</th>
-                                <th style="width: 25%">Название</th>
+                                <th style="width: 30%">Название</th>
                                 <th style="width: 10%">Срок</th>
                                 <th style="width: 10%">Тренировки</th>
                                 <th style="width: 10%">Цена</th>
                                 <th style="width: 10%">Тип</th>
                                 <th style="width: 10%">Статус</th>
                                 <th style="width: 10%">Продажи</th>
-                                <th style="width: 10%" class="text-end">Действия</th>
+                                <th style="width: 5%" class="text-end">Действия</th>
                             </thead>
                         <tbody>
                             @foreach($subscriptions as $subscription)
                                  <tr>
                                     <td data-label="ID" class="fw-semibold">#{{ $subscription->id }}</td>
                                     <td data-label="Название">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="color-indicator" style="background: linear-gradient(135deg, #667eea, #764ba2)"></div>
-                                            <div>
-                                                <strong class="d-block">{{ $subscription->name }}</strong>
-                                                @if($subscription->description)
-                                                    <small class="text-muted">{{ Str::limit($subscription->description, 40) }}</small>
-                                                @endif
-                                            </div>
+                                        <div>
+                                            <strong class="d-block">{{ $subscription->name }}</strong>
+                                            @if($subscription->description)
+                                                <small class="text-muted">{{ Str::limit($subscription->description, 50) }}</small>
+                                            @endif
                                         </div>
                                     </td>
                                     <td data-label="Срок">
@@ -218,7 +210,7 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <<td data-label="Продажи">
+                                    <td data-label="Продажи">
                                         @php
                                             $totalCount = \App\Models\UserSubscription::where('subscription_id', $subscription->id)->count();
                                         @endphp
@@ -258,7 +250,7 @@
                         Показано с {{ $subscriptions->firstItem() }} по {{ $subscriptions->lastItem() }} из {{ $subscriptions->total() }} записей
                     </div>
                     <div class="pagination-links">
-                        {{ $subscriptions->withQueryString()->links() }}
+                        {{ $subscriptions->withQueryString()->onEachSide(1)->links() }}
                     </div>
                 </div>
             @else

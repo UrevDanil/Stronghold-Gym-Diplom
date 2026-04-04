@@ -388,9 +388,9 @@
 }
 
 .empty-state .btn-create {
-    background: linear-gradient(135deg, #0e2778, #1a3a9e);
-    color: white;
-    border: none;
+    background: white;
+    color: #f94da6;
+    border: 2px solid #f94da6;
     border-radius: 50px;
     padding: 0.6rem 1.5rem;
     font-weight: 600;
@@ -403,7 +403,9 @@
 
 .empty-state .btn-create:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(14, 39, 120, 0.3);
+    box-shadow: 0 6px 20px rgba(235, 17, 224, 0.185);
+    background: #f94da6;
+    color: white;
 }
 
 /* ----------------------------------------

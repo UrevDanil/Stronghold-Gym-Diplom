@@ -917,4 +917,134 @@ public function deleteSubscription($id)
         ->with('success', 'Абонемент удален');
 }
 
+/**
+ * Страница отчетов
+ */
+public function reports(Request $request)
+{
+    // Фильтры
+    $period = $request->get('period', 'month');
+    $dateFrom = $request->get('date_from');
+    $dateTo = $request->get('date_to');
+    
+    // Устанавливаем даты в зависимости от периода
+    if ($period === 'month') {
+        $dateFrom = Carbon::now()->startOfMonth();
+        $dateTo = Carbon::now()->endOfMonth();
+    } elseif ($period === 'quarter') {
+        $dateFrom = Carbon::now()->startOfQuarter();
+        $dateTo = Carbon::now()->endOfQuarter();
+    } elseif ($period === 'year') {
+        $dateFrom = Carbon::now()->startOfYear();
+        $dateTo = Carbon::now()->endOfYear();
+    } elseif ($period === 'custom' && $dateFrom && $dateTo) {
+        $dateFrom = Carbon::parse($dateFrom);
+        $dateTo = Carbon::parse($dateTo);
+    } else {
+        $dateFrom = Carbon::now()->startOfMonth();
+        $dateTo = Carbon::now()->endOfMonth();
+    }
+    
+    // 1. Общая статистика
+    $totalClients = User::clients()->count();
+    $totalTrainers = User::trainers()->count();
+    $totalWorkouts = Workout::count();
+    
+    // 2. Финансовая статистика
+    $totalRevenue = UserSubscription::where('status', 'active')
+        ->whereBetween('created_at', [$dateFrom, $dateTo])
+        ->with('subscription')
+        ->get()
+        ->sum(function($sub) {
+            return $sub->subscription->price ?? 0;
+        });
+    
+    $revenueBySubscription = UserSubscription::where('status', 'active')
+        ->whereBetween('created_at', [$dateFrom, $dateTo])
+        ->with('subscription')
+        ->get()
+        ->groupBy('subscription.name')
+        ->map(function($group) {
+            return [
+                'count' => $group->count(),
+                'revenue' => $group->sum(function($item) {
+                    return $item->subscription->price ?? 0;
+                })
+            ];
+        });
+    
+    // 3. Статистика тренировок
+    $totalTrainings = Schedule::whereBetween('date', [$dateFrom, $dateTo])->count();
+    $completedTrainings = Schedule::where('status', 'completed')
+        ->whereBetween('date', [$dateFrom, $dateTo])
+        ->count();
+    $cancelledTrainings = Schedule::where('status', 'cancelled')
+        ->whereBetween('date', [$dateFrom, $dateTo])
+        ->count();
+    
+    // 4. Статистика посещаемости
+    $totalBookings = Booking::whereBetween('created_at', [$dateFrom, $dateTo])->count();
+    $attendedCount = Booking::where('status', 'attended')
+        ->whereBetween('created_at', [$dateFrom, $dateTo])
+        ->count();
+    $missedCount = Booking::where('status', 'missed')
+        ->whereBetween('created_at', [$dateFrom, $dateTo])
+        ->count();
+    $cancelledCount = Booking::where('status', 'cancelled')
+        ->whereBetween('created_at', [$dateFrom, $dateTo])
+        ->count();
+    
+    $attendanceRate = $totalBookings > 0 
+        ? round(($attendedCount / $totalBookings) * 100, 1) 
+        : 0;
+    
+    // 5. Популярные тренировки
+    $popularWorkouts = Workout::withCount(['schedules' => function($q) use ($dateFrom, $dateTo) {
+            $q->whereBetween('date', [$dateFrom, $dateTo]);
+        }])
+        ->orderBy('schedules_count', 'desc')
+        ->limit(5)
+        ->get();
+    
+    // 6. Топ тренеров
+    $topTrainers = User::trainers()
+        ->withCount(['trainings as trainings_count' => function($q) use ($dateFrom, $dateTo) {
+            $q->whereBetween('date', [$dateFrom, $dateTo]);
+        }])
+        ->orderBy('trainings_count', 'desc')
+        ->limit(5)
+        ->get();
+    
+    // 7. Топ клиентов
+    $topClients = User::clients()
+        ->withCount(['bookings as bookings_count' => function($q) use ($dateFrom, $dateTo) {
+            $q->whereBetween('created_at', [$dateFrom, $dateTo]);
+        }])
+        ->orderBy('bookings_count', 'desc')
+        ->limit(5)
+        ->get();
+    
+    return view('admin.reports', [
+        'period' => $period,
+        'dateFrom' => $dateFrom->format('Y-m-d'),
+        'dateTo' => $dateTo->format('Y-m-d'),
+        'totalClients' => $totalClients,
+        'totalTrainers' => $totalTrainers,
+        'totalWorkouts' => $totalWorkouts,
+        'totalRevenue' => $totalRevenue,
+        'revenueBySubscription' => $revenueBySubscription,
+        'totalTrainings' => $totalTrainings,
+        'completedTrainings' => $completedTrainings,
+        'cancelledTrainings' => $cancelledTrainings,
+        'totalBookings' => $totalBookings,
+        'attendedCount' => $attendedCount,
+        'missedCount' => $missedCount,
+        'cancelledCount' => $cancelledCount,
+        'attendanceRate' => $attendanceRate,
+        'popularWorkouts' => $popularWorkouts,
+        'topTrainers' => $topTrainers,
+        'topClients' => $topClients,
+    ]);
+}
+
 }

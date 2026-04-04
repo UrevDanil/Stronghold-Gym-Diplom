@@ -1,3 +1,4 @@
+<!-- Абонементы -->
 @extends('layouts.app')
 
 @section('title', 'Абонементы - Stronghold Gym')
@@ -182,7 +183,7 @@
                     <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
                             Да, вы можете заморозить абонемент на срок до 14 дней по уважительной причине 
-                            (болезнь, командировка, отпуск). Для этого обратитесь к администратору.
+                            (болезнь, командировка, отпуск). Для этого обратитесь к администратору чтобы уточнить.
                         </div>
                     </div>
                 </div>
@@ -199,22 +200,6 @@
                         <div class="accordion-body">
                             Неиспользованные тренировки сгорают по истечении срока действия абонемента. 
                             Рекомендуем планировать свои тренировки заранее.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
-                                data-bs-target="#faq4">
-                            <i class="fas fa-exchange-alt me-2 text-success"></i>
-                            Можно ли купить два абонемента одновременно?
-                        </button>
-                    </h2>
-                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Вы можете приобрести обычный абонемент и абонемент с тренером одновременно. 
-                            Они будут действовать параллельно.
                         </div>
                     </div>
                 </div>
