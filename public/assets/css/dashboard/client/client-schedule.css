@@ -152,15 +152,15 @@
 
 .client-filters-body .form-control:focus,
 .client-filters-body .form-select:focus {
-    border-color: #2aa8e2;
+    border-color: #667eea;
     box-shadow: 0 0 0 0.2rem rgba(11, 102, 187, 0.1);
     outline: none;
 }
 
 .client-btn-filter {
-    background: linear-gradient(135deg, #2aa8e2, #667eea);
-    color: white;
-    border: none;
+    background: white;
+    border: 2px solid #667eea;
+    color: #667eea;
     border-radius: 12px;
     padding: 0.7rem 1.5rem;
     font-weight: 600;
@@ -173,9 +173,9 @@
 }
 
 .client-btn-filter:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(11, 52, 187, 0.3);
+    background: #667eea;
     color: white;
+    transform: translateY(-2px);
 }
 
 .client-btn-reset {

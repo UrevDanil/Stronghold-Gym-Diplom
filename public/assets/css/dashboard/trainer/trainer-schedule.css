@@ -686,9 +686,9 @@
 }
 
 .empty-state .btn-tomorrow {
-    background: linear-gradient(135deg, #9c121e, #cc222a );
-    color: white;
-    border: none;
+    background: white;
+    color: #cc222a;
+    border: 2px solid #cc222a;
     border-radius: 50px;
     padding: 0.6rem 1.5rem;
     font-weight: 600;
@@ -702,6 +702,8 @@
 .empty-state .btn-tomorrow:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(197, 35, 35, 0.3);
+    background: linear-gradient(135deg, #9c121e, #cc222a );
+    color: white;
 }
 
 .empty-state .btn-home {
