@@ -611,4 +611,103 @@ public function deleteSchedule($id)
         ->with('success', $message);
 }
 
+/**
+ * Показать форму создания тренировки
+ */
+public function createSchedule()
+{
+    $workouts = Workout::where('is_active', true)->get();
+    
+    return view('trainer.schedule-create', [
+        'workouts' => $workouts
+    ]);
+}
+
+/**
+ * Сохранить новую тренировку
+ */
+public function storeSchedule(Request $request)
+{
+    $validated = $request->validate([
+        'workout_id' => 'required|exists:workouts,id',
+        'date' => 'required|date|after_or_equal:today',
+        'start_time' => 'required',
+        'end_time' => 'required|after:start_time',
+        'room' => 'nullable|string|max:255',
+        'capacity' => 'required|integer|min:1|max:100',
+    ]);
+    
+    Schedule::create([
+        'workout_id' => $validated['workout_id'],
+        'trainer_id' => auth()->id(),
+        'date' => $validated['date'],
+        'start_time' => $validated['start_time'],
+        'end_time' => $validated['end_time'],
+        'room' => $validated['room'] ?? null,
+        'capacity' => $validated['capacity'],
+        'status' => 'scheduled',
+        'current_participants' => 0,
+    ]);
+    
+    return redirect()->route('trainer.schedule')
+        ->with('success', 'Тренировка успешно добавлена в расписание');
+}
+
+/**
+ * Показать форму редактирования тренировки
+ */
+public function editSchedule($id)
+{
+    $schedule = Schedule::findOrFail($id);
+    
+    // Проверяем, что тренировка принадлежит этому тренеру
+    if ($schedule->trainer_id !== auth()->id()) {
+        abort(403, 'У вас нет прав на редактирование этой тренировки');
+    }
+    
+    // Проверяем, что тренировка не прошла
+    if ($schedule->isPast()) {
+        return back()->with('error', 'Нельзя редактировать прошедшую тренировку');
+    }
+    
+    $workouts = Workout::where('is_active', true)->get();
+    
+    return view('trainer.schedule-edit', [
+        'schedule' => $schedule,
+        'workouts' => $workouts
+    ]);
+}
+
+/**
+ * Обновить тренировку
+ */
+public function updateSchedule(Request $request, $id)
+{
+    $schedule = Schedule::findOrFail($id);
+    
+    // Проверяем, что тренировка принадлежит этому тренеру
+    if ($schedule->trainer_id !== auth()->id()) {
+        abort(403, 'У вас нет прав на редактирование этой тренировки');
+    }
+    
+    // Проверяем, что тренировка не прошла
+    if ($schedule->isPast()) {
+        return back()->with('error', 'Нельзя редактировать прошедшую тренировку');
+    }
+    
+    $validated = $request->validate([
+        'workout_id' => 'required|exists:workouts,id',
+        'date' => 'required|date',
+        'start_time' => 'required',
+        'end_time' => 'required|after:start_time',
+        'room' => 'nullable|string|max:255',
+        'capacity' => 'required|integer|min:1|max:100',
+    ]);
+    
+    $schedule->update($validated);
+    
+    return redirect()->route('trainer.schedule')
+        ->with('success', 'Тренировка успешно обновлена');
+}
+
 }

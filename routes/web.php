@@ -196,9 +196,15 @@ Route::middleware(['auth', 'active', 'role:trainer'])->prefix('trainer')->name('
     });
 
     // Маршруты для посещаемости (доступны тренеру)
-Route::middleware(['auth', 'role:trainer'])->group(function () {
+    Route::middleware(['auth', 'role:trainer'])->group(function () {
     Route::get('/attendance', [TrainerDashboardController::class, 'attendance'])->name('attendance');
     Route::post('/attendance/mark', [TrainerDashboardController::class, 'markAttendance'])->name('attendance.mark.simple');
+
+    // Управление тренировками (создание, редактирование)
+    Route::get('/schedule/create', [TrainerDashboardController::class, 'createSchedule'])->name('schedule.create');
+    Route::post('/schedule', [TrainerDashboardController::class, 'storeSchedule'])->name('schedule.store');
+    Route::get('/schedule/{schedule}/edit', [TrainerDashboardController::class, 'editSchedule'])->name('schedule.edit');
+    Route::put('/schedule/{schedule}', [TrainerDashboardController::class, 'updateSchedule'])->name('schedule.update');
 });
 });
 
