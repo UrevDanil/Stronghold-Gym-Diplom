@@ -24,7 +24,7 @@ class SendBookingNotification
         // 1. Уведомление тренеру
         $this->notificationService->send(
             $trainer->id,
-            "Новый клиент! {$client->name} записался на тренировку '{$schedule->workout->name}' {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+            "Клиент {$client->name} записался на тренировку '{$schedule->workout->name}' {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
             'booking',
             [
                 'booking_id' => $booking->id,
