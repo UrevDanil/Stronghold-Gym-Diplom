@@ -9,61 +9,52 @@
 
 @section('content')
 <div class="container py-4 schedule-page">
-    <!-- Заголовок -->
-    <div class="schedule-header d-flex justify-content-between align-items-center">
-        <h1 class="mb-0">
-            <i class="fas fa-calendar-alt me-3"></i>Моё расписание
-        </h1>
-        <div class="d-flex gap-2">
+<!-- Заголовок -->
+<div class="schedule-header d-flex justify-content-between align-items-center">
+    <h1 class="mb-0">
+        <i class="fas fa-calendar-alt me-3"></i>Моё расписание
+    </h1>
+    <a href="{{ route('trainer.dashboard') }}" class="back-btn">
+        <i class="fas fa-arrow-left me-2"></i>Назад
+    </a>
+</div>
+
+<!-- Навигация по датам -->
+<div class="date-nav-card">
+    <div class="card-body">
+        <div class="date-nav-controls">
+            <a href="{{ route('trainer.schedule') }}?date={{ \Carbon\Carbon::parse(request('date', now()))->subDay()->format('Y-m-d') }}" 
+               class="nav-btn">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            
+            <div class="date-display">
+                <h3>
+                    {{ \Carbon\Carbon::parse(request('date', now()))->isoFormat('dddd, D MMMM YYYY') }}
+                </h3>
+                <span class="trainings-count">
+                    <i class="fas fa-dumbbell me-1"></i>
+                    {{ $schedules->count() ?? 0 }} тренировок
+                </span>
+            </div>
+            
+            <a href="{{ route('trainer.schedule') }}?date={{ \Carbon\Carbon::parse(request('date', now()))->addDay()->format('Y-m-d') }}" 
+               class="nav-btn">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+        
+        <!-- Кнопки действий: Сегодня и Создать тренировку -->
+        <div class="action-buttons-row">
+            <a href="{{ route('trainer.schedule') }}" class="btn-today">
+                <i class="fas fa-calendar-day me-2"></i>Сегодня
+            </a>
             <a href="{{ route('trainer.schedule.create') }}" class="btn-create-workout">
                 <i class="fas fa-plus me-2"></i>Создать тренировку
             </a>
-            <a href="{{ route('trainer.dashboard') }}" class="back-btn">
-                <i class="fas fa-arrow-left me-2"></i>Назад
-            </a>
         </div>
     </div>
-
-    @if(session('success'))
-        <div class="alert schedule-alert success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    <!-- Навигация по датам -->
-    <div class="date-nav-card">
-        <div class="card-body">
-            <div class="date-nav-controls">
-                <a href="{{ route('trainer.schedule') }}?date={{ \Carbon\Carbon::parse(request('date', now()))->subDay()->format('Y-m-d') }}" 
-                   class="nav-btn">
-                    <i class="fas fa-chevron-left"></i>
-                </a>
-                
-                <div class="date-display">
-                    <h3>
-                        {{ \Carbon\Carbon::parse(request('date', now()))->isoFormat('dddd, D MMMM YYYY') }}
-                    </h3>
-                    <span class="trainings-count">
-                        <i class="fas fa-dumbbell me-1"></i>
-                        {{ $schedules->count() ?? 0 }} тренировок
-                    </span>
-                </div>
-                
-                <a href="{{ route('trainer.schedule') }}?date={{ \Carbon\Carbon::parse(request('date', now()))->addDay()->format('Y-m-d') }}" 
-                   class="nav-btn">
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-            </div>
-            
-            <div class="today-btn">
-                <a href="{{ route('trainer.schedule') }}" class="btn-today">
-                    <i class="fas fa-calendar-day me-2"></i>Сегодня
-                </a>
-            </div>
-        </div>
-    </div>
+</div>
 
     <!-- Расписание на день -->
     @if(isset($schedules) && $schedules->count() > 0)

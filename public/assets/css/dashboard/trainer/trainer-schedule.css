@@ -74,103 +74,6 @@
     margin-right: 0.5rem;
 }
 
-/* Убираем trainer-info */
-.schedule-header .trainer-info {
-    display: none;
-}
-
-/* ----------------------------------------
-   КНОПКИ СОЗДАНИЯ И РЕДАКТИРОВАНИЯ
-   ---------------------------------------- */
-
-.btn-create-workout {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: white;
-    border: none;
-    border-radius: 50px;
-    padding: 0.6rem 1.2rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn-create-workout:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
-    color: white;
-}
-
-.btn-edit {
-    background: rgba(13, 110, 253, 0.1);
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #0d6efd;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.btn-edit:hover {
-    background: #0d6efd;
-    color: white;
-    transform: scale(1.1);
-}
-
-.card-actions {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    z-index: 10;
-    display: flex;
-    gap: 0.5rem;
-}
-
-.card-delete-btn {
-    display: inline-block;
-}
-
-.btn-delete {
-    background: rgba(220, 53, 69, 0.1);
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #dc3545;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-delete:hover {
-    background: #dc3545;
-    color: white;
-    transform: scale(1.1);
-}
-
-/* Мобильная адаптация */
-@media (max-width: 768px) {
-    .card-actions {
-        position: static;
-        justify-content: flex-end;
-        margin-bottom: 0.8rem;
-    }
-    
-    .btn-edit,
-    .btn-delete {
-        width: 36px;
-        height: 36px;
-    }
-}
-
 /* ----------------------------------------
    3. АЛЕРТЫ
    ---------------------------------------- */
@@ -234,15 +137,13 @@
     background: white;
     color: #cc222a;
     transition: all 0.3s ease;
-    box-shadow: 0 6px 20px rgba(194, 93, 93, 0.048);
     text-decoration: none;
     flex-shrink: 0;
 }
 
 .nav-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(194, 93, 93, 0.048);
-    background: linear-gradient(135deg, #9c121e, #cc222a );
+    background: linear-gradient(135deg, #9c121e, #cc222a);
     color: white;
 }
 
@@ -268,19 +169,24 @@
     display: inline-block;
 }
 
-.today-btn {
-    text-align: center;
-    margin-top: 1rem;
+/* Ряд с кнопками действий */
+.action-buttons-row {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
     padding-top: 1rem;
     border-top: 1px solid #e9ecef;
+    flex-wrap: wrap;
 }
 
-.today-btn .btn-today {
+/* Кнопка "Сегодня" */
+.btn-today {
     background: #f8f9fa;
     border: 2px solid #cc222a;
     color: #cc222a;
     border-radius: 50px;
-    padding: 0.5rem 1.5rem;
+    padding: 0.6rem 1.8rem;
     font-weight: 600;
     transition: all 0.3s ease;
     text-decoration: none;
@@ -289,12 +195,32 @@
     gap: 0.5rem;
 }
 
-.today-btn .btn-today:hover {
-    background: linear-gradient(135deg, #9c121e, #cc222a );
+.btn-today:hover {
+    background: linear-gradient(135deg, #9c121e, #cc222a);
     color: white;
     transform: translateY(-2px);
 }
 
+/* Кнопка "Создать тренировку" */
+.btn-create-workout {
+    background: #f8f9fa;
+    border: 2px solid #28a745;
+    color: #28a745;
+    border-radius: 50px;
+    padding: 0.6rem 1.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-create-workout:hover {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    transform: translateY(-2px);
+}
 
 /* ----------------------------------------
    5. КАРТОЧКА ТРЕНИРОВКИ
@@ -308,6 +234,7 @@
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     height: 100%;
     background: white;
+    position: relative;
 }
 
 .workout-card:hover {
@@ -324,7 +251,7 @@
 }
 
 .workout-card .card-header {
-    background: linear-gradient(135deg, #3d2d69, #cc222a );
+    background: linear-gradient(135deg, #3d2d69, #cc222a);
     color: white;
     padding: 1rem 1.5rem;
     border: none;
@@ -377,6 +304,7 @@
     margin-bottom: 1rem;
 }
 
+/* Бейдж с количеством участников */
 .participants-badge {
     display: inline-flex;
     align-items: center;
@@ -398,7 +326,134 @@
 }
 
 /* ----------------------------------------
-   6. СПИСОК КЛИЕНТОВ
+   6. КНОПКИ ДЕЙСТВИЙ НА КАРТОЧКЕ
+   ---------------------------------------- */
+
+/* Десктопная версия - кнопки в правом верхнем углу */
+.card-actions {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-edit {
+    background: rgba(13, 110, 253, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #0d6efd;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-edit:hover {
+    background: #0d6efd;
+    color: white;
+    transform: scale(1.1);
+}
+
+.btn-delete {
+    background: rgba(220, 53, 69, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #dc3545;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+    background: #dc3545;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Мобильная версия (до 768px) - кнопки внизу карточки */
+@media (max-width: 768px) {
+    .workout-card {
+        padding-bottom: 0;
+    }
+    
+    .card-actions {
+        position: static;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.8rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .btn-edit,
+    .btn-delete {
+        width: auto;
+        height: auto;
+        border-radius: 12px;
+        padding: 0.6rem 1.2rem;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .btn-edit {
+        background: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+    }
+    
+    .btn-edit i {
+        font-size: 0.9rem;
+    }
+    
+    .btn-edit:hover {
+        background: #0d6efd;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-delete {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+    
+    .btn-delete i {
+        font-size: 0.9rem;
+    }
+    
+    .btn-delete:hover {
+        background: #dc3545;
+        color: white;
+        transform: translateY(-2px);
+    }
+}
+
+/* Очень маленькие экраны (до 480px) */
+@media (max-width: 480px) {
+    .card-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .btn-edit,
+    .btn-delete {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ----------------------------------------
+   7. СПИСОК КЛИЕНТОВ
    ---------------------------------------- */
 
 .clients-list {
@@ -442,7 +497,7 @@
     width: 35px;
     height: 35px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #7cacdf );
+    background: linear-gradient(135deg, #667eea, #764ba2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -520,11 +575,6 @@
     color: #dc3545;
 }
 
-.status-badge-small.past {
-    background: rgba(108, 117, 125, 0.1);
-    color: #6c757d;
-}
-
 .empty-clients {
     text-align: center;
     padding: 2rem;
@@ -544,7 +594,7 @@
 }
 
 /* ----------------------------------------
-   7. СТАТИСТИКА ТРЕНИРОВКИ И КНОПКА
+   8. СТАТИСТИКА ТРЕНИРОВКИ
    ---------------------------------------- */
 
 .stats-grid {
@@ -553,7 +603,7 @@
     gap: 1rem;
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: none; /* Убираем полосу */
+    border-top: 1px solid #e9ecef;
 }
 
 .stat-block {
@@ -578,36 +628,8 @@
     color: #28a745;
 }
 
-.action-btn {
-    margin-top: 1rem;
-    text-align: center; /* Центрируем кнопку */
-}
-
-.btn-attendance {
-    background: linear-gradient(135deg, #9c121e, #cc222a);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 0.8rem 1.5rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    width: auto; /* Убираем width: 100% */
-    min-width: 200px;
-}
-
-.btn-attendance:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(175, 30, 30, 0.3);
-    color: white;
-}
-
 /* ----------------------------------------
-   8. НЕДЕЛЬНОЕ РАСПИСАНИЕ
+   9. НЕДЕЛЬНОЕ РАСПИСАНИЕ
    ---------------------------------------- */
 
 .week-schedule-card {
@@ -664,10 +686,6 @@
     vertical-align: middle;
 }
 
-.week-table tbody tr {
-    transition: all 0.3s ease;
-}
-
 .week-table tbody tr:hover {
     background: rgba(102, 126, 234, 0.05);
 }
@@ -691,26 +709,6 @@
     color: #2c3e50;
 }
 
-.participants-badge.small {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.2rem 0.6rem;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.participants-badge.small.full {
-    background: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
-}
-
-.participants-badge.small.available {
-    background: rgba(40, 167, 69, 0.1);
-    color: #28a745;
-}
-
 .status-badge-week {
     display: inline-flex;
     align-items: center;
@@ -722,7 +720,7 @@
 }
 
 .status-badge-week.today {
-    background: linear-gradient(135deg, #9c121e, #cc222a );
+    background: linear-gradient(135deg, #9c121e, #cc222a);
     color: white;
 }
 
@@ -736,9 +734,8 @@
     color: #6c757d;
 }
 
-
 /* ----------------------------------------
-   9. ПУСТОЕ СОСТОЯНИЕ
+   10. ПУСТОЕ СОСТОЯНИЕ
    ---------------------------------------- */
 
 .empty-state {
@@ -797,7 +794,7 @@
 .empty-state .btn-tomorrow:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(197, 35, 35, 0.3);
-    background: linear-gradient(135deg, #9c121e, #cc222a );
+    background: linear-gradient(135deg, #9c121e, #cc222a);
     color: white;
 }
 
@@ -821,71 +818,7 @@
 }
 
 /* ----------------------------------------
-   КНОПКА УДАЛЕНИЯ (ВАРИАНТ С ПЛАШКОЙ)
-   ---------------------------------------- */
-
-.workout-card {
-    position: relative;
-}
-
-.card-delete-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    z-index: 10;
-}
-
-.btn-delete {
-    background: rgba(220, 53, 69, 0.1);
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #dc3545;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-delete:hover {
-    background: #dc3545;
-    color: white;
-    transform: scale(1.1);
-}
-
-/* Мобильная версия - кнопка-плашка на всю ширину */
-@media (max-width: 768px) {
-    .card-delete-btn {
-        position: static;
-        margin-bottom: 1rem;
-    }
-    
-    .btn-delete {
-        width: 100%;
-        border-radius: 12px;
-        padding: 0.6rem;
-        gap: 0.5rem;
-        background: rgba(220, 53, 69, 0.1);
-        color: #dc3545;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-    
-    .btn-delete i {
-        font-size: 0.9rem;
-    }
-    
-    .btn-delete:hover {
-        background: #dc3545;
-        color: white;
-        transform: translateY(-2px);
-    }
-}
-
-/* ----------------------------------------
-   10. АДАПТИВНОСТЬ
+   11. МОБИЛЬНАЯ АДАПТАЦИЯ
    ---------------------------------------- */
 
 @media (max-width: 768px) {
@@ -907,7 +840,6 @@
         flex-shrink: 0;
     }
     
-    /* Навигация на мобилках - кнопки на одном уровне */
     .date-nav-controls {
         flex-direction: row;
         justify-content: space-between;
@@ -928,14 +860,28 @@
         padding: 0.2rem 0.8rem;
     }
     
-    .today-btn {
-        margin-top: 0.8rem;
-        padding-top: 0.8rem;
+    /* Адаптация клиентов */
+    .client-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
     }
     
-    .today-btn .btn-today {
-        padding: 0.4rem 1.2rem;
-        font-size: 0.85rem;
+    .client-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .stats-grid {
+        gap: 0.5rem;
+    }
+    
+    .stat-block .stat-value {
+        font-size: 1rem;
+    }
+    
+    .stat-block .stat-label {
+        font-size: 0.65rem;
     }
 }
 
@@ -960,11 +906,6 @@
         font-size: 0.8rem;
     }
     
-    .schedule-header .back-btn i {
-        margin-right: 0.3rem;
-        font-size: 0.7rem;
-    }
-    
     .date-nav-controls {
         gap: 0.5rem;
     }
@@ -987,12 +928,20 @@
         padding: 0.15rem 0.6rem;
     }
     
-    .trainings-count i {
-        font-size: 0.65rem;
+    /* Клиенты на очень маленьких экранах */
+    .client-info {
+        width: 100%;
     }
     
-    .today-btn .btn-today {
-        padding: 0.3rem 1rem;
-        font-size: 0.8rem;
+    .client-actions {
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .btn-mark-attend,
+    .btn-mark-miss {
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem;
     }
 }
