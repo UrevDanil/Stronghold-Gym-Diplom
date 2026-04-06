@@ -279,6 +279,15 @@ Route::middleware(['auth'])->group(function () {
     })->name('notifications.read-all');
 });
 
+// Удаление уведомления
+Route::delete('/notifications/{id}', function ($id) {
+    $notification = App\Models\Notification::findOrFail($id);
+    if ($notification->user_id == auth()->id()) {
+        $notification->delete();
+    }
+    return back()->with('success', 'Уведомление удалено');
+})->name('notifications.delete');
+
 // ====================
 // ТЕСТОВЫЕ МАРШРУТЫ
 // ====================

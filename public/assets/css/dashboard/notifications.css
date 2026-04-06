@@ -516,3 +516,213 @@
         height: 32px;
     }
 }
+
+/* ----------------------------------------
+   9. ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ
+   ---------------------------------------- */
+
+/* Бейдж с количеством уведомлений */
+.badge-notification {
+    background: #dc3545;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+/* Фильтры уведомлений */
+.notifications-filters {
+    margin-bottom: 1.5rem;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.filter-btn {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 50px;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.filter-btn:hover {
+    border-color: #0b34bb;
+    color: #0b34bb;
+    transform: translateY(-2px);
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, #0b34bb, #0e2778);
+    border-color: #0b34bb;
+    color: white;
+    box-shadow: 0 4px 12px rgba(11, 52, 187, 0.3);
+}
+
+/* Типы уведомлений */
+.notification-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.notification-type-badge.booking {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.notification-type-badge.subscription {
+    background: rgba(70, 53, 220, 0.1);
+    color: #4635dc;
+}
+
+.notification-type-badge.attendance {
+    background: rgba(23, 162, 184, 0.1);
+    color: #17a2b8;
+}
+
+.notification-type-badge.schedule {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.notification-type-badge.system {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+/* Иконки для новых типов */
+.notification-item .notification-icon.attendance {
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+    color: #00573d;
+}
+
+.notification-item .notification-icon.schedule {
+    background: linear-gradient(135deg, #f6d365, #fda085);
+    color: #9b4d1d;
+}
+
+/* Заголовок уведомления */
+.notification-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.unread-badge {
+    background: #dc3545;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 50px;
+}
+
+/* Мета-информация уведомления */
+.notification-meta {
+    margin-top: 0.5rem;
+}
+
+.notification-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    color: #0b34bb;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.notification-link:hover {
+    color: #cc222a;
+    text-decoration: underline;
+}
+
+/* Время уведомления */
+.notification-time .separator {
+    margin: 0 0.3rem;
+    color: #dee2e6;
+}
+
+/* Кнопка удаления */
+.notification-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.delete-notification-btn {
+    background: rgba(220, 53, 69, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #dc3545;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.delete-notification-btn:hover {
+    background: #dc3545;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Структура уведомления */
+.notification-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    flex: 1;
+}
+
+/* Адаптация */
+@media (max-width: 768px) {
+    .filter-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.75rem;
+    }
+    
+    .notification-main {
+        width: 100%;
+    }
+    
+    .notification-actions {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 0.5rem;
+    }
+    
+    .notification-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .delete-notification-btn {
+        width: auto;
+        height: auto;
+        border-radius: 12px;
+        padding: 0.4rem 0.8rem;
+    }
+}

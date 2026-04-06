@@ -8,10 +8,13 @@ use App\Models\Role;  // <-- ДОБАВЬ ЭТУ СТРОКУ
 use App\Models\Subscription;
 use App\Models\UserSubscription;
 use App\Models\Booking;
+use App\Services\NotificationService;
 use App\Models\Schedule;
 use App\Models\Workout;
 use App\Models\Notification;
 use App\Models\Attendance;
+use App\Events\ScheduleDeleted;
+use App\Events\ScheduleCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;  // <-- ДОБАВЬ ДЛЯ ХЭШИРОВАНИЯ ПАРОЛЕЙ
@@ -19,6 +22,13 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+    protected $notify;
+    
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notify = $notificationService;
+    }
+
     public function dashboard()
     {
         // Статистика для дашборда
@@ -93,27 +103,32 @@ class DashboardController extends Controller
  * Удаление (блокировка) пользователя
  */
 public function deleteUser($id)
-{
-    // Не даем удалить самого себя
-    if ($id == auth()->id()) {
+    {
+        if ($id == auth()->id()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Вы не можете заблокировать самого себя');
+        }
+        
+        $user = User::findOrFail($id);
+        
+        if ($user->isOwner()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Вы не можете заблокировать владельца системы');
+        }
+        
+        // Уведомление пользователю
+        $this->notify->send(
+            $user->id,
+            "⚠️ Ваш аккаунт был заблокирован администратором. Для получения информации обратитесь в поддержку.",
+            'warning',
+            ['user_id' => $user->id]
+        );
+        
+        $user->delete();
+        
         return redirect()->route('admin.users.index')
-            ->with('error', 'Вы не можете заблокировать самого себя');
+            ->with('success', "Пользователь {$user->name} успешно заблокирован");
     }
-    
-    $user = User::findOrFail($id);
-    
-    // Не даем удалить владельца
-    if ($user->isOwner()) {
-        return redirect()->route('admin.users.index')
-            ->with('error', 'Вы не можете заблокировать владельца системы');
-    }
-    
-    // Мягкое удаление (поле deleted_at заполняется)
-    $user->delete();
-    
-    return redirect()->route('admin.users.index')
-        ->with('success', "Пользователь {$user->name} успешно заблокирован");
-}
 
 /**
  * Полное удаление пользователя из БД (осторожно!)
@@ -222,56 +237,57 @@ public function restoreUser($id)
  * Сохранение нового пользователя
  */
 public function storeUser(Request $request)
-{
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users',
-        'phone' => 'nullable|string|max:20',
-        'password' => 'required|string|min:8|confirmed',
-        'role_id' => 'required|exists:roles,id',
-        'birth_date' => 'nullable|date',
-        'qualification' => 'nullable|string|max:255',
-        'specialization' => 'nullable|string|max:255',
-        'health_info' => 'nullable|string',
-    ]);
-    
-    // Хэшируем пароль
-    $validated['password'] = Hash::make($validated['password']);
-    
-    // ИСПРАВЛЕНО: проверяем чекбокс email_verified
-if ($request->input('email_verified') == '1') {
-    $validated['email_verified_at'] = now();
-}
-    
-    // Сохраняем health_info в notes для клиентов
-    $healthInfo = $validated['health_info'] ?? null;
-    unset($validated['health_info']);
-    
-    // Сохраняем qualification и specialization для тренеров
-    $qualification = $validated['qualification'] ?? null;
-    $specialization = $validated['specialization'] ?? null;
-    unset($validated['qualification']);
-    unset($validated['specialization']);
-    
-    // Создаем пользователя
-    $user = User::create($validated);
-    
-    // Для тренера - сохраняем квалификацию и специализацию
-    if ($request->role_id == 3) { // ID роли тренера
-        $user->qualification = $qualification;
-        $user->specialization = $specialization;
-        $user->save();
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'phone' => 'nullable|string|max:20',
+            'password' => 'required|string|min:8|confirmed',
+            'role_id' => 'required|exists:roles,id',
+            'birth_date' => 'nullable|date',
+            'qualification' => 'nullable|string|max:255',
+            'specialization' => 'nullable|string|max:255',
+            'health_info' => 'nullable|string',
+        ]);
+        
+        $validated['password'] = Hash::make($validated['password']);
+        
+        if ($request->input('email_verified') == '1') {
+            $validated['email_verified_at'] = now();
+        }
+        
+        $healthInfo = $validated['health_info'] ?? null;
+        unset($validated['health_info']);
+        
+        $qualification = $validated['qualification'] ?? null;
+        $specialization = $validated['specialization'] ?? null;
+        unset($validated['qualification']);
+        unset($validated['specialization']);
+        
+        $user = User::create($validated);
+        
+        if ($request->role_id == 3) {
+            $user->qualification = $qualification;
+            $user->specialization = $specialization;
+            $user->save();
+        }
+        
+        if ($request->role_id == 4 && $healthInfo) {
+            $user->notes = $healthInfo;
+            $user->save();
+        }
+        
+        // Уведомление новому пользователю
+        $this->notify->send(
+            $user->id,
+            "🎉 Добро пожаловать в Stronghold Gym! Ваш аккаунт успешно создан.",
+            'system',
+            ['user_id' => $user->id]
+        );
+        
+        return redirect()->route('admin.users.index')
+            ->with('success', 'Пользователь успешно создан');
     }
-    
-    // Для клиента - сохраняем информацию о здоровье в notes
-    if ($request->role_id == 4 && $healthInfo) { // ID роли клиента
-        $user->notes = $healthInfo;
-        $user->save();
-    }
-    
-    return redirect()->route('admin.users.index')
-        ->with('success', 'Пользователь успешно создан');
-}
 
 /**
  * Просмотр профиля пользователя
@@ -421,75 +437,61 @@ public function updateUser(Request $request, $id)
 /**
  * Отметка посещаемости клиента (для обычных абонементов)
  */
-public function markClientAttendance(Request $request, $clientId)
-{
-    $admin = auth()->user();
-    $client = User::findOrFail($clientId);
-    
-    // Проверяем, что это клиент
-    if (!$client->isClient()) {
-        return back()->with('error', 'Пользователь не является клиентом');
-    }
-    
-    $validated = $request->validate([
-        'date' => 'required|date',
-        'workout_name' => 'nullable|string|max:255',
-        'comment' => 'nullable|string',
-    ]);
-    
-    // Получаем активный абонемент клиента
-    $activeSubscription = $client->activeSubscription();
-    
-    if (!$activeSubscription) {
-        return back()->with('error', 'У клиента нет активного абонемента');
-    }
-    
-    // Проверяем, есть ли остаток тренировок
-    if ($activeSubscription->remaining_workouts <= 0 && $activeSubscription->subscription->workouts_count > 0) {
-        return back()->with('error', 'У клиента закончились тренировки в абонементе');
-    }
-    
-    // Создаем запись о посещении
-    $attendance = Attendance::create([
-        'booking_id' => null,  // <-- ДОБАВЬ ЭТУ СТРОКУ
-        'user_id' => $client->id,
-        'marked_by' => $admin->id,
-        'attended_at' => $validated['date'],
-        'comment' => $validated['comment'] ?? null,
-        'attendance_type' => 'attended'
-    ]);
-    
-    // Списываем тренировку из абонемента (если абонемент не безлимитный)
-    if ($activeSubscription->subscription->workouts_count > 0) {
-        $activeSubscription->decrement('remaining_workouts');
-        $workoutsLeft = $activeSubscription->remaining_workouts;
+public function markClientAttendance(Request $request, $clientId){
+    {
+        $admin = auth()->user();
+        $client = User::findOrFail($clientId);
         
-        // Если тренировки закончились, меняем статус
-        if ($workoutsLeft <= 0) {
-            $activeSubscription->status = UserSubscription::STATUS_EXPIRED;
-            $activeSubscription->save();
+        if (!$client->isClient()) {
+            return back()->with('error', 'Пользователь не является клиентом');
         }
+        
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'workout_name' => 'nullable|string|max:255',
+            'comment' => 'nullable|string',
+        ]);
+        
+        $activeSubscription = $client->activeSubscription();
+        
+        if (!$activeSubscription) {
+            return back()->with('error', 'У клиента нет активного абонемента');
+        }
+        
+        if ($activeSubscription->remaining_workouts <= 0 && $activeSubscription->subscription->workouts_count > 0) {
+            return back()->with('error', 'У клиента закончились тренировки в абонементе');
+        }
+        
+        Attendance::create([
+            'booking_id' => null,
+            'user_id' => $client->id,
+            'marked_by' => $admin->id,
+            'attended_at' => $validated['date'],
+            'comment' => $validated['comment'] ?? null,
+            'attendance_type' => 'attended'
+        ]);
+        
+        if ($activeSubscription->subscription->workouts_count > 0) {
+            $activeSubscription->decrement('remaining_workouts');
+            if ($activeSubscription->remaining_workouts <= 0) {
+                $activeSubscription->status = UserSubscription::STATUS_EXPIRED;
+                $activeSubscription->save();
+            }
+        }
+        
+        $this->notify->send(
+            $client->id,
+            "✅ Администратор отметил ваше посещение {$validated['date']}. Осталось тренировок: " . ($activeSubscription->remaining_workouts ?? 0),
+            'attendance',
+            ['date' => $validated['date'], 'workout' => $validated['workout_name'] ?? 'Тренировка']
+        );
+        
+        $remainingText = $activeSubscription->subscription->workouts_count > 0 
+            ? "Осталось тренировок: " . ($activeSubscription->remaining_workouts ?? 0)
+            : "Безлимитный абонемент";
+        
+        return back()->with('success', "Посещение клиента {$client->name} отмечено. " . $remainingText);
     }
-    
-    // Создаем уведомление для клиента
-    Notification::create([
-        'user_id' => $client->id,
-        'type' => 'attendance',
-        'message' => "Администратор отметил ваше посещение {$validated['date']}",
-        'is_read' => false,
-        'data' => json_encode([
-            'date' => $validated['date'],
-            'workout' => $validated['workout_name'] ?? 'Тренировка',
-            'remaining_workouts' => $activeSubscription->remaining_workouts ?? 0,
-            'subscription_name' => $activeSubscription->subscription->name ?? 'Абонемент'
-        ])
-    ]);
-    
-    $remainingText = $activeSubscription->subscription->workouts_count > 0 
-        ? "Осталось тренировок: " . ($activeSubscription->remaining_workouts ?? 0)
-        : "Безлимитный абонемент";
-    
-    return back()->with('success', "Посещение клиента {$client->name} отмечено. " . $remainingText);
 }
 
 /**
@@ -497,10 +499,8 @@ public function markClientAttendance(Request $request, $clientId)
  */
 public function attendance()
 {
-    // Получаем всех клиентов
-    $clients = User::clients()
-        ->orderBy('name')
-        ->get();
+    // Получаем всех клиентов через scope
+    $clients = User::clients()->orderBy('name')->get();
     
     // Вручную загружаем активный абонемент для каждого клиента
     foreach ($clients as $client) {
@@ -598,34 +598,45 @@ public function createSchedule()
 }
 
 /**
- * Сохранение нового занятия
- */
-public function storeSchedule(Request $request)
-{
-    $validated = $request->validate([
-        'workout_id' => 'required|exists:workouts,id',
-        'trainer_id' => 'required|exists:users,id',
-        'date' => 'required|date|after_or_equal:today',
-        'start_time' => 'required',
-        'end_time' => 'required|after:start_time',
-        'room' => 'nullable|string|max:255',
-        'capacity' => 'required|integer|min:1|max:100',
-    ]);
-    
-    Schedule::create([
-        'workout_id' => $validated['workout_id'],
-        'trainer_id' => $validated['trainer_id'],
-        'date' => $validated['date'],
-        'start_time' => $validated['start_time'],
-        'end_time' => $validated['end_time'],
-        'room' => $validated['room'] ?? null,
-        'capacity' => $validated['capacity'],
-        'status' => 'scheduled',
-        'current_participants' => 0,
-    ]);
-    
-    return redirect()->route('admin.schedule.index')
-        ->with('success', 'Занятие успешно добавлено в расписание');
+     * Сохранение нового занятия
+     */
+    public function storeSchedule(Request $request)
+    {
+        $validated = $request->validate([
+            'workout_id' => 'required|exists:workouts,id',
+            'trainer_id' => 'required|exists:users,id',
+            'date' => 'required|date|after_or_equal:today',
+            'start_time' => 'required',
+            'end_time' => 'required|after:start_time',
+            'room' => 'nullable|string|max:255',
+            'capacity' => 'required|integer|min:1|max:100',
+        ]);
+        
+        $schedule = Schedule::create([
+            'workout_id' => $validated['workout_id'],
+            'trainer_id' => $validated['trainer_id'],
+            'date' => $validated['date'],
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'],
+            'room' => $validated['room'] ?? null,
+            'capacity' => $validated['capacity'],
+            'status' => 'scheduled',
+            'current_participants' => 0,
+        ]);
+        
+        // Уведомление тренеру через сервис
+        $this->notify->send(
+            $validated['trainer_id'],
+            "Администратор добавил вам тренировку '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+            'schedule',
+            ['schedule_id' => $schedule->id]
+        );
+        
+        // ВЫЗЫВАЕМ СОБЫТИЕ СОЗДАНИЯ ТРЕНИРОВКИ (для уведомления админов)
+        event(new ScheduleCreated($schedule));
+        
+        return redirect()->route('admin.schedule.index')
+            ->with('success', 'Занятие успешно добавлено в расписание');
 }
 
 /**
@@ -698,17 +709,16 @@ public function cancelSchedule($id)
 {
     $schedule = Schedule::findOrFail($id);
     
-    // Меняем статус на отменено
     $schedule->status = 'cancelled';
     $schedule->save();
     
-    // Отменяем все активные бронирования
+    $notifiedCount = 0;
+    
     foreach ($schedule->bookings()->where('status', 'booked')->get() as $booking) {
         $booking->status = 'cancelled';
         $booking->cancelled_at = now();
         $booking->save();
         
-        // Возвращаем тренировку в абонемент
         $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
             ->where('status', 'active')
             ->first();
@@ -716,27 +726,30 @@ public function cancelSchedule($id)
             $activeSubscription->increment('remaining_workouts');
         }
         
-        // Уменьшаем счетчик занятых мест
         $schedule->decrement('current_participants');
         
-        // Уведомляем клиента об отмене
-        \App\Models\Notification::create([
-            'user_id' => $booking->user_id,
-            'type' => 'booking',
-            'message' => "Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} отменено администратором. Тренировка возвращена в абонемент.",
-            'is_read' => false,
-            'data' => json_encode([
-                'schedule_id' => $schedule->id,
-                'workout_name' => $schedule->workout->name,
-                'date' => $schedule->date->format('d.m.Y'),
-                'time' => $schedule->start_time,
-                'cancelled_by' => 'admin'
-            ])
-        ]);
+        $this->notify->send(
+            $booking->user_id,
+            "❌ Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} отменено администратором. Тренировка возвращена в абонемент.",
+            'schedule',
+            ['schedule_id' => $schedule->id]
+        );
+        
+        $notifiedCount++;
     }
     
+    $this->notify->send(
+        $schedule->trainer_id,
+        "⚠️ Администратор отменил вашу тренировку '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+        'schedule',
+        ['schedule_id' => $schedule->id]
+    );
+    
+    // ВЫЗЫВАЕМ СОБЫТИЕ ОТМЕНЫ ТРЕНИРОВКИ
+    event(new \App\Events\ScheduleDeleted($schedule, auth()->user()));
+    
     return redirect()->route('admin.schedule.index')
-        ->with('success', 'Занятие отменено, все бронирования отменены, клиенты оповещены');
+        ->with('success', "Занятие отменено, оповещено {$notifiedCount} клиентов");
 }
 
 /**

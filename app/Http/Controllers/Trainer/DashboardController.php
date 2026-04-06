@@ -10,6 +10,9 @@ use App\Models\Attendance; // <-- ДОБАВЬ ЭТУ СТРОКУ
 use App\Models\Workout;
 use App\Models\Notification; // <-- ДОБАВЬ ЭТУ СТРОКУ
 use App\Models\UserSubscription; // <-- ДОБАВЬ ЭТУ СТРОКУ
+use App\Events\AttendanceMarked;
+use App\Events\ScheduleUpdated;
+use App\Events\ScheduleCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -322,103 +325,71 @@ public function clientDetails($id)
     ]);
 }
 
-/**
- * Отметка посещаемости
- */
-public function markAttendance(Request $request, Schedule $schedule)
-{
-    // Проверяем, что тренировка принадлежит этому тренеру и не отменена
-    if ($schedule->trainer_id !== auth()->id()) {
-        abort(403);
-    }
-    
-    // Проверяем, что тренировка не отменена
-    if ($schedule->status !== Schedule::STATUS_SCHEDULED) {
-        return back()->with('error', 'Нельзя отмечать посещаемость на отмененной тренировке');
-    }
-    
-    $validated = $request->validate([
-        'booking_id' => 'required|exists:bookings,id',
-        'status' => 'required|in:attended,missed'
-    ]);
-    
-    $booking = Booking::find($validated['booking_id']);
-    
-    // Проверяем, что бронирование еще не отмечено
-    if ($booking->status !== Booking::STATUS_BOOKED) {
-        return back()->with('error', 'Это бронирование уже отмечено');
-    }
-    
-    if ($validated['status'] === 'attended') {
-        // Отмечаем как посещенное
-        $booking->markAttended();
-        
-        // Создаем запись о посещении
-        Attendance::create([
-            'booking_id' => $booking->id,
-            'marked_by' => auth()->id(),
-            'attended_at' => now(),
-            'attendance_type' => 'attended'
-        ]);
-        
-        // Уменьшаем количество тренировок в абонементе
-        $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
-            ->where('status', 'active')
-            ->first();
-        if ($activeSubscription && $activeSubscription->remaining_workouts > 0) {
-            $activeSubscription->decrement('remaining_workouts');
+    public function markAttendance(Request $request, Schedule $schedule)
+    {
+        // Проверяем, что тренировка принадлежит этому тренеру и не отменена
+        if ($schedule->trainer_id !== auth()->id()) {
+            abort(403);
         }
         
-        // НЕ уменьшаем счетчик участников! Клиент уже занял место.
-        // current_participants остается прежним
+        // Проверяем, что тренировка не отменена
+        if ($schedule->status !== Schedule::STATUS_SCHEDULED) {
+            return back()->with('error', 'Нельзя отмечать посещаемость на отмененной тренировке');
+        }
         
-        // Отправляем уведомление клиенту
-        \App\Models\Notification::create([
-            'user_id' => $booking->user_id,
-            'type' => 'booking',
-            'message' => "Вы посетили тренировку '{$schedule->workout->name}' {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
-            'is_read' => false,
-            'data' => json_encode([
-                'schedule_id' => $schedule->id,
-                'workout_name' => $schedule->workout->name,
-                'date' => $schedule->date->format('d.m.Y'),
-                'time' => $schedule->start_time,
-                'status' => 'attended'
-            ])
+        $validated = $request->validate([
+            'booking_id' => 'required|exists:bookings,id',
+            'status' => 'required|in:attended,missed'
         ]);
         
-    } else {
-        // Отмечаем как пропущенное
-        $booking->markMissed();
+        $booking = Booking::find($validated['booking_id']);
         
-        // Создаем запись о посещении как пропуск
-        Attendance::create([
-            'booking_id' => $booking->id,
-            'marked_by' => auth()->id(),
-            'attended_at' => now(),
-            'attendance_type' => 'left_early'
-        ]);
+        // Проверяем, что бронирование еще не отмечено
+        if ($booking->status !== Booking::STATUS_BOOKED) {
+            return back()->with('error', 'Это бронирование уже отмечено');
+        }
         
-        // Для пропуска НЕ списываем тренировку и НЕ уменьшаем счетчик участников
+        if ($validated['status'] === 'attended') {
+            // Отмечаем как посещенное
+            $booking->markAttended();
+            
+            // Создаем запись о посещении
+            Attendance::create([
+                'booking_id' => $booking->id,
+                'marked_by' => auth()->id(),
+                'attended_at' => now(),
+                'attendance_type' => 'attended'
+            ]);
+            
+            // Уменьшаем количество тренировок в абонементе
+            $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
+                ->where('status', 'active')
+                ->first();
+            if ($activeSubscription && $activeSubscription->remaining_workouts > 0) {
+                $activeSubscription->decrement('remaining_workouts');
+            }
+            
+            // Отправляем уведомление клиенту через событие
+            event(new AttendanceMarked($booking, auth()->user(), 'attended'));
+            
+        } else {
+            // Отмечаем как пропущенное
+            $booking->markMissed();
+            
+            // Создаем запись о посещении как пропуск
+            Attendance::create([
+                'booking_id' => $booking->id,
+                'marked_by' => auth()->id(),
+                'attended_at' => now(),
+                'attendance_type' => 'left_early'
+            ]);
+            
+            // Отправляем уведомление клиенту через событие
+            event(new AttendanceMarked($booking, auth()->user(), 'missed'));
+        }
         
-        // Отправляем уведомление клиенту
-        \App\Models\Notification::create([
-            'user_id' => $booking->user_id,
-            'type' => 'booking',
-            'message' => "Вы пропустили тренировку '{$schedule->workout->name}' {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
-            'is_read' => false,
-            'data' => json_encode([
-                'schedule_id' => $schedule->id,
-                'workout_name' => $schedule->workout->name,
-                'date' => $schedule->date->format('d.m.Y'),
-                'time' => $schedule->start_time,
-                'status' => 'missed'
-            ])
-        ]);
+        return back()->with('success', 'Посещаемость отмечена');
     }
-    
-    return back()->with('success', 'Посещаемость отмечена');
-}
 
    public function attendance(Request $request)
 {
@@ -627,31 +598,34 @@ public function createSchedule()
  * Сохранить новую тренировку
  */
 public function storeSchedule(Request $request)
-{
-    $validated = $request->validate([
-        'workout_id' => 'required|exists:workouts,id',
-        'date' => 'required|date|after_or_equal:today',
-        'start_time' => 'required',
-        'end_time' => 'required|after:start_time',
-        'room' => 'nullable|string|max:255',
-        'capacity' => 'required|integer|min:1|max:100',
-    ]);
-    
-    Schedule::create([
-        'workout_id' => $validated['workout_id'],
-        'trainer_id' => auth()->id(),
-        'date' => $validated['date'],
-        'start_time' => $validated['start_time'],
-        'end_time' => $validated['end_time'],
-        'room' => $validated['room'] ?? null,
-        'capacity' => $validated['capacity'],
-        'status' => 'scheduled',
-        'current_participants' => 0,
-    ]);
-    
-    return redirect()->route('trainer.schedule')
-        ->with('success', 'Тренировка успешно добавлена в расписание');
-}
+    {
+        $validated = $request->validate([
+            'workout_id' => 'required|exists:workouts,id',
+            'date' => 'required|date|after_or_equal:today',
+            'start_time' => 'required',
+            'end_time' => 'required|after:start_time',
+            'room' => 'nullable|string|max:255',
+            'capacity' => 'required|integer|min:1|max:100',
+        ]);
+        
+        $schedule = Schedule::create([
+            'workout_id' => $validated['workout_id'],
+            'trainer_id' => auth()->id(),
+            'date' => $validated['date'],
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'],
+            'room' => $validated['room'] ?? null,
+            'capacity' => $validated['capacity'],
+            'status' => 'scheduled',
+            'current_participants' => 0,
+        ]);
+        
+        // ВЫЗЫВАЕМ СОБЫТИЕ СОЗДАНИЯ ТРЕНИРОВКИ (для уведомления админов)
+        event(new ScheduleCreated($schedule));
+        
+        return redirect()->route('trainer.schedule')
+            ->with('success', 'Тренировка успешно добавлена в расписание');
+    }
 
 /**
  * Показать форму редактирования тренировки
@@ -679,35 +653,46 @@ public function editSchedule($id)
 }
 
 /**
- * Обновить тренировку
- */
-public function updateSchedule(Request $request, $id)
-{
-    $schedule = Schedule::findOrFail($id);
-    
-    // Проверяем, что тренировка принадлежит этому тренеру
-    if ($schedule->trainer_id !== auth()->id()) {
-        abort(403, 'У вас нет прав на редактирование этой тренировки');
+     * Обновить тренировку
+     */
+    public function updateSchedule(Request $request, $id)
+    {
+        $schedule = Schedule::findOrFail($id);
+        
+        // Проверяем, что тренировка принадлежит этому тренеру
+        if ($schedule->trainer_id !== auth()->id()) {
+            abort(403, 'У вас нет прав на редактирование этой тренировки');
+        }
+        
+        // Проверяем, что тренировка не прошла
+        if ($schedule->isPast()) {
+            return back()->with('error', 'Нельзя редактировать прошедшую тренировку');
+        }
+        
+        $validated = $request->validate([
+            'workout_id' => 'required|exists:workouts,id',
+            'date' => 'required|date',
+            'start_time' => 'required',
+            'end_time' => 'required|after:start_time',
+            'room' => 'nullable|string|max:255',
+            'capacity' => 'required|integer|min:1|max:100',
+        ]);
+        
+        // Сохраняем старые данные для события
+        $oldData = [
+            'date' => $schedule->date->format('d.m.Y'),
+            'start_time' => $schedule->start_time,
+            'end_time' => $schedule->end_time,
+            'capacity' => $schedule->capacity,
+            'room' => $schedule->room
+        ];
+        
+        $schedule->update($validated);
+        
+        // Вызываем событие обновления тренировки
+        event(new ScheduleUpdated($schedule, auth()->user(), $oldData));
+        
+        return redirect()->route('trainer.schedule')
+            ->with('success', 'Тренировка успешно обновлена');
     }
-    
-    // Проверяем, что тренировка не прошла
-    if ($schedule->isPast()) {
-        return back()->with('error', 'Нельзя редактировать прошедшую тренировку');
-    }
-    
-    $validated = $request->validate([
-        'workout_id' => 'required|exists:workouts,id',
-        'date' => 'required|date',
-        'start_time' => 'required',
-        'end_time' => 'required|after:start_time',
-        'room' => 'nullable|string|max:255',
-        'capacity' => 'required|integer|min:1|max:100',
-    ]);
-    
-    $schedule->update($validated);
-    
-    return redirect()->route('trainer.schedule')
-        ->with('success', 'Тренировка успешно обновлена');
-}
-
 }

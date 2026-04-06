@@ -7,8 +7,9 @@ use App\Models\Booking;
 use App\Models\Schedule;
 use App\Models\Subscription;
 use App\Models\Attendance; 
-use App\Models\UserSubscription; // <-- ДОБАВЬ ЭТУ СТРОКУ
-use App\Models\Notification; // <-- И ЭТУ, ЕСЛИ ЕЩЕ НЕТ
+use App\Services\NotificationService;
+use App\Models\UserSubscription;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -16,257 +17,261 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+    protected $notify;
+    
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notify = $notificationService;
+    }
+    
     public function dashboard()
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    $user->refreshSubscriptionStatuses();
-    
-    if (!$user->is_active) {
-        Auth::logout();
-        return redirect()->route('login')
-            ->withErrors(['email' => 'Ваш аккаунт деактивирован.']);
-    }
+        $user->refreshSubscriptionStatuses();
+        
+        if (!$user->is_active) {
+            Auth::logout();
+            return redirect()->route('login')
+                ->withErrors(['email' => 'Ваш аккаунт деактивирован.']);
+        }
 
-    $userSubscriptions = $user->userSubscriptions()
-        ->with('subscription')
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    // Проверяем, есть ли у пользователя абонемент с тренером
-    $hasTrainerSubscription = $user->hasActiveTrainerSubscription();
-    
-    // Показываем предстоящие тренировки только если есть абонемент с тренером
-    $upcomingBookings = $hasTrainerSubscription 
-        ? $user->upcomingBookings()->limit(5)->get() 
-        : collect();
-
-    $data = [
-        'user' => $user,
-        'userSubscriptions' => $userSubscriptions,
-        'upcomingBookings' => $upcomingBookings,
-        'hasTrainerSubscription' => $hasTrainerSubscription,
-        'pastBookings' => Booking::where('user_id', $user->id)
-            ->whereIn('status', ['attended', 'missed'])
-            ->with('schedule.workout', 'schedule.trainer')
+        $userSubscriptions = $user->userSubscriptions()
+            ->with('subscription')
             ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get(),
-        'activeSubscription' => $user->activeSubscription(),
-        'availableSubscriptions' => Subscription::where('is_active', true)->get(),
-    ];
-    
-    return view('client.dashboard', $data);
-}
+            ->get();
 
-public function schedule(Request $request)
-{
-    $user = Auth::user();
-    
-    // Проверяем, есть ли у пользователя абонемент с тренером
-    if (!$user->hasActiveTrainerSubscription()) {
-        return redirect()->route('client.dashboard')
-            ->with('error', 'Для записи на тренировки с тренером необходим абонемент "С тренером"');
-    }
-    
-    $workoutId = $request->get('workout_id');
-    $date = $request->get('date');
-    
-    $query = Schedule::with(['workout', 'trainer'])
-        ->where('date', '>=', now()->toDateString())
-        ->where('status', 'scheduled')
-        ->whereHas('workout', function($q) {
-            $q->where('is_active', true);
-        });
-
-    if ($workoutId && $workoutId != '') {
-        $query->where('workout_id', $workoutId);
-    }
-
-    if ($date && $date != '') {
-        $query->where('date', $date);
-    } else {
-        $query->where('date', '<=', now()->addDays(7)->toDateString());
-    }
-
-    $schedules = $query->orderBy('date')->orderBy('start_time')->get();
-    $workouts = \App\Models\Workout::where('is_active', true)->get();
-    
-    $userBookings = Auth::user()->bookings()
-        ->whereIn('schedule_id', $schedules->pluck('id'))
-        ->where('status', '!=', 'cancelled')
-        ->pluck('schedule_id')
-        ->toArray();
-
-    return view('client.schedule', [
-        'schedules' => $schedules,
-        'workouts' => $workouts,
-        'userBookings' => $userBookings,
-        'selectedWorkout' => $workoutId,
-        'selectedDate' => $date,
-    ]);
-}
-
-/**
- * Бронирование тренировки
- */
-public function book(Schedule $schedule, Request $request)
-{
-    $user = Auth::user();
-
-    // Проверяем наличие абонемента с тренером
-    if (!$user->hasActiveTrainerSubscription()) {
-        return back()->with('error', 'Для записи на тренировки с тренером необходим абонемент "С тренером"');
-    }
-
-    if (!$schedule->canBook()) {
-        return back()->with('error', 'Это занятие нельзя забронировать');
-    }
-
-    // ПРОВЕРЯЕМ СУЩЕСТВУЮЩИЕ БРОНИРОВАНИЯ
-    $existingBooking = Booking::where('user_id', $user->id)
-        ->where('schedule_id', $schedule->id)
-        ->whereIn('status', ['booked', 'attended']) // Только активные бронирования
-        ->first();
-
-    if ($existingBooking) {
-        return back()->with('error', 'Вы уже забронировали это занятие (статус: ' . $existingBooking->status . ')');
-    }
-
-    // Проверяем, есть ли свободные места
-    if (!$schedule->hasAvailableSlots()) {
-        return back()->with('error', 'Нет свободных мест');
-    }
-
-    // Проверяем, есть ли отмененное бронирование, которое можно восстановить
-    $cancelledBooking = Booking::where('user_id', $user->id)
-        ->where('schedule_id', $schedule->id)
-        ->where('status', 'cancelled')
-        ->first();
+        $hasTrainerSubscription = $user->hasActiveTrainerSubscription();
         
-    if ($cancelledBooking) {
-        // Восстанавливаем отмененное бронирование
-        $cancelledBooking->status = Booking::STATUS_BOOKED;
-        $cancelledBooking->cancelled_at = null;
-        $cancelledBooking->save();
+        $upcomingBookings = $hasTrainerSubscription 
+            ? $user->upcomingBookings()->limit(5)->get() 
+            : collect();
+
+        $data = [
+            'user' => $user,
+            'userSubscriptions' => $userSubscriptions,
+            'upcomingBookings' => $upcomingBookings,
+            'hasTrainerSubscription' => $hasTrainerSubscription,
+            'pastBookings' => Booking::where('user_id', $user->id)
+                ->whereIn('status', ['attended', 'missed'])
+                ->with('schedule.workout', 'schedule.trainer')
+                ->orderBy('created_at', 'desc')
+                ->limit(5)
+                ->get(),
+            'activeSubscription' => $user->activeSubscription(),
+            'availableSubscriptions' => Subscription::where('is_active', true)->get(),
+        ];
         
-        $booking = $cancelledBooking;
+        return view('client.dashboard', $data);
+    }
+
+    public function schedule(Request $request)
+    {
+        $user = Auth::user();
         
-        // Увеличиваем счетчик занятых мест
+        if (!$user->hasActiveTrainerSubscription()) {
+            return redirect()->route('client.dashboard')
+                ->with('error', 'Для записи на тренировки с тренером необходим абонемент "С тренером"');
+        }
+        
+        $workoutId = $request->get('workout_id');
+        $date = $request->get('date');
+        
+        $query = Schedule::with(['workout', 'trainer'])
+            ->where('date', '>=', now()->toDateString())
+            ->where('status', 'scheduled')
+            ->whereHas('workout', function($q) {
+                $q->where('is_active', true);
+            });
+
+        if ($workoutId && $workoutId != '') {
+            $query->where('workout_id', $workoutId);
+        }
+
+        if ($date && $date != '') {
+            $query->where('date', $date);
+        } else {
+            $query->where('date', '<=', now()->addDays(7)->toDateString());
+        }
+
+        $schedules = $query->orderBy('date')->orderBy('start_time')->get();
+        $workouts = \App\Models\Workout::where('is_active', true)->get();
+        
+        $userBookings = Auth::user()->bookings()
+            ->whereIn('schedule_id', $schedules->pluck('id'))
+            ->where('status', '!=', 'cancelled')
+            ->pluck('schedule_id')
+            ->toArray();
+
+        return view('client.schedule', [
+            'schedules' => $schedules,
+            'workouts' => $workouts,
+            'userBookings' => $userBookings,
+            'selectedWorkout' => $workoutId,
+            'selectedDate' => $date,
+        ]);
+    }
+
+    public function book(Schedule $schedule, Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user->hasActiveTrainerSubscription()) {
+            return back()->with('error', 'Для записи на тренировки с тренером необходим абонемент "С тренером"');
+        }
+
+        if (!$schedule->canBook()) {
+            return back()->with('error', 'Это занятие нельзя забронировать');
+        }
+
+        $existingBooking = Booking::where('user_id', $user->id)
+            ->where('schedule_id', $schedule->id)
+            ->whereIn('status', ['booked', 'attended'])
+            ->first();
+
+        if ($existingBooking) {
+            return back()->with('error', 'Вы уже забронировали это занятие (статус: ' . $existingBooking->status . ')');
+        }
+
+        if (!$schedule->hasAvailableSlots()) {
+            return back()->with('error', 'Нет свободных мест');
+        }
+
+        $cancelledBooking = Booking::where('user_id', $user->id)
+            ->where('schedule_id', $schedule->id)
+            ->where('status', 'cancelled')
+            ->first();
+            
+        if ($cancelledBooking) {
+            $cancelledBooking->status = Booking::STATUS_BOOKED;
+            $cancelledBooking->cancelled_at = null;
+            $cancelledBooking->save();
+            
+            $booking = $cancelledBooking;
+            $schedule->increment('current_participants');
+            
+            $activeSubscription = $user->activeSubscription();
+            if ($activeSubscription && $activeSubscription->remaining_workouts > 0) {
+                $activeSubscription->decrement('remaining_workouts');
+            }
+            
+            // Уведомление о восстановлении
+            $this->notify->send(
+                $user->id,
+                "Вы восстановили бронирование на занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+                'booking',
+                ['schedule_id' => $schedule->id, 'workout_name' => $schedule->workout->name]
+            );
+            
+            $this->notify->send(
+                $schedule->trainer_id,
+                "Клиент {$user->name} восстановил бронирование на '{$schedule->workout->name}' в {$schedule->start_time}",
+                'booking',
+                ['schedule_id' => $schedule->id, 'client_id' => $user->id]
+            );
+            
+            return back()->with('success', 'Бронирование восстановлено!');
+        }
+
+        $booking = Booking::create([
+            'user_id' => $user->id,
+            'schedule_id' => $schedule->id,
+            'status' => Booking::STATUS_BOOKED,
+        ]);
+
         $schedule->increment('current_participants');
-        
-        // Уменьшаем количество тренировок в абонементе
+
         $activeSubscription = $user->activeSubscription();
         if ($activeSubscription && $activeSubscription->remaining_workouts > 0) {
             $activeSubscription->decrement('remaining_workouts');
         }
         
-        // Создаем уведомление о восстановлении
-        \App\Models\Notification::create([
-            'user_id' => $user->id,
-            'type' => 'booking',
-            'message' => "Вы восстановили бронирование на занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
-            'is_read' => false,
-            'data' => json_encode([
-                'schedule_id' => $schedule->id,
-                'workout_name' => $schedule->workout->name,
-                'date' => $schedule->date->format('d.m.Y'),
-                'time' => $schedule->start_time
-            ])
-        ]);
+        // Уведомления
+        $this->notify->send(
+            $user->id,
+            "Вы забронировали занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+            'booking',
+            ['schedule_id' => $schedule->id, 'workout_name' => $schedule->workout->name]
+        );
         
-        return back()->with('success', 'Бронирование восстановлено!');
-    }
-
-    // Создаем новое бронирование
-    $booking = Booking::create([
-        'user_id' => $user->id,
-        'schedule_id' => $schedule->id,
-        'status' => Booking::STATUS_BOOKED,
-    ]);
-
-    // Увеличиваем счетчик занятых мест
-    $schedule->increment('current_participants');
-
-    // Уменьшаем количество тренировок в абонементе
-    $activeSubscription = $user->activeSubscription();
-    if ($activeSubscription && $activeSubscription->remaining_workouts > 0) {
-        $activeSubscription->decrement('remaining_workouts');
-    }
-    
-    // Создаем уведомление
-    \App\Models\Notification::create([
-        'user_id' => $user->id,
-        'type' => 'booking',
-        'message' => "Вы забронировали занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
-        'is_read' => false,
-        'data' => json_encode([
-            'schedule_id' => $schedule->id,
-            'workout_name' => $schedule->workout->name,
-            'date' => $schedule->date->format('d.m.Y'),
-            'time' => $schedule->start_time
-        ])
-    ]);
-
-    return back()->with('success', 'Занятие успешно забронировано!');
-}
-
-    /**
- * Отмена бронирования
- */
-public function cancelBooking(Booking $booking, Request $request)
-{
-    if ($booking->user_id !== Auth::id()) {
-        abort(403);
-    }
-
-    if (!$booking->canCancel()) {
-        return back()->with('error', 'Это бронирование нельзя отменить');
-    }
-
-    // Проверяем, не было ли уже посещение
-    $attendanceExists = Attendance::where('booking_id', $booking->id)->exists();
-    if ($attendanceExists) {
-        return back()->with('error', 'Нельзя отменить тренировку, которая уже была посещена');
-    }
-
-    // Сохраняем данные до отмены
-    $scheduleDate = $booking->schedule->date;
-    $user = Auth::user();
-
-    // Отменяем бронирование
-    $booking->cancel();
-
-    // ВОЗВРАЩАЕМ ТРЕНИРОВКУ В АБОНЕМЕНТ (только для будущих занятий)
-    if ($scheduleDate > now()->toDateString()) {
-        $activeSubscription = $user->activeSubscription();
-        if ($activeSubscription) {
-            $activeSubscription->increment('remaining_workouts');
+        $this->notify->send(
+            $schedule->trainer_id,
+            "Новый клиент! {$user->name} записался на тренировку '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+            'booking',
+            ['schedule_id' => $schedule->id, 'client_id' => $user->id]
+        );
+        
+        if ($schedule->current_participants >= $schedule->capacity) {
+            $this->notify->notifyAdmins(
+                "Тренировка '{$schedule->workout->name}' полностью заполнена! ({$schedule->current_participants}/{$schedule->capacity})",
+                'booking',
+                ['schedule_id' => $schedule->id, 'trainer_id' => $schedule->trainer_id]
+            );
         }
+
+        return back()->with('success', 'Занятие успешно забронировано!');
     }
 
-    return back()->with('success', 'Бронирование отменено, тренировка возвращена в абонемент');
-}
+    public function cancelBooking(Booking $booking, Request $request)
+    {
+        if ($booking->user_id !== Auth::id()) {
+            abort(403);
+        }
 
-/**
- * ИСПРАВЛЕННЫЙ МЕТОД subscriptions
- */
-public function subscriptions()
-{
-    $subscriptions = Subscription::where('is_active', true)->get();
-    
-    // ИСПРАВЛЕНО: используем userSubscriptions() вместо subscriptions()
-    $userSubscriptions = Auth::user()->userSubscriptions()
-        ->with('subscription')
-        ->orderBy('created_at', 'desc')
-        ->get();
+        if (!$booking->canCancel()) {
+            return back()->with('error', 'Это бронирование нельзя отменить');
+        }
 
-    return view('client.subscriptions', [
-        'subscriptions' => $subscriptions,
-        'userSubscriptions' => $userSubscriptions,
-        'user' => Auth::user(),
-    ]);
-}
+        $attendanceExists = Attendance::where('booking_id', $booking->id)->exists();
+        if ($attendanceExists) {
+            return back()->with('error', 'Нельзя отменить тренировку, которая уже была посещена');
+        }
+
+        $scheduleDate = $booking->schedule->date;
+        $user = Auth::user();
+        $schedule = $booking->schedule;
+
+        $booking->cancel();
+
+        if ($scheduleDate > now()->toDateString()) {
+            $activeSubscription = $user->activeSubscription();
+            if ($activeSubscription) {
+                $activeSubscription->increment('remaining_workouts');
+            }
+        }
+        
+        $this->notify->send(
+            $user->id,
+            "Вы отменили бронирование на '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+            'booking',
+            ['schedule_id' => $schedule->id]
+        );
+        
+        $this->notify->send(
+            $schedule->trainer_id,
+            "Клиент {$user->name} отменил бронирование на '{$schedule->workout->name}' в {$schedule->start_time}",
+            'booking',
+            ['schedule_id' => $schedule->id, 'client_id' => $user->id]
+        );
+
+        return back()->with('success', 'Бронирование отменено, тренировка возвращена в абонемент');
+    }
+
+    public function subscriptions()
+    {
+        $subscriptions = Subscription::where('is_active', true)->get();
+        
+        $userSubscriptions = Auth::user()->userSubscriptions()
+            ->with('subscription')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('client.subscriptions', [
+            'subscriptions' => $subscriptions,
+            'userSubscriptions' => $userSubscriptions,
+            'user' => Auth::user(),
+        ]);
+    }
 
     public function purchaseSubscription(Subscription $subscription)
     {
@@ -280,6 +285,13 @@ public function subscriptions()
             'activated_by' => $user->id,
             'activated_at' => now(),
         ]);
+        
+        $this->notify->send(
+            $user->id,
+            "Вы приобрели абонемент '{$subscription->name}'!",
+            'subscription',
+            ['subscription_id' => $subscription->id]
+        );
 
         return back()->with('success', "Абонемент '{$subscription->name}' успешно приобретен!");
     }
@@ -291,22 +303,22 @@ public function subscriptions()
     }
 
     public function updateProfile(Request $request)
-{
-    $user = Auth::user();
-    
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-        'phone' => 'nullable|string|max:20',
-        'birth_date' => 'nullable|date|before:today',
-        'notes' => 'nullable|string|max:1000', // ДОБАВЛЕНО
-    ]);
-    
-    $user->update($validated);
-    
-    return redirect()->route('client.profile')
-        ->with('success', 'Профиль успешно обновлен');
-}
+    {
+        $user = Auth::user();
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20',
+            'birth_date' => 'nullable|date|before:today',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+        
+        $user->update($validated);
+        
+        return redirect()->route('client.profile')
+            ->with('success', 'Профиль успешно обновлен');
+    }
 
     public function updatePassword(Request $request)
     {
@@ -324,95 +336,79 @@ public function subscriptions()
             ->with('success', 'Пароль успешно изменен');
     }
 
-/**
- * Заморозка абонемента*/
-
-public function freezeSubscription(Request $request)
-{
-    $request->validate([
-        'reason' => 'required|string|max:255',
-        'days' => 'required|integer|min:1|max:14',
-    ]);
-    
-    $user = Auth::user();
-    
-    // Получаем активную запись user_subscriptions
-    $userSubscription = $user->activeSubscription();
-    
-    if (!$userSubscription) {
-        return back()->with('error', 'У вас нет активного абонемента');
-    }
-    
-    // Проверяем, не заморожен ли уже
-    if ($userSubscription->isPaused()) {
-        return back()->with('error', 'Абонемент уже заморожен');
-    }
-    
-    try {
-        // Используем метод pause из модели UserSubscription
-        $userSubscription->pause($request->days);
-        
-        // Сохраняем причину (можно добавить поле в таблицу)
-        $userSubscription->pause_reason = $request->reason;
-        $userSubscription->save();
-        
-        return back()->with('success', "Абонемент успешно заморожен на {$request->days} дней");
-        
-    } catch (\Exception $e) {
-        return back()->with('error', 'Ошибка при заморозке: ' . $e->getMessage());
-    }
-}
-
-/**
- * Разморозка абонемента
- */
-public function resumeSubscription(Request $request)
-{
-    $user = Auth::user();
-    
-    // Ищем замороженный абонемент (включая те, у которых уже истекла дата заморозки)
-    $userSubscription = $user->userSubscriptions()
-        ->where('status', UserSubscription::STATUS_FROZEN)
-        ->whereNotNull('paused_at')
-        ->whereNotNull('paused_until')
-        ->first(); // Убираем условие по дате
-    
-    if (!$userSubscription) {
-        return back()->with('error', 'У вас нет замороженного абонемента');
-    }
-    
-    try {
-        // Проверяем, если заморозка уже закончилась - просто меняем статус
-        if (!$userSubscription->isPaused()) {
-            // Заморозка закончилась, просто возвращаем статус в active
-            $userSubscription->status = UserSubscription::STATUS_ACTIVE;
-            $userSubscription->paused_at = null;
-            $userSubscription->paused_until = null;
-            $userSubscription->pause_days = null;
-            $userSubscription->save();
-        } else {
-            // Заморозка еще активна - используем метод resume
-            $userSubscription->resume();
-        }
-        
-        // Создаем уведомление
-        \App\Models\Notification::create([
-            'user_id' => $user->id,
-            'type' => 'subscription',
-            'message' => 'Ваш абонемент успешно разморожен. Срок действия обновлен.',
-            'is_read' => false,
-            'data' => json_encode([
-                'subscription_id' => $userSubscription->subscription_id,
-                'subscription_name' => $userSubscription->subscription->name ?? 'Абонемент',
-                'new_end_date' => $userSubscription->end_date->format('d.m.Y')
-            ])
+    public function freezeSubscription(Request $request)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:255',
+            'days' => 'required|integer|min:1|max:14',
         ]);
         
-        return back()->with('success', 'Абонемент успешно разморожен');
+        $user = Auth::user();
+        $userSubscription = $user->activeSubscription();
         
-    } catch (\Exception $e) {
-        return back()->with('error', 'Ошибка при разморозке: ' . $e->getMessage());
+        if (!$userSubscription) {
+            return back()->with('error', 'У вас нет активного абонемента');
+        }
+        
+        if ($userSubscription->isPaused()) {
+            return back()->with('error', 'Абонемент уже заморожен');
+        }
+        
+        try {
+            $userSubscription->pause($request->days);
+            $userSubscription->pause_reason = $request->reason;
+            $userSubscription->save();
+            
+            $this->notify->send(
+                $user->id,
+                "Ваш абонемент заморожен на {$request->days} дней. Причина: {$request->reason}",
+                'subscription',
+                ['subscription_id' => $userSubscription->subscription_id]
+            );
+            
+            return back()->with('success', "Абонемент успешно заморожен на {$request->days} дней");
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ошибка при заморозке: ' . $e->getMessage());
+        }
     }
-}
 
+    public function resumeSubscription(Request $request)
+    {
+        $user = Auth::user();
+        
+        $userSubscription = $user->userSubscriptions()
+            ->where('status', UserSubscription::STATUS_FROZEN)
+            ->whereNotNull('paused_at')
+            ->whereNotNull('paused_until')
+            ->first();
+        
+        if (!$userSubscription) {
+            return back()->with('error', 'У вас нет замороженного абонемента');
+        }
+        
+        try {
+            if (!$userSubscription->isPaused()) {
+                $userSubscription->status = UserSubscription::STATUS_ACTIVE;
+                $userSubscription->paused_at = null;
+                $userSubscription->paused_until = null;
+                $userSubscription->pause_days = null;
+                $userSubscription->save();
+            } else {
+                $userSubscription->resume();
+            }
+            
+            $this->notify->send(
+                $user->id,
+                "Ваш абонемент успешно разморожен. Срок действия обновлен.",
+                'subscription',
+                ['subscription_id' => $userSubscription->subscription_id]
+            );
+            
+            return back()->with('success', 'Абонемент успешно разморожен');
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ошибка при разморозке: ' . $e->getMessage());
+        }
+    }
 }

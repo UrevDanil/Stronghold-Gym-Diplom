@@ -4,6 +4,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Events\NewClientRegistered; // ДОБАВИТЬ
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -17,44 +18,44 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-/**
- * Обработка входа
- */
-public function login(Request $request)
-{
-    $credentials = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+    /**
+     * Обработка входа
+     */
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-    if (Auth::attempt($credentials, $request->remember)) {
-        $request->session()->regenerate();
-        
-        $user = Auth::user();
-        
-        // ПРОВЕРКА: активен ли пользователь
-        if (property_exists($user, 'is_active') && !$user->is_active) {
-            Auth::logout();
-            return back()->withErrors([
-                'email' => 'Ваш аккаунт деактивирован. Обратитесь к администратору.',
-            ])->onlyInput('email');
+        if (Auth::attempt($credentials, $request->remember)) {
+            $request->session()->regenerate();
+            
+            $user = Auth::user();
+            
+            // ПРОВЕРКА: активен ли пользователь
+            if (property_exists($user, 'is_active') && !$user->is_active) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Ваш аккаунт деактивирован. Обратитесь к администратору.',
+                ])->onlyInput('email');
+            }
+            
+            // Проверка на удаленного (заблокированного)
+            if (method_exists($user, 'trashed') && $user->trashed()) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Ваш аккаунт заблокирован. Обратитесь к администратору.',
+                ])->onlyInput('email');
+            }
+            
+            return redirect()->intended('dashboard');
         }
-        
-        // Проверка на удаленного (заблокированного)
-        if (method_exists($user, 'trashed') && $user->trashed()) {
-            Auth::logout();
-            return back()->withErrors([
-                'email' => 'Ваш аккаунт заблокирован. Обратитесь к администратору.',
-            ])->onlyInput('email');
-        }
-        
-        return redirect()->intended('dashboard');
+
+        return back()->withErrors([
+            'email' => 'Неверные учетные данные.',
+        ])->onlyInput('email');
     }
-
-    return back()->withErrors([
-        'email' => 'Неверные учетные данные.',
-    ])->onlyInput('email');
-}
 
     // Показ формы регистрации
     public function showRegister()
@@ -88,7 +89,11 @@ public function login(Request $request)
             'phone' => $request->phone,
             'birth_date' => $request->birth_date,
             'role_id' => $clientRole->id,
+            'is_active' => true, // ДОБАВИТЬ: по умолчанию активен
         ]);
+
+        // ВЫЗЫВАЕМ СОБЫТИЕ НОВОГО КЛИЕНТА
+        event(new NewClientRegistered($user));
 
         Auth::login($user);
 
