@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Role;  // <-- ДОБАВЬ ЭТУ СТРОКУ
+use App\Models\Role;
 use App\Models\Subscription;
 use App\Models\UserSubscription;
 use App\Models\Booking;
@@ -17,7 +17,7 @@ use App\Events\ScheduleDeleted;
 use App\Events\ScheduleCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;  // <-- ДОБАВЬ ДЛЯ ХЭШИРОВАНИЯ ПАРОЛЕЙ
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -1057,6 +1057,95 @@ public function reports(Request $request)
         'popularWorkouts' => $popularWorkouts,
         'topTrainers' => $topTrainers,
         'topClients' => $topClients,
+    ]);
+}
+
+/**
+ * Простой возврат тренировки в абонемент
+ */
+public function refundTraining(Request $request, $clientId)
+{
+    $admin = auth()->user();
+    $client = User::findOrFail($clientId);
+    
+    if (!$client->isClient()) {
+        return back()->with('error', 'Пользователь не является клиентом');
+    }
+    
+    $validated = $request->validate([
+        'reason' => 'nullable|string|max:500',
+    ]);
+    
+    // Получаем активный абонемент клиента
+    $activeSubscription = $client->activeSubscription();
+    
+    if (!$activeSubscription) {
+        return back()->with('error', 'У клиента нет активного абонемента');
+    }
+    
+    // Просто добавляем одну тренировку обратно в абонемент
+    $activeSubscription->increment('remaining_workouts');
+    
+    // Создаем запись о возврате (опционально)
+    $refundNote = "Возврат тренировки администратором {$admin->name}. Причина: " . ($validated['reason'] ?? 'Не указана');
+    
+    // Можно создать уведомление или запись в лог
+    \App\Models\Notification::create([
+        'user_id' => $client->id,
+        'type' => 'attendance',
+        'message' => "🔄 Администратор вернул одну тренировку в ваш абонемент. Причина: " . ($validated['reason'] ?? 'Ошибка учета'),
+        'is_read' => false,
+        'data' => json_encode([
+            'refunded_by' => $admin->id,
+            'refunded_at' => now()->format('d.m.Y H:i'),
+            'reason' => $validated['reason'] ?? null,
+            'new_balance' => $activeSubscription->remaining_workouts
+        ])
+    ]);
+    
+    // Уведомление админам
+    $this->notify->notifyAdmins(
+        "🔄 Администратор {$admin->name} вернул тренировку клиенту {$client->name}. Теперь у клиента {$activeSubscription->remaining_workouts} тренировок в абонементе",
+        'attendance',
+        ['client_id' => $client->id, 'admin_id' => $admin->id]
+    );
+    
+    $remainingText = $activeSubscription->subscription->workouts_count > 0 
+        ? "Теперь у клиента {$activeSubscription->remaining_workouts} тренировок в абонементе"
+        : "Безлимитный абонемент";
+    
+    return back()->with('success', "Тренировка успешно возвращена! " . $remainingText);
+}
+
+/**
+ * Получить список списанных тренировок клиента (AJAX)
+ */
+public function getClientAttendanceHistory($clientId)
+{
+    $client = User::findOrFail($clientId);
+    
+    if (!$client->isClient()) {
+        return response()->json(['error' => 'Не клиент'], 404);
+    }
+    
+    $attendances = Attendance::where('user_id', $client->id)
+        ->whereNotNull('booking_id')
+        ->with(['booking.schedule.workout'])
+        ->orderBy('attended_at', 'desc')
+        ->get()
+        ->map(function($attendance) {
+            return [
+                'id' => $attendance->id,
+                'date' => $attendance->attended_at->format('Y-m-d'),
+                'date_formatted' => $attendance->attended_at->format('d.m.Y'),
+                'workout_name' => $attendance->booking->schedule->workout->name ?? 'Тренировка',
+                'time' => substr($attendance->booking->schedule->start_time ?? '', 0, 5),
+            ];
+        });
+    
+    return response()->json([
+        'success' => true,
+        'attendances' => $attendances
     ]);
 }
 

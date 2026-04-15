@@ -118,6 +118,8 @@ Route::middleware(['auth', 'active', 'role:admin,owner'])->prefix('admin')->name
     Route::get('/attendance', [AdminDashboardController::class, 'attendance'])->name('attendance');
     Route::post('/attendance/mark/{clientId}', [AdminDashboardController::class, 'markClientAttendance'])->name('attendance.mark');
     Route::get('/attendance/client/{clientId}', [AdminDashboardController::class, 'getClientInfo'])->name('attendance.client-info');
+    Route::post('/attendance/refund/{clientId}', [AdminDashboardController::class, 'refundTraining'])->name('attendance.refund');
+    Route::get('/attendance/history/{clientId}', [AdminDashboardController::class, 'getClientAttendanceHistory'])->name('attendance.history');
 
     // Отчеты
     Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');

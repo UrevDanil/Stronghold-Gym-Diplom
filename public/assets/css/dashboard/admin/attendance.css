@@ -392,7 +392,7 @@
    ---------------------------------------- */
 
 .btn-mark {
-    background: linear-gradient(135deg, #198cf7, #17dd8b);
+    background: linear-gradient(135deg,  #17dd8b);
     border: none;
     border-radius: 60px;
     padding: 0.8rem 1.5rem;
@@ -456,6 +456,116 @@
 
 .btn-mark-disabled:hover::before {
     display: none;
+}
+
+/* ----------------------------------------
+   7.1 КНОПКА ВОЗВРАТА ТРЕНИРОВКИ
+   ---------------------------------------- */
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.btn-refund {
+    background: linear-gradient(135deg,  #198cf7);
+    border: none;
+    border-radius: 60px;
+    padding: 0.8rem 1.5rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: white;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-refund::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-refund:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-refund:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 0 4px rgba(25, 102, 218, 0.1);
+    color: white;
+}
+
+.btn-refund i {
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-refund:hover i {
+    transform: rotate(-15deg);
+}
+
+/* Стили для модального окна возврата */
+.modal-header.bg-danger {
+    background: linear-gradient(135deg, #198cf7, #17dd8b);
+}
+
+.modal-footer .btn-danger {
+    background: white;
+    color: #17dd8b;
+    border: 2px solid #17dd8b;
+    border-radius: 60px;
+    padding: 0.7rem 2rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 0 4px rgba(14, 120, 85, 0.1);
+}
+
+.modal-footer .btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 4px rgba(14, 120, 85, 0.1);
+    background: #17dd8b;
+    color: white;
+}
+
+/* Стили для radio кнопок в модальном окне */
+.form-check-input:checked {
+    background-color: #198cf7, #17dd8b;
+    border-color: #198cf7, #17dd8b;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+    .btn-refund {
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .btn-refund i {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-refund {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.75rem;
+    }
 }
 
 /* ----------------------------------------

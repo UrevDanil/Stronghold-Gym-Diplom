@@ -111,18 +111,25 @@
                             @endif
                         </div>
 
-                        <button type="button" class="btn-mark mt-3 {{ !$canMark ? 'btn-mark-disabled' : '' }}"
-                                data-bs-toggle="modal" data-bs-target="#markAttendanceModal"
-                                data-client-id="{{ $client->id }}"
-                                data-client-name="{{ $client->name }}"
-                                data-client-phone="{{ $client->phone }}"
-                                data-has-subscription="{{ $hasSubscription ? 'true' : 'false' }}"
-                                data-remaining="{{ $remaining }}"
-                                data-is-unlimited="{{ $isUnlimited ? 'true' : 'false' }}"
-                                data-subscription-name="{{ $hasSubscription ? ($activeSub->subscription->name ?? 'Абонемент') : '' }}"
-                                {{ !$canMark ? 'disabled' : '' }}>
-                            <i class="fas fa-check-circle"></i> Отметить посещение
-                        </button>
+                        <div class="button-group mt-3">
+                            <button type="button" class="btn-mark {{ !$canMark ? 'btn-mark-disabled' : '' }}"
+                                    data-bs-toggle="modal" data-bs-target="#markAttendanceModal"
+                                    data-client-id="{{ $client->id }}"
+                                    data-client-name="{{ $client->name }}"
+                                    data-client-phone="{{ $client->phone }}"
+                                    data-has-subscription="{{ $hasSubscription ? 'true' : 'false' }}"
+                                    data-remaining="{{ $remaining }}"
+                                    data-is-unlimited="{{ $isUnlimited ? 'true' : 'false' }}"
+                                    data-subscription-name="{{ $hasSubscription ? ($activeSub->subscription->name ?? 'Абонемент') : '' }}"
+                                    {{ !$canMark ? 'disabled' : '' }}>
+                                <i class="fas fa-check-circle"></i> Отметить посещение
+                            </button>
+                            
+                            <button type="button" class="btn-refund mt-2" 
+                                    onclick="showRefundModal({{ $client->id }}, '{{ addslashes($client->name) }}')">
+                                <i class="fas fa-undo-alt me-1"></i>Вернуть тренировку
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -188,6 +195,53 @@
     </div>
 </div>
 
+<!-- Модальное окно для возврата тренировки (упрощенное) -->
+<div class="modal fade" id="refundModal" tabindex="-1" aria-labelledby="refundModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #198cf7, #17dd8b); color: white;">
+                <h5 class="modal-title" id="refundModalLabel">
+                    <i class="fas fa-undo-alt me-2"></i>Возврат тренировки
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="refundForm" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <input type="hidden" name="client_id" id="refundClientId">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Клиент</label>
+                        <p class="form-control-plaintext" id="refundClientName"></p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="refundReason" class="form-label">Причина возврата (необязательно)</label>
+                        <textarea class="form-control" id="refundReason" name="reason" rows="2" 
+                                  placeholder="Например: клиент не пришел, ошибка учета, техническая проблема и т.д."></textarea>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Возврат добавит <strong>+1 тренировку</strong> в абонемент клиента.
+                    </div>
+                    
+                    <div class="alert alert-warning" id="currentBalanceInfo">
+                        <i class="fas fa-chart-line me-2"></i>
+                        <span id="currentBalanceText">Загрузка информации об абонементе...</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-undo-alt me-2"></i>Вернуть тренировку
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Поиск клиентов
@@ -199,17 +253,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const searchTerm = this.value.toLowerCase().trim();
             
             clientCards.forEach(card => {
-                // Получаем данные из dataset
                 const name = (card.dataset.name || '').toLowerCase();
                 const email = (card.dataset.email || '').toLowerCase();
                 const phone = (card.dataset.phone || '').toLowerCase();
                 
-                // Проверяем совпадение
                 const matches = name.includes(searchTerm) || 
                                email.includes(searchTerm) || 
                                phone.includes(searchTerm);
                 
-                // Если поиск пустой - показываем все карточки
                 if (searchTerm === '') {
                     card.style.display = '';
                 } else if (matches) {
@@ -221,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Модальное окно
+    // Модальное окно отметки посещения
     const modal = document.getElementById('markAttendanceModal');
     const form = document.getElementById('markAttendanceForm');
     const modalClientName = document.getElementById('modalClientName');
@@ -241,10 +292,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const isUnlimited = button.getAttribute('data-is-unlimited') === 'true';
             const subscriptionName = button.getAttribute('data-subscription-name');
             
-            // Устанавливаем action формы
             form.action = `/admin/attendance/mark/${clientId}`;
             
-            // Заполняем данные
             modalClientName.textContent = clientName;
             modalClientPhone.textContent = clientPhone ? `📞 ${clientPhone}` : '';
             
@@ -277,5 +326,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Функция открытия модального окна возврата (упрощенная)
+function showRefundModal(clientId, clientName) {
+    document.getElementById('refundClientId').value = clientId;
+    document.getElementById('refundClientName').innerText = clientName;
+    document.getElementById('refundForm').action = `/admin/attendance/refund/${clientId}`;
+    document.getElementById('refundReason').value = '';
+    
+    // Получаем информацию об абонементе клиента
+    fetch(`/admin/attendance/client/${clientId}`)
+        .then(response => response.json())
+        .then(data => {
+            const balanceSpan = document.getElementById('currentBalanceText');
+            if (data.has_subscription) {
+                if (data.is_unlimited) {
+                    balanceSpan.innerHTML = `<i class="fas fa-infinity"></i> У клиента <strong>${data.name}</strong> безлимитный абонемент. Возврат добавит +1 к счетчику (хотя это не требуется для безлимита).`;
+                    document.querySelector('#refundModal .btn-danger').disabled = false;
+                } else {
+                    balanceSpan.innerHTML = `<i class="fas fa-dumbbell"></i> У клиента <strong>${data.name}</strong> осталось <strong>${data.remaining_workouts}</strong> тренировок. После возврата станет <strong>${data.remaining_workouts + 1}</strong>.`;
+                    document.querySelector('#refundModal .btn-danger').disabled = false;
+                }
+            } else {
+                balanceSpan.innerHTML = `<i class="fas fa-exclamation-triangle"></i> У клиента <strong>${data.name}</strong> НЕТ активного абонемента! Возврат невозможен.`;
+                document.querySelector('#refundModal .btn-danger').disabled = true;
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            document.getElementById('currentBalanceText').innerHTML = 'Не удалось загрузить информацию об абонементе';
+        });
+    
+    new bootstrap.Modal(document.getElementById('refundModal')).show();
+}
 </script>
 @endsection
