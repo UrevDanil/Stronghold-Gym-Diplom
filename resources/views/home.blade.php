@@ -14,16 +14,13 @@
 
   <title>Stronghold Gym - Ваш путь к силе и энергии</title>
 
-  <!-- slider stylesheet -->
-  <link rel="stylesheet" type="text/css"
-    href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.3/assets/owl.carousel.min.css" />
-
   <!-- bootstrap core css -->
   <link href="{{ asset('assets/css/bootstrap.css') }}" rel="stylesheet">
 
   <!-- fonts style -->
   <link href="https://fonts.googleapis.com/css?family=Baloo+Chettan|Dosis:400,600,700|Poppins:400,600,700&display=swap"
     rel="stylesheet" />
+    
   <!-- Custom styles for this template -->
   <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
   <!-- responsive style -->
@@ -38,14 +35,12 @@
         <nav class="navbar navbar-expand-lg custom_nav-container">
           <a class="navbar-brand" href="{{ route('home') }}">
             <img src="{{ asset('assets/images/logo.png') }}" alt="Stronghold Gym Logo" />
-            <span>
-              Stronghold Gym
-            </span>
+            <span>Stronghold Gym</span>
           </a>
-          <div class="contact_nav" id="">
+          <div class="contact_nav">
             <ul class="navbar-nav">
               <li class="nav-item">
-                <a class="nav-link" href="{{ route('service') }}">
+                <a class="nav-link" href="#">
                   <img src="{{ asset('assets/images/location.png') }}" alt="Location" />
                   <span>Донецк, Ленинский пр-т, 77А</span>
                 </a>
@@ -70,7 +65,10 @@
     <!-- end header section -->
 
     <!-- slider section -->
-    <section class="slider_section position-relative">
+    <section class="slider_section">
+      <!-- ВАЖНО: Фоновый блок для красоты на внутренних страницах -->
+      <div class="bg-box"></div>
+      
       <div class="container">
         <div class="custom_nav2">
           <nav class="navbar navbar-expand-lg custom_nav-container">
@@ -80,32 +78,31 @@
             </button>
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <div class="d-flex flex-column flex-lg-row align-items-center">
-                <ul class="navbar-nav">
-                  <li class="nav-item active">
-                    <a class="nav-link" href="{{ route('home') }}">Главная</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="{{ route('about') }}">О нас</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="{{ route('service') }}">Услуги</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="{{ route('contact') }}">Контакты</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="{{ route('login') }}">Войти</a>
-                  </li>
-                </ul>
-                <form class="form-inline my-2 my-lg-0 ml-0 ml-lg-4 mb-3 mb-lg-0">
-                  <button class="btn my-2 my-sm-0 nav_search-btn" type="submit" aria-label="Search"></button>
-                </form>
-              </div>
+              <ul class="navbar-nav">
+                <li class="nav-item active">
+                  <a class="nav-link" href="{{ route('home') }}">Главная</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ route('about') }}">О нас</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ route('service') }}">Услуги</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ route('contact') }}">Контакты</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ route('login') }}">Войти</a>
+                </li>
+              </ul>
+              <form class="form-inline">
+                <button class="nav_search-btn" type="submit" aria-label="Search"></button>
+              </form>
             </div>
           </nav>
         </div>
       </div>
+
       <div class="slider_container">
         <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
           <ol class="carousel-indicators">
@@ -114,72 +111,51 @@
             <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
           </ol>
           <div class="carousel-inner">
+            <!-- Слайд 1 -->
             <div class="carousel-item active">
               <div class="container">
                 <div class="row">
-                  <div class="col-lg-6 col-md-7 offset-md-6 offset-md-5">
-                    <div class="detail-box">
-                      <h2>
-                        Работай над телом
-                      </h2>
-                      <h1>
-                        Тренируйся с нами
-                      </h1>
-                      <p>
-                        Выбери программу и стартуй! Твоя трансформация начинается здесь, чтобы ты смог создать тело своей мечты.
-                      </p>
+                  <div class="col-lg-8 mx-auto">
+                    <div class="detail-box text-center">
+                      <h2>Работай над телом</h2>
+                      <h1>Тренируйся с нами</h1>
+                      <p>Выбери программу и стартуй! Твоя трансформация начинается здесь, чтобы ты смог создать тело своей мечты.</p>
                       <div class="btn-box">
-                        <a href="{{ route('service') }}" class="btn-1">
-                          Подробнее
-                        </a>
+                        <a href="{{ route('service') }}" class="btn-1">Подробнее</a>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+            <!-- Слайд 2 -->
             <div class="carousel-item">
               <div class="container">
                 <div class="row">
-                  <div class="col-lg-6 col-md-7 offset-md-6 offset-md-5">
-                    <div class="detail-box">
-                      <h2>
-                        Измени свое питание
-                      </h2>
-                      <h1>
-                        Доверься нам
-                      </h1>
-                      <p>
-                        Выбери программу и стартуй! Твоя трансформация начинается с тарелки — создай тело своей мечты через правильные привычки.
-                      </p>
+                  <div class="col-lg-8 mx-auto">
+                    <div class="detail-box text-center">
+                      <h2>Измени свое питание</h2>
+                      <h1>Доверься нам</h1>
+                      <p>Выбери программу и стартуй! Твоя трансформация начинается с тарелки — создай тело своей мечты через правильные привычки.</p>
                       <div class="btn-box">
-                        <a href="{{ route('nutrition') }}" class="btn-1">
-                          Подробнее
-                        </a>
+                        <a href="{{ route('nutrition') }}" class="btn-1">Подробнее</a>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+            <!-- Слайд 3 -->
             <div class="carousel-item">
               <div class="container">
                 <div class="row">
-                  <div class="col-lg-6 col-md-7 offset-md-6 offset-md-5">
-                    <div class="detail-box">
-                      <h2>
-                        ВКЛЮЧАЙСЯ!
-                      </h2>
-                      <h1>
-                        Достигай цели
-                      </h1>
-                      <p>
-                        Хотите больше? Тогда записывайтесь! Ваш путь к телу мечты начинается с первого шага — здесь и сейчас.
-                      </p>
+                  <div class="col-lg-8 mx-auto">
+                    <div class="detail-box text-center">
+                      <h2>ВКЛЮЧАЙСЯ!</h2>
+                      <h1>Достигай цели</h1>
+                      <p>Хотите больше? Тогда записывайтесь! Ваш путь к телу мечты начинается с первого шага — здесь и сейчас.</p>
                       <div class="btn-box">
-                        <a href="{{ route('contact') }}" class="btn-1">
-                          Подробнее
-                        </a>
+                        <a href="{{ route('contact') }}" class="btn-1">Подробнее</a>
                       </div>
                     </div>
                   </div>
@@ -197,18 +173,12 @@
   <section class="about_section layout_padding">
     <div class="container">
       <div class="heading_container">
-        <h2>
-          О нас Stronghold Gym
-        </h2>
+        <h2>О нас Stronghold Gym</h2>
       </div>
       <div class="box">
         <div class="detail-box">
-          <p>
-            Stronghold Gym — это не просто тренажёрный зал, а место, где сила становится образом жизни. Мы создаём пространство, в котором каждый может достичь своих фитнес-целей: будь то набор мышечной массы, похудение, повышение выносливости или просто улучшение самочувствия.
-          </p>
-          <a href="{{ route('about') }}" class="btn-about">
-            Подробнее
-          </a>
+          <p>Stronghold Gym — это не просто тренажёрный зал, а место, где сила становится образом жизни. Мы создаём пространство, в котором каждый может достичь своих фитнес-целей: будь то набор мышечной массы, похудение, повышение выносливости или просто улучшение самочувствия.</p>
+          <a href="{{ route('about') }}">Подробнее</a>
         </div>
       </div>
     </div>
@@ -219,65 +189,55 @@
   <section class="service_section layout_padding">
     <div class="container">
       <div class="heading_container">
-        <h2>
-          Наши услуги
-        </h2>
+        <h2>Наши услуги</h2>
       </div>
       <div class="service_container">
         <div class="box">
           <img src="{{ asset('assets/images/s-1.png') }}" alt="Бодибилдинг" />
-          <h6 class="visible_heading">
-            Бодибилдинг
-          </h6>
+          <div class="visible_heading">
+            <h6>Бодибилдинг</h6>
+          </div>
           <div class="link_box">
             <a href="{{ route('bodybuilding') }}">
               <img src="{{ asset('assets/images/link.png') }}" alt="Подробнее" />
             </a>
-            <h6>
-              Бодибилдинг
-            </h6>
+            <h6>Бодибилдинг</h6>
           </div>
         </div>
         <div class="box">
           <img src="{{ asset('assets/images/s-2.png') }}" alt="Пауэрлифтинг" />
-          <h6 class="visible_heading">
-            Пауэрлифтинг
-          </h6>
+          <div class="visible_heading">
+            <h6>Пауэрлифтинг</h6>
+          </div>
           <div class="link_box">
             <a href="{{ route('powerlifting') }}">
               <img src="{{ asset('assets/images/link.png') }}" alt="Подробнее" />
             </a>
-            <h6>
-              Пауэрлифтинг
-            </h6>
+            <h6>Пауэрлифтинг</h6>
           </div>
         </div>
         <div class="box">
           <img src="{{ asset('assets/images/s-3.png') }}" alt="Кроссфит" />
-          <h6 class="visible_heading">
-            Кроссфит
-          </h6>
+          <div class="visible_heading">
+            <h6>Кроссфит</h6>
+          </div>
           <div class="link_box">
             <a href="{{ route('crossfit') }}">
               <img src="{{ asset('assets/images/link.png') }}" alt="Подробнее" />
             </a>
-            <h6>
-              Кроссфит
-            </h6>
+            <h6>Кроссфит</h6>
           </div>
         </div>
         <div class="box">
           <img src="{{ asset('assets/images/s-43.jpeg') }}" alt="Питание" />
-          <h6 class="visible_heading">
-            Питание
-          </h6>
+          <div class="visible_heading">
+            <h6>Питание</h6>
+          </div>
           <div class="link_box">
             <a href="{{ route('nutrition') }}">
               <img src="{{ asset('assets/images/link.png') }}" alt="Подробнее" />
             </a>
-            <h6>
-              Питание
-            </h6>
+            <h6>Питание</h6>
           </div>
         </div>
       </div>
@@ -289,9 +249,7 @@
   <section class="us_section layout_padding">
     <div class="container">
       <div class="heading_container">
-        <h2>
-          Почему выбирают нас
-        </h2>
+        <h2>Почему выбирают нас</h2>
       </div>
       <div class="us_container">
         <div class="box">
@@ -299,12 +257,8 @@
             <img src="{{ asset('assets/images/u-1.png') }}" alt="Качественное оборудование" />
           </div>
           <div class="detail-box">
-            <h5>
-              КАЧЕСТВЕННОЕ ОБОРУДОВАНИЕ
-            </h5>
-            <p>
-              для безопасных и эффективных тренировок, ваш комфорт и результат превыше всего, на котором приятно и безопасно работать.
-            </p>
+            <h5>КАЧЕСТВЕННОЕ ОБОРУДОВАНИЕ</h5>
+            <p>для безопасных и эффективных тренировок, ваш комфорт и результат превыше всего.</p>
           </div>
         </div>
         <div class="box">
@@ -312,12 +266,8 @@
             <img src="{{ asset('assets/images/u-2.png') }}" alt="План здорового питания" />
           </div>
           <div class="detail-box">
-            <h5>
-              ПЛАН ЗДОРОВОГО ПИТАНИЯ
-            </h5>
-            <p>
-              составленный персонально под ваши цели и образ жизни, который работает на ваш результат: похудение, массу, тонус; с учетом ваших предпочтений и особенностей организма.
-            </p>
+            <h5>ПЛАН ЗДОРОВОГО ПИТАНИЯ</h5>
+            <p>составленный персонально под ваши цели и образ жизни.</p>
           </div>
         </div>
         <div class="box">
@@ -325,12 +275,8 @@
             <img src="{{ asset('assets/images/u-3.png') }}" alt="Комфорт после тренировки" />
           </div>
           <div class="detail-box">
-            <h5>
-              КОМФОРТ ПОСЛЕ ТРЕНИРОВКИ
-            </h5>
-            <p>
-              это больше, чем просто душ. Это ваше личное пространство для восстановления.
-            </p>
+            <h5>КОМФОРТ ПОСЛЕ ТРЕНИРОВКИ</h5>
+            <p>это больше, чем просто душ. Ваше личное пространство для восстановления.</p>
           </div>
         </div>
         <div class="box">
@@ -338,12 +284,8 @@
             <img src="{{ asset('assets/images/u-4.png') }}" alt="Индивидуальный подход" />
           </div>
           <div class="detail-box">
-            <h5>
-              ТОЛЬКО ПОД ВАШИ ЦЕЛИ
-            </h5>
-            <p>
-              похудеть, набрать массу, подготовиться к марафону, избавиться от боли в спине.
-            </p>
+            <h5>ТОЛЬКО ПОД ВАШИ ЦЕЛИ</h5>
+            <p>похудеть, набрать массу, подготовиться к марафону.</p>
           </div>
         </div>
       </div>
@@ -355,9 +297,7 @@
   <section class="client_section layout_padding">
     <div class="container">
       <div class="heading_container">
-        <h2>
-          Что говорят наши клиенты
-        </h2>
+        <h2>Что говорят наши клиенты</h2>
       </div>
       <div id="carouselClient" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
@@ -372,12 +312,8 @@
                 <img src="{{ asset('assets/images/client1.png') }}" alt="Клиент Арчоморис" />
               </div>
               <div class="detail-box">
-                <h5>
-                  Арчоморис
-                </h5>
-                <p>
-                  И вот он, момент, к которому шёл 15 лет: долгожданная сотня! Эта заветная планка в 100 кг покорилась наконец-то, и в этом — огромная заслуга моего наставника. Спасибо тебе, Евгений, за веру, которые сильнее железа!
-                </p>
+                <h5>Арчоморис</h5>
+                <p>И вот он, момент, к которому шёл 15 лет: долгожданная сотня! Эта заветная планка в 100 кг покорилась наконец-то, и в этом — огромная заслуга моего наставника.</p>
               </div>
             </div>
           </div>
@@ -387,12 +323,8 @@
                 <img src="{{ asset('assets/images/client2.png') }}" alt="Клиент Юра спорт" />
               </div>
               <div class="detail-box">
-                <h5>
-                  Юра спорт
-                </h5>
-                <p>
-                  Лучший пинок к победе над собой — это тренер Данил. Всегда увидит, где можно выложиться сильнее, и подбодрит в нужный момент.
-                </p>
+                <h5>Юра спорт</h5>
+                <p>Лучший пинок к победе над собой — это тренер Данил. Всегда увидит, где можно выложиться сильнее, и подбодрит в нужный момент.</p>
               </div>
             </div>
           </div>
@@ -402,12 +334,8 @@
                 <img src="{{ asset('assets/images/client3.png') }}" alt="Клиент Марат андеграунд" />
               </div>
               <div class="detail-box">
-                <h5>
-                  Марат андеграунд
-                </h5>
-                <p>
-                  Лучший совет по жиму, приседу и становой — всегда от Константина. С ним тренировки становятся осознанными, а результаты — предсказуемыми. Профи!
-                </p>
+                <h5>Марат андеграунд</h5>
+                <p>Лучший совет по жиму, приседу и становой — всегда от Константина. С ним тренировки становятся осознанными, а результаты — предсказуемыми.</p>
               </div>
             </div>
           </div>
@@ -428,12 +356,8 @@
         </div>
         <div class="col-lg-4 col-md-5">
           <div class="detail-box">
-            <h2>
-              СОЗДАНЫ, ЧТОБЫ ДОСТИГАТЬ МАКСИМУМА
-            </h2>
-            <p>
-              Здесь не добиваются средних результатов. Только осознанные тренировки, научный подход и безграничная поддержка для тех, кто хочет выйти за рамки "просто похудеть" или "подкачаться". Здесь создают чемпионов — в спорте, в карьере, в жизни.
-            </p>
+            <h2>СОЗДАНЫ, ЧТОБЫ ДОСТИГАТЬ МАКСИМУМА</h2>
+            <p>Здесь не добиваются средних результатов. Только осознанные тренировки, научный подход и безграничная поддержка для тех, кто хочет выйти за рамки "просто похудеть" или "подкачаться".</p>
           </div>
         </div>
       </div>
@@ -445,9 +369,7 @@
   <section class="client_section layout_padding">
     <div class="container">
       <div class="heading_container">
-        <h2>
-          Наши тренеры
-        </h2>
+        <h2>Наши тренеры</h2>
       </div>
       <div id="carouselCoaches" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
@@ -463,12 +385,8 @@
                 <img src="{{ asset('assets/images/coach1.png') }}" alt="Тренер Евгений" />
               </div>
               <div class="detail-box">
-                <h5>
-                  Тренер Евгений
-                </h5>
-                <p>
-                  Основа основ — техника. Для Евгения нет мелочей. Он будет раз за разом поправлять угол наклона спины в тяге, траекторию грифа в жиме и положение колена в приседе. «Лучше меньше, но идеально» — его частый девиз. Он верит, что безупречная техника — это и профилактика травм, и гарантия роста целевых мышц.
-                </p>
+                <h5>Тренер Евгений</h5>
+                <p>Основа основ — техника. Для Евгения нет мелочей. Он будет раз за разом поправлять угол наклона спины в тяге, траекторию грифа в жиме и положение колена в приседе.</p>
               </div>
             </div>
           </div>
@@ -478,12 +396,8 @@
                 <img src="{{ asset('assets/images/coach2.png') }}" alt="Тренер Данил" />
               </div>
               <div class="detail-box">
-                <h5>
-                  Тренер Данил
-                </h5>
-                <p>
-                  Психолог и мотиватор. Он умеет считать не только повторения, но и «считывать» состояние подопечных. Видит, когда человек психологически «сломался» в середине комплекса, и найдёт нужные слова («Соберись, ты же сильнее!», «Дыши, работай!»), чтобы вернуть его в строй.
-                </p>
+                <h5>Тренер Данил</h5>
+                <p>Психолог и мотиватор. Он умеет считать не только повторения, но и «считывать» состояние подопечных. Видит, когда человек психологически «сломался».</p>
               </div>
             </div>
           </div>
@@ -493,12 +407,8 @@
                 <img src="{{ asset('assets/images/coach3.png') }}" alt="Тренер Константин" />
               </div>
               <div class="detail-box">
-                <h5>
-                  Тренер Константин
-                </h5>
-                <p>
-                  Константин не признаёт антагонизма между «качками» и «кроссфитерами». Он видит тело целостно. От бодибилдинга он берёт: Акцент на изоляцию и эстетику: Умение «добить» отстающую мышцу, создать баланс и красивую форму. Контроль и ментальную связь: Упор на чувство целевой мышцы в каждом повторении, работу в полную амплитуду.
-                </p>
+                <h5>Тренер Константин</h5>
+                <p>Константин не признаёт антагонизма между «качками» и «кроссфитерами». Он видит тело целостно. От бодибилдинга он берёт акцент на изоляцию и эстетику.</p>
               </div>
             </div>
           </div>
@@ -508,12 +418,8 @@
                 <img src="{{ asset('assets/images/coach4.png') }}" alt="Тренер Александр" />
               </div>
               <div class="detail-box">
-                <h5>
-                  Тренер Александр
-                </h5>
-                <p>
-                  Тренер Александр в боксе и ММА выступает в роли мультиспециалиста и менеджера процесса подготовки. Его задачи шире, чем просто обучение ударам.
-                </p>
+                <h5>Тренер Александр</h5>
+                <p>Тренер Александр в боксе и ММА выступает в роли мультиспециалиста и менеджера процесса подготовки.</p>
               </div>
             </div>
           </div>
@@ -527,9 +433,7 @@
   <section class="contact_section layout_padding">
     <div class="container">
       <div class="heading_container">
-        <h2>
-          Связаться с нами
-        </h2>
+        <h2>Связаться с нами</h2>
       </div>
       <div class="layout_padding2-top">
         <div class="row">
@@ -538,40 +442,26 @@
               @csrf
               <div class="contact_form-container">
                 <div>
-                  <div>
-                    <input type="text" placeholder="Ваше имя" required />
-                  </div>
-                  <div>
-                    <input type="email" placeholder="Электронная почта" required />
-                  </div>
-                  <div>
-                    <input type="tel" placeholder="Мобильный телефон" />
-                  </div>
-                  <div class="mt-5">
-                    <textarea rows="4" placeholder="Ваше сообщение" required></textarea>
-                  </div>
-                  <div class="mt-5">
-                    <button type="submit">
-                      Отправить
-                    </button>
-                  </div>
+                  <input type="text" placeholder="Ваше имя" required />
+                  <input type="email" placeholder="Электронная почта" required />
+                  <input type="tel" placeholder="Мобильный телефон" />
+                  <textarea rows="4" placeholder="Ваше сообщение" required></textarea>
+                  <button type="submit">Отправить</button>
                 </div>
               </div>
             </form>
           </div>
           <div class="col-md-6">
             <div class="map_container">
-              <div class="map-responsive">
-                <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2712.3456789!2d37.805!3d48.015!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40e1e5c5c5c5c5c5%3A0x0!2z0JTQvtC90LXRhtC6LCDQn9C70L7RidCw0LTRjA!5e0!3m2!1sru!2sru!4v1234567890" 
-                  width="100%" 
-                  height="300" 
-                  style="border:0; border-radius: 12px;" 
-                  allowfullscreen="" 
-                  loading="lazy"
-                  title="Stronghold Gym на карте">
-                </iframe>
-              </div>
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2712.3456789!2d37.805!3d48.015!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40e1e5c5c5c5c5c5%3A0x0!2z0JTQvtC90LXRhtC6LCDQn9C70L7RidCw0LTRjA!5e0!3m2!1sru!2sru!4v1234567890" 
+                width="100%" 
+                height="350" 
+                style="border:0; border-radius: 12px;" 
+                allowfullscreen="" 
+                loading="lazy"
+                title="Stronghold Gym на карте">
+              </iframe>
             </div>
           </div>
         </div>
@@ -584,9 +474,7 @@
   <section class="about_section layout_padding">
     <div class="container">
       <div class="heading_container">
-        <h2>
-          Автор проекта
-        </h2>
+        <h2>Автор проекта</h2>
       </div>
       <div class="box">
         <div class="detail-box">
@@ -602,72 +490,40 @@
   <section class="info_section layout_padding2-top">
     <div class="container">
       <div class="info_form">
-        <h4>
-          Будьте в курсе
-        </h4>
+        <h4>Будьте в курсе</h4>
         <form action="" method="POST">
           @csrf
           <input type="email" placeholder="Введите свой адрес электронной почты" required>
-          <div class="d-flex justify-content-end">
-            <button type="submit">
-              Подписаться
-            </button>
-          </div>
+          <button type="submit">Подписаться</button>
         </form>
       </div>
     </div>
     <div class="container">
       <div class="row">
         <div class="col-md-3">
-          <h6>
-            О нас Stronghold Gym
-          </h6>
-          <p>
-            Stronghold Gym — ваш путь к силе и энергии! 🏋️‍♂️ Мы объединяем: Современное оборудование (силовые тренажёры, свободные веса, кардиозона); Опытных тренеров, готовых составить индивидуальную программу; Дружелюбную атмосферу без барьеров — для новичков и профи.
-          </p>
+          <h6>О нас Stronghold Gym</h6>
+          <p>Stronghold Gym — ваш путь к силе и энергии! 🏋️‍♂️ Мы объединяем современное оборудование, опытных тренеров и дружелюбную атмосферу.</p>
         </div>
         <div class="col-md-2 offset-md-1">
-          <h6>
-            Меню
-          </h6>
+          <h6>Меню</h6>
           <ul>
-            <li>
-              <a href="{{ route('home') }}">Главная</a>
-            </li>
-            <li>
-              <a href="{{ route('about') }}">О нас</a>
-            </li>
-            <li>
-              <a href="{{ route('service') }}">Услуги</a>
-            </li>
-            <li>
-              <a href="{{ route('contact') }}">Контакты</a>
-            </li>
+            <li><a href="{{ route('home') }}">Главная</a></li>
+            <li><a href="{{ route('about') }}">О нас</a></li>
+            <li><a href="{{ route('service') }}">Услуги</a></li>
+            <li><a href="{{ route('contact') }}">Контакты</a></li>
           </ul>
         </div>
         <div class="col-md-3">
-          <h6>
-            Полезные ссылки
-          </h6>
+          <h6>Полезные ссылки</h6>
           <ul>
-            <li>
-              <a href="https://primekraft.ru/" target="_blank" rel="noopener noreferrer">Primekraft</a>
-            </li>
-            <li>
-              <a href="https://www.bombbar.ru/" target="_blank" rel="noopener noreferrer">Bombbar</a>
-            </li>
-            <li>
-              <a href="https://sport-magic.ru/" target="_blank" rel="noopener noreferrer">Sportmagic</a>
-            </li>
-            <li>
-              <a href="https://gls.store/" target="_blank" rel="noopener noreferrer">GLS Store</a>
-            </li>
+            <li><a href="https://primekraft.ru/" target="_blank">Primekraft</a></li>
+            <li><a href="https://www.bombbar.ru/" target="_blank">Bombbar</a></li>
+            <li><a href="https://sport-magic.ru/" target="_blank">Sportmagic</a></li>
+            <li><a href="https://gls.store/" target="_blank">GLS Store</a></li>
           </ul>
         </div>
         <div class="col-md-3">
-          <h6>
-            Контакты
-          </h6>
+          <h6>Контакты</h6>
           <div class="info_link-box">
             <a href="https://maps.google.com/?q=Ленинский+просп.,+77А,+Донецк" target="_blank">
               <img src="{{ asset('assets/images/location-white.png') }}" alt="Адрес" />
@@ -683,18 +539,10 @@
             </a>
           </div>
           <div class="info_social">
-            <a href="#" target="_blank" aria-label="Facebook">
-              <img src="{{ asset('assets/images/facebook-logo-button.png') }}" alt="Facebook" />
-            </a>
-            <a href="#" target="_blank" aria-label="Twitter">
-              <img src="{{ asset('assets/images/twitter-logo-button.png') }}" alt="Twitter" />
-            </a>
-            <a href="#" target="_blank" aria-label="LinkedIn">
-              <img src="{{ asset('assets/images/linkedin.png') }}" alt="LinkedIn" />
-            </a>
-            <a href="https://vk.com/id320753965" target="_blank" aria-label="VK">
-              <img src="{{ asset('assets/images/instagram.png') }}" alt="Instagram/VK" />
-            </a>
+            <a href="#" target="_blank"><img src="{{ asset('assets/images/facebook-logo-button.png') }}" alt="Facebook" /></a>
+            <a href="#" target="_blank"><img src="{{ asset('assets/images/twitter-logo-button.png') }}" alt="Twitter" /></a>
+            <a href="#" target="_blank"><img src="{{ asset('assets/images/linkedin.png') }}" alt="LinkedIn" /></a>
+            <a href="https://vk.com/id320753965" target="_blank"><img src="{{ asset('assets/images/instagram.png') }}" alt="Instagram/VK" /></a>
           </div>
         </div>
       </div>
@@ -703,23 +551,13 @@
   <!-- end info section -->
 
   <!-- footer section -->
-  <footer class="container-fluid footer_section">
-    <p>
-      &copy; 2026 Stronghold Gym. Все права защищены. Design by
-      <a href="https://html.design/" target="_blank">bodybuilders</a>
-    </p>
+  <footer class="footer_section">
+    <p>&copy; 2026 Stronghold Gym. Все права защищены. Design by <a href="https://html.design/" target="_blank">bodybuilders</a></p>
   </footer>
   <!-- end footer section -->
 
   <script src="{{ asset('assets/js/jquery-3.4.1.min.js') }}"></script>
   <script src="{{ asset('assets/js/bootstrap.js') }}"></script>
-
-  <script>
-    function openNav() {
-      document.getElementById("myNav").classList.toggle("menu_width");
-      document.querySelector(".custom_menu-btn").classList.toggle("menu_btn-style");
-    }
-  </script>
 </body>
 
 </html>
