@@ -89,6 +89,7 @@
                                     <th>Время</th>
                                     <th>Тренировка</th>
                                     <th>Тренер</th>
+                                    <th>Инфо</th>
                                     <th>Зал</th>
                                     <th>Места</th>
                                     <th>Статус</th>
@@ -119,6 +120,13 @@
                                             <span class="client-trainer-name">
                                                 <i class="fas fa-user-circle me-1"></i>{{ $schedule->trainer->name }}
                                             </span>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="client-trainer-info-btn" 
+                                                    onclick="showTrainerInfo({{ $schedule->trainer->id }})"
+                                                    data-trainer-name="{{ $schedule->trainer->name }}">
+                                                <i class="fas fa-info-circle"></i> О тренере
+                                            </button>
                                         </td>
                                         <td>
                                             <span class="client-room-badge">
@@ -251,6 +259,17 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- Кнопка информации о тренере в мобильной версии -->
+                                    <div class="client-mobile-info-item trainer-info-btn" 
+                                         onclick="showTrainerInfo({{ $schedule->trainer->id }})">
+                                        <i class="fas fa-info-circle"></i>
+                                        <div class="info-content">
+                                            <span class="label">Информация</span>
+                                            <span class="value trainer-link">
+                                                О тренере <i class="fas fa-chevron-right"></i>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div class="client-mobile-status">
@@ -308,4 +327,156 @@
         </div>
     @endif
 </div>
+
+<!-- Модальное окно информации о тренере -->
+<div class="modal fade" id="trainerInfoModal" tabindex="-1" aria-labelledby="trainerInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="trainerInfoModalLabel">
+                    
+                    <span id="trainerModalName">Информация о тренере</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="trainerModalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                    <p class="mt-2">Загрузка информации...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showTrainerInfo(trainerId) {
+    const modal = new bootstrap.Modal(document.getElementById('trainerInfoModal'));
+    const modalBody = document.getElementById('trainerModalBody');
+    const modalTitle = document.getElementById('trainerModalName');
+    
+    modalBody.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <p class="mt-2">Загрузка информации о тренере...</p>
+        </div>
+    `;
+    modalTitle.innerHTML = '<i class="fas fa-user-circle me-2"></i>Загрузка...';
+    
+    modal.show();
+    
+    fetch(`/client/trainer-info/${trainerId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                modalTitle.innerHTML = `<i class="fas fa-user-circle me-2"></i>${escapeHtml(data.trainer.name)}`;
+                
+                const avatarHtml = data.trainer.avatar 
+                    ? `<img src="${data.trainer.avatar}" alt="${escapeHtml(data.trainer.name)}" class="trainer-avatar-large">`
+                    : `<div class="trainer-avatar-large">${escapeHtml(data.trainer.name.charAt(0).toUpperCase())}</div>`;
+                
+                modalBody.innerHTML = `
+                    <div class="trainer-profile">
+                        ${avatarHtml}
+                        
+                        <div class="trainer-info-grid">
+                            <div class="trainer-info-item">
+                                <i class="fas fa-user"></i>
+                                <div class="info-content">
+                                    <span class="label">Полное имя</span>
+                                    <span class="value">${escapeHtml(data.trainer.name)}</span>
+                                </div>
+                            </div>
+                            <div class="trainer-info-item">
+                                <i class="fas fa-envelope"></i>
+                                <div class="info-content">
+                                    <span class="label">Email</span>
+                                    <span class="value">${escapeHtml(data.trainer.email)}</span>
+                                </div>
+                            </div>
+                            ${data.trainer.phone ? `
+                            <div class="trainer-info-item">
+                                <i class="fas fa-phone-alt"></i>
+                                <div class="info-content">
+                                    <span class="label">Телефон</span>
+                                    <span class="value">${escapeHtml(data.trainer.phone)}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${data.trainer.qualification ? `
+                            <div class="trainer-info-item">
+                                <i class="fas fa-graduation-cap"></i>
+                                <div class="info-content">
+                                    <span class="label">Квалификация</span>
+                                    <span class="value">${escapeHtml(data.trainer.qualification)}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${data.trainer.specialization ? `
+                            <div class="trainer-info-item">
+                                <i class="fas fa-dumbbell"></i>
+                                <div class="info-content">
+                                    <span class="label">Специализация</span>
+                                    <span class="value">${escapeHtml(data.trainer.specialization)}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${data.trainer.bio ? `
+                            <div class="trainer-info-item full-width">
+                                <i class="fas fa-align-left"></i>
+                                <div class="info-content">
+                                    <span class="label">О себе</span>
+                                    <span class="value">${escapeHtml(data.trainer.bio)}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="trainer-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${data.stats.total_trainings}</div>
+                                <div class="stat-label">Проведено тренировок</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${data.stats.total_clients}</div>
+                                <div class="stat-label">Клиентов</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${data.stats.attendance_rate}%</div>
+                                <div class="stat-label">Посещаемость</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                modalBody.innerHTML = `
+                    <div class="text-center py-5 text-danger">
+                        <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                        <p>${escapeHtml(data.message) || 'Не удалось загрузить информацию о тренере'}</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            modalBody.innerHTML = `
+                <div class="text-center py-5 text-danger">
+                    <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                    <p>Ошибка при загрузке данных. Попробуйте позже.</p>
+                </div>
+            `;
+        });
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
 @endsection

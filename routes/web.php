@@ -226,6 +226,8 @@ Route::middleware(['auth', 'active', 'role:trainer'])->prefix('trainer')->name('
     // Расписание
     Route::get('/schedule', [ClientDashboardController::class, 'schedule'])->name('schedule');
     Route::post('/schedule/{schedule}/book', [ClientDashboardController::class, 'book'])->name('schedule.book');
+
+    Route::get('/trainer-info/{trainerId}', [ClientDashboardController::class, 'getTrainerInfo'])->name('client.trainer.info');
     
     // Бронирования
     Route::post('/bookings/{booking}/cancel', [ClientDashboardController::class, 'cancelBooking'])->name('bookings.cancel');

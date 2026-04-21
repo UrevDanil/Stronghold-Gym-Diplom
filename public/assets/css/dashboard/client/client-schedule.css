@@ -398,6 +398,502 @@
     cursor: not-allowed;
 }
 
+/* ========================================
+   КНОПКА ИНФОРМАЦИИ О ТРЕНЕРЕ
+   ======================================== */
+
+.client-trainer-info-btn {
+    background: rgba(14, 39, 120, 0.1);
+    border: 1px solid var(--primary-color, #0e2778);
+    color: var(--primary-color, #0e2778);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.client-trainer-info-btn:hover {
+    background: var(--primary-color, #0e2778);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.client-trainer-info-btn i {
+    font-size: 0.85rem;
+}
+
+/* Мобильная кнопка информации о тренере */
+.client-mobile-info-item.trainer-info-btn {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.client-mobile-info-item.trainer-info-btn:hover {
+    background: rgba(14, 39, 120, 0.1);
+    transform: translateX(3px);
+}
+
+.client-mobile-info-item .trainer-link {
+    color: var(--primary-color, #0e2778);
+    font-weight: 600;
+}
+
+.client-mobile-info-item .trainer-link i {
+    font-size: 0.7rem;
+    transition: transform 0.3s ease;
+}
+
+.client-mobile-info-item.trainer-info-btn:hover .trainer-link i {
+    transform: translateX(3px);
+}
+
+/* ========================================
+   МОДАЛЬНОЕ ОКНО ТРЕНЕРА - ОБНОВЛЕННЫЙ ДИЗАЙН
+   ======================================== */
+
+.modal-content {
+    border: none;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #07154e, #3bbdf1);
+    border-bottom: none;
+    padding: 1.2rem 1.8rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 100%);
+    transform: skewX(-20deg) translateX(50px);
+}
+
+.modal-title {
+    color: white;
+    font-weight: 800;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.modal-title i {
+    color: #ffffff;
+    font-size: 1.3rem;
+}
+
+.btn-close-white {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.btn-close-white:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 2rem;
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+}
+
+/* Профиль тренера */
+.trainer-profile {
+    padding: 0;
+}
+
+/* Аватар */
+.trainer-avatar-large {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #07154e, #3bbdf1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: white;
+    margin: 0 auto 25px;
+    box-shadow: 0 15px 35px rgba(14, 39, 120, 0.082);
+    object-fit: cover;
+    transition: all 0.3s ease;
+    border: 4px solid white;
+    
+}
+
+.trainer-avatar-large:hover {
+    transform: scale(1.05);
+    box-shadow: 0 20px 40px rgba(40, 63, 138, 0.4);
+}
+
+.trainer-avatar-large img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Имя тренера в теле */
+.trainer-name-title {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px dashed rgba(14, 39, 120, 0.1);
+}
+
+.trainer-name-title h3 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #07154e;
+    margin: 0 0 5px 0;
+}
+
+.trainer-name-title .trainer-role {
+    font-size: 0.85rem;
+    color: #07154e;
+    font-weight: 600;
+    display: inline-block;
+    padding: 0.2rem 1rem;
+    background: rgba(14, 39, 120, 0.1);
+    border-radius: 50px;
+}
+
+/* Сетка информации */
+.trainer-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 30px;
+}
+
+.trainer-info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: white;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.trainer-info-item:hover {
+    transform: translateY(-3px);
+    border-color: #07154e;
+    box-shadow: 0 8px 20px rgba(14, 39, 120, 0.1);
+}
+
+.trainer-info-item i {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(14, 39, 120, 0.1);
+    border-radius: 12px;
+    font-size: 1.2rem;
+    color: #07154e;
+    transition: all 0.3s ease;
+}
+
+.trainer-info-item:hover i {
+    background: linear-gradient(135deg, #07154e, #3bbdf1);
+    color: white;
+    transform: scale(1.05);
+}
+
+.trainer-info-item .info-content {
+    flex: 1;
+}
+
+.trainer-info-item .label {
+    display: block;
+    font-size: 0.7rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+}
+
+.trainer-info-item .value {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2c3e50;
+    word-break: break-word;
+}
+
+.trainer-info-item.full-width {
+    grid-column: span 2;
+}
+
+/* Специализация в виде тегов */
+.trainer-specialization-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.specialization-tag {
+    background: rgba(14, 39, 120, 0.1);
+    padding: 0.2rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #07154e;
+    border: 1px solid rgba(14, 39, 120, 0.2);
+}
+
+/* Статистика */
+.trainer-stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 15px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 20px;
+    margin-top: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.trainer-stats .stat-item {
+    text-align: center;
+    flex: 1;
+    padding: 10px;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.trainer-stats .stat-item:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+.trainer-stats .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #07154e;
+    line-height: 1.2;
+    margin-bottom: 5px;
+}
+
+.trainer-stats .stat-label {
+    font-size: 0.7rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Секция "О себе" */
+.trainer-bio-section {
+    margin-top: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    border-radius: 20px;
+    border-left: 4px solid #fd9e2e;
+}
+
+.trainer-bio-section h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0e2778;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.trainer-bio-section h4 i {
+    color: #fd9e2e;
+    font-size: 1rem;
+}
+
+.trainer-bio-section p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #4a5568;
+    margin: 0;
+}
+
+/* Кнопка закрытия в модалке */
+.modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 2rem;
+    background: #f8f9fa;
+}
+
+.modal-footer .btn-secondary {
+    background: #6c757d;
+    border: none;
+    border-radius: 50px;
+    padding: 0.6rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.modal-footer .btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* Анимация загрузки */
+.modal-body .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.25rem;
+    color: #fd9e2e;
+}
+
+/* Ошибка загрузки */
+.modal-body .text-danger {
+    animation: fadeInUp 0.3s ease;
+}
+
+/* ----------------------------------------
+   АДАПТАЦИЯ ПОД ТЕЛЕФОНЫ
+   ---------------------------------------- */
+@media (max-width: 768px) {
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .trainer-avatar-large {
+        width: 90px;
+        height: 90px;
+        font-size: 2.5rem;
+    }
+    
+    .trainer-name-title h3 {
+        font-size: 1.3rem;
+    }
+    
+    .trainer-info-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .trainer-info-item.full-width {
+        grid-column: span 1;
+    }
+    
+    .trainer-info-item {
+        padding: 10px;
+    }
+    
+    .trainer-info-item i {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+    
+    .trainer-stats {
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+    }
+    
+    .trainer-stats .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+    }
+    
+    .trainer-stats .stat-value {
+        font-size: 1.4rem;
+        margin-bottom: 0;
+    }
+    
+    .trainer-stats .stat-label {
+        font-size: 0.75rem;
+    }
+    
+    .trainer-bio-section {
+        padding: 15px;
+        margin-top: 20px;
+    }
+    
+    .trainer-bio-section h4 {
+        font-size: 0.9rem;
+    }
+    
+    .trainer-bio-section p {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-body {
+        padding: 1rem;
+    }
+    
+    .trainer-avatar-large {
+        width: 70px;
+        height: 70px;
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+    
+    .trainer-name-title {
+        margin-bottom: 15px;
+    }
+    
+    .trainer-name-title h3 {
+        font-size: 1.2rem;
+    }
+    
+    .trainer-info-item .label {
+        font-size: 0.65rem;
+    }
+    
+    .trainer-info-item .value {
+        font-size: 0.8rem;
+    }
+    
+    .trainer-stats .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .trainer-stats .stat-label {
+        font-size: 0.7rem;
+    }
+}
+
 /* ----------------------------------------
    8. МОБИЛЬНЫЕ КАРТОЧКИ
    ---------------------------------------- */

@@ -10,6 +10,7 @@ use App\Models\Attendance;
 use App\Services\NotificationService;
 use App\Models\UserSubscription;
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -411,4 +412,60 @@ class DashboardController extends Controller
             return back()->with('error', 'Ошибка при разморозке: ' . $e->getMessage());
         }
     }
+
+    /**
+ * Получить информацию о тренере для модального окна
+ */
+public function getTrainerInfo($trainerId)
+{
+    $trainer = User::where('role_id', 3) // ID роли тренера
+        ->withCount(['trainings as total_trainings' => function($q) {
+            $q->where('status', 'completed');
+        }])
+        ->find($trainerId);
+    
+    if (!$trainer) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Тренер не найден'
+        ], 404);
+    }
+    
+    // Количество уникальных клиентов
+    $totalClients = Booking::whereHas('schedule', function($q) use ($trainerId) {
+            $q->where('trainer_id', $trainerId);
+        })
+        ->distinct('user_id')
+        ->count('user_id');
+    
+    // Процент посещаемости клиентов этого тренера
+    $totalBookings = Booking::whereHas('schedule', function($q) use ($trainerId) {
+        $q->where('trainer_id', $trainerId);
+    })->count();
+    
+    $attendedBookings = Booking::whereHas('schedule', function($q) use ($trainerId) {
+        $q->where('trainer_id', $trainerId);
+    })->where('status', 'attended')->count();
+    
+    $attendanceRate = $totalBookings > 0 ? round(($attendedBookings / $totalBookings) * 100) : 0;
+    
+    return response()->json([
+        'success' => true,
+        'trainer' => [
+            'id' => $trainer->id,
+            'name' => $trainer->name,
+            'email' => $trainer->email,
+            'phone' => $trainer->phone,
+            'qualification' => $trainer->qualification,
+            'specialization' => $trainer->specialization,
+            'bio' => $trainer->bio ?? null,
+            'avatar' => $trainer->avatar ? asset('storage/' . $trainer->avatar) : null,
+        ],
+        'stats' => [
+            'total_trainings' => $trainer->total_trainings ?? 0,
+            'total_clients' => $totalClients,
+            'attendance_rate' => $attendanceRate,
+        ]
+    ]);
+}
 }
