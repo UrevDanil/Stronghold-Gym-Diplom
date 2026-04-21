@@ -260,10 +260,15 @@ Route::middleware(['auth'])->group(function () {
 // Уведомления
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', function () {
-        $notifications = App\Models\Notification::where('user_id', auth()->id())
-            ->latest()
-            ->paginate(20);
-            
+        $query = App\Models\Notification::where('user_id', auth()->id());
+        
+        $filter = request('filter', 'all');
+        if ($filter !== 'all') {
+            $query->where('type', $filter);
+        }
+        
+        $notifications = $query->latest()->paginate(20);
+        
         return view('notifications.index', compact('notifications'));
     })->name('notifications');
     
@@ -272,18 +277,18 @@ Route::middleware(['auth'])->group(function () {
         if ($notification->user_id == auth()->id()) {
             $notification->markAsRead();
         }
-        return back();
+        return back()->with('success', 'Уведомление отмечено как прочитанное');
     })->name('notifications.read');
     
     Route::post('/notifications/read-all', function () {
-        App\Models\Notification::where('user_id', auth()->id())
+        $count = App\Models\Notification::where('user_id', auth()->id())
             ->where('is_read', false)
             ->update(['is_read' => true]);
-        return back()->with('success', 'Все уведомления отмечены как прочитанные');
+        
+        return back()->with('success', "Отмечено как прочитанное: {$count} уведомлений");
     })->name('notifications.read-all');
 });
 
-// Удаление уведомления
 Route::delete('/notifications/{id}', function ($id) {
     $notification = App\Models\Notification::findOrFail($id);
     if ($notification->user_id == auth()->id()) {

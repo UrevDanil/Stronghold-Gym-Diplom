@@ -658,7 +658,7 @@
 }
 
 .subscription-mobile-card[data-status="frozen"] {
-    border-left-color: #2aa8e2;
+    border-left-color: #4635dc;
 }
 
 .subscription-mobile-card[data-status="expired"] {

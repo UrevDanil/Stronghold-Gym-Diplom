@@ -75,7 +75,54 @@
 }
 
 /* ----------------------------------------
-   4. СПИСОК УВЕДОМЛЕНИЙ
+   4. ФИЛЬТРЫ УВЕДОМЛЕНИЙ (без нижней черты)
+   ---------------------------------------- */
+
+.notifications-filters {
+    margin-bottom: 2rem;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.filter-btn {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 50px;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #495057;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-btn:hover {
+    border-color: #0b34bb;
+    color: #0b34bb;
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, #0b34bb, #0e2778);
+    border-color: #0b34bb;
+    color: white;
+    box-shadow: 0 4px 12px rgba(11, 52, 187, 0.3);
+}
+
+/* ----------------------------------------
+   5. СПИСОК УВЕДОМЛЕНИЙ
    ---------------------------------------- */
 
 .notifications-list {
@@ -91,7 +138,10 @@
     border-left: 4px solid transparent;
     transition: all 0.3s ease;
     position: relative;
-    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
 }
 
 .notification-item:hover {
@@ -104,96 +154,208 @@
     border-left-color: #0b34bb;
 }
 
-.notification-item.unread::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100px;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(11, 52, 187, 0.05));
-    transform: skewX(-20deg) translateX(50px);
+/* Структура уведомления */
+.notification-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    flex: 1;
 }
 
-.notification-item .notification-icon {
+/* Иконки уведомлений */
+.notification-icon {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 1rem;
+    flex-shrink: 0;
 }
 
-.notification-item .notification-icon.booking {
+.notification-icon.booking {
     background: linear-gradient(135deg, #84fab0, #8fd3f4);
     color: #00573d;
 }
 
-.notification-item .notification-icon.subscription {
+.notification-icon.subscription {
     background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
     color: #4635dc;
 }
 
-.notification-item .notification-icon.system {
+.notification-icon.system {
     background: linear-gradient(135deg, #f6d365, #fda085);
     color: #9b4d1d;
 }
 
-.notification-item .notification-icon i {
+.notification-icon.attendance {
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+    color: #00573d;
+}
+
+.notification-icon.schedule {
+    background: linear-gradient(135deg, #f6d365, #fda085);
+    color: #9b4d1d;
+}
+
+.notification-icon i {
     font-size: 1.5rem;
 }
 
-.notification-item .notification-content {
+/* Контент уведомления */
+.notification-content {
     flex: 1;
 }
 
-.notification-item .notification-message {
-    font-size: 1rem;
-    color: #212529;
-    margin-bottom: 0.3rem;
-    font-weight: 500;
+.notification-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
 }
 
-.notification-item .notification-time {
-    font-size: 0.85rem;
+.notification-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.notification-type-badge.booking {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.notification-type-badge.subscription {
+    background: rgba(70, 53, 220, 0.1);
+    color: #4635dc;
+}
+
+.notification-type-badge.attendance {
+    background: rgba(23, 162, 184, 0.1);
+    color: #17a2b8;
+}
+
+.notification-type-badge.schedule {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.notification-type-badge.system {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+.unread-badge {
+    background: #dc3545;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15rem 0.6rem;
+    border-radius: 50px;
+}
+
+.notification-message {
+    font-size: 1rem;
+    color: #212529;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.notification-meta {
+    margin-top: 0.5rem;
+}
+
+.notification-time {
+    font-size: 0.8rem;
     color: #6c757d;
     display: flex;
     align-items: center;
     gap: 0.3rem;
+    flex-wrap: wrap;
 }
 
-.notification-item .notification-time i {
+.notification-time i {
+    font-size: 0.75rem;
+}
+
+.separator {
+    margin: 0 0.25rem;
+    color: #dee2e6;
+}
+
+.notification-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
     font-size: 0.8rem;
+    color: #0b34bb;
+    text-decoration: none;
+    margin-top: 0.5rem;
+    transition: all 0.3s ease;
 }
 
-.notification-item .mark-read-btn {
-    background: transparent;
-    border: 2px solid #0b34bb;
-    color: #0b34bb;
-    border-radius: 50px;
-    padding: 0.5rem 1.2rem;
-    font-size: 0.9rem;
+.notification-link:hover {
+    color: #cc222a;
+    text-decoration: underline;
+}
+
+/* Кнопки действий (удаление и отметка) */
+.notification-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.mark-read-btn {
+    background: linear-gradient(135deg, #0b34bb, #4c71eb);
+    border: none;
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
     font-weight: 600;
+    color: white;
     transition: all 0.3s ease;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.notification-item .mark-read-btn:hover {
-    background: #0b34bb;
-    color: white;
+.mark-read-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(11, 52, 187, 0.3);
+    box-shadow: 0 4px 12px rgba(11, 52, 187, 0.3);
 }
 
-.notification-item .mark-read-btn i {
-    font-size: 0.9rem;
+.delete-notification-btn {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid #dc3545;
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #dc3545;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.delete-notification-btn:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-2px);
 }
 
 /* ----------------------------------------
-   5. ПУСТОЕ СОСТОЯНИЕ
+   6. ПУСТОЕ СОСТОЯНИЕ
    ---------------------------------------- */
 
 .empty-notifications {
@@ -201,7 +363,7 @@
     padding: 4rem 2rem;
 }
 
-.empty-notifications .empty-icon {
+.empty-icon {
     width: 100px;
     height: 100px;
     border-radius: 50%;
@@ -212,7 +374,7 @@
     margin: 0 auto 1.5rem;
 }
 
-.empty-notifications .empty-icon i {
+.empty-icon i {
     font-size: 3rem;
     color: #adb5bd;
 }
@@ -247,7 +409,7 @@
 }
 
 /* ----------------------------------------
-   6. КНОПКА "ВСЕ ПРОЧИТАНО"
+   7. КНОПКА "ВСЕ ПРОЧИТАНО"
    ---------------------------------------- */
 
 .btn-mark-all {
@@ -271,42 +433,29 @@
     box-shadow: 0 6px 20px rgba(11, 52, 187, 0.3);
 }
 
-.btn-mark-all:active {
-    transform: translateY(0);
-}
-
-.btn-mark-all i {
-    font-size: 1rem;
-    color: #ffffff;
-}
-
 /* ----------------------------------------
-   7. ПАГИНАЦИЯ И ИНФОРМАЦИЯ
+   8. ПАГИНАЦИЯ (исправленная)
    ---------------------------------------- */
 
 .pagination-wrapper {
     margin-top: 2rem;
     padding: 1.5rem;
-    border-top: 2px solid #e9ecef;
-    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    background: #f8f9fa;
     border-radius: 0 0 25px 25px;
+    border-top: 1px solid #e9ecef;
+    text-align: center;
 }
 
 .pagination-info {
     text-align: center;
     color: #495057;
-    font-size: 0.95rem;
-    margin-bottom: 1.5rem;
-    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
     background: white;
     border-radius: 50px;
     display: inline-block;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    border: 1px solid #e9ecef;
-    font-weight: 500;
-    width: auto;
-    margin-left: auto;
-    margin-right: auto;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .pagination-info i {
@@ -317,437 +466,16 @@
 .pagination-info strong {
     color: #0b34bb;
     font-weight: 700;
-    margin: 0 0.2rem;
 }
 
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.pagination-prev,
-.pagination-next {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: white;
-    border: 2px solid #0b34bb;
-    color: #0b34bb;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.pagination-prev:hover,
-.pagination-next:hover {
-    background: #0b34bb;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(11, 52, 187, 0.2);
-}
-
-.pagination-prev.disabled,
-.pagination-next.disabled {
-    border-color: #ced4da;
-    color: #ced4da;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-.pagination-pages {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.pagination-page {
-    min-width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    background: white;
-    color: #495057;
-    border: 1px solid #e9ecef;
-}
-
-.pagination-page:hover {
-    background: #f0f4ff;
-    color: #0b34bb;
-    border-color: #0b34bb;
-    transform: translateY(-2px);
-}
-
-.pagination-page.active {
-    background: linear-gradient(135deg, #0b34bb, #0e2778);
-    color: white;
-    border: none;
-    box-shadow: 0 4px 12px rgba(11, 52, 187, 0.3);
-}
-
-.pagination-dots {
-    min-width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #6c757d;
-    font-weight: 600;
-}
-
-/* ----------------------------------------
-   8. АДАПТИВНОСТЬ
-   ---------------------------------------- */
-
-@media (max-width: 768px) {
-    .notifications-header {
-        padding: 1.2rem 1.5rem;
-    }
-    
-    .notifications-header h1 {
-        font-size: 1.5rem;
-    }
-    
-    .notifications-header .back-btn {
-        padding: 0.4rem 1rem;
-        font-size: 0.9rem;
-    }
-    
-    .btn-mark-all {
-        padding: 0.5rem 1.2rem;
-        font-size: 0.9rem;
-    }
-    
-    .notification-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    
-    .notification-item .mark-read-btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .notification-item .d-flex {
-        width: 100%;
-    }
-    
-    .pagination-container {
-        gap: 0.5rem;
-    }
-    
-    .pagination-page {
-        min-width: 35px;
-        height: 35px;
-        font-size: 0.9rem;
-    }
-    
-    .pagination-prev,
-    .pagination-next {
-        width: 35px;
-        height: 35px;
-    }
-    
-    .pagination-info {
-        font-size: 0.85rem;
-        padding: 0.5rem 1rem;
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .notifications-header {
-        padding: 1rem;
-    }
-    
-    .notifications-header h1 {
-        font-size: 1.3rem;
-    }
-    
-    .btn-mark-all {
-        padding: 0.4rem 1rem;
-        font-size: 0.85rem;
-    }
-    
-    .notification-item {
-        padding: 1rem;
-    }
-    
-    .notification-item .notification-icon {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .notification-item .notification-icon i {
-        font-size: 1.2rem;
-    }
-    
-    .notification-item .notification-message {
-        font-size: 0.9rem;
-    }
-    
-    .pagination-pages {
-        gap: 0.3rem;
-    }
-    
-    .pagination-page {
-        min-width: 32px;
-        height: 32px;
-        font-size: 0.8rem;
-    }
-    
-    .pagination-prev,
-    .pagination-next {
-        width: 32px;
-        height: 32px;
-    }
-}
-
-/* ----------------------------------------
-   9. ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ
-   ---------------------------------------- */
-
-/* Бейдж с количеством уведомлений */
-.badge-notification {
-    background: #dc3545;
-    color: white;
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 0.2rem 0.6rem;
-    border-radius: 50px;
-    margin-left: 0.5rem;
-    vertical-align: middle;
-}
-
-/* Фильтры уведомлений */
-.notifications-filters {
-    margin-bottom: 1.5rem;
-}
-
-.filter-buttons {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.filter-btn {
-    background: white;
-    border: 2px solid #e9ecef;
-    border-radius: 50px;
-    padding: 0.5rem 1.2rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #495057;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.filter-btn:hover {
-    border-color: #0b34bb;
-    color: #0b34bb;
-    transform: translateY(-2px);
-}
-
-.filter-btn.active {
-    background: linear-gradient(135deg, #0b34bb, #0e2778);
-    border-color: #0b34bb;
-    color: white;
-    box-shadow: 0 4px 12px rgba(11, 52, 187, 0.3);
-}
-
-/* Типы уведомлений */
-.notification-type-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.2rem 0.6rem;
-    border-radius: 50px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-}
-
-.notification-type-badge.booking {
-    background: rgba(40, 167, 69, 0.1);
-    color: #28a745;
-}
-
-.notification-type-badge.subscription {
-    background: rgba(70, 53, 220, 0.1);
-    color: #4635dc;
-}
-
-.notification-type-badge.attendance {
-    background: rgba(23, 162, 184, 0.1);
-    color: #17a2b8;
-}
-
-.notification-type-badge.schedule {
-    background: rgba(255, 193, 7, 0.1);
-    color: #ffc107;
-}
-
-.notification-type-badge.system {
-    background: rgba(108, 117, 125, 0.1);
-    color: #6c757d;
-}
-
-/* Иконки для новых типов */
-.notification-item .notification-icon.attendance {
-    background: linear-gradient(135deg, #43e97b, #38f9d7);
-    color: #00573d;
-}
-
-.notification-item .notification-icon.schedule {
-    background: linear-gradient(135deg, #f6d365, #fda085);
-    color: #9b4d1d;
-}
-
-/* Заголовок уведомления */
-.notification-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.unread-badge {
-    background: #dc3545;
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 600;
-    padding: 0.15rem 0.5rem;
-    border-radius: 50px;
-}
-
-/* Мета-информация уведомления */
-.notification-meta {
-    margin-top: 0.5rem;
-}
-
-.notification-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.8rem;
-    color: #0b34bb;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.notification-link:hover {
-    color: #cc222a;
-    text-decoration: underline;
-}
-
-/* Время уведомления */
-.notification-time .separator {
-    margin: 0 0.3rem;
-    color: #dee2e6;
-}
-
-/* Кнопка удаления */
-.notification-actions {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.delete-notification-btn {
-    background: rgba(220, 53, 69, 0.1);
-    border: none;
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #dc3545;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.delete-notification-btn:hover {
-    background: #dc3545;
-    color: white;
-    transform: scale(1.1);
-}
-
-/* Структура уведомления */
-.notification-main {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    flex: 1;
-}
-
-/* Адаптация */
-@media (max-width: 768px) {
-    .filter-btn {
-        padding: 0.4rem 1rem;
-        font-size: 0.75rem;
-    }
-    
-    .notification-main {
-        width: 100%;
-    }
-    
-    .notification-actions {
-        width: 100%;
-        justify-content: flex-end;
-        margin-top: 0.5rem;
-    }
-    
-    .notification-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .delete-notification-btn {
-        width: auto;
-        height: auto;
-        border-radius: 12px;
-        padding: 0.4rem 0.8rem;
-    }
-}
-
-/* ========================================
-   10. КАСТОМНАЯ ПАГИНАЦИЯ
-   ======================================== */
-
-/* Контейнер пагинации */
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-top: 1rem;
-}
-
-/* Стили для ссылок пагинации */
+/* Скрываем стандартную пагинацию Laravel и создаем свою */
 .pagination-container nav {
-    display: inline-block;
+    display: block;
 }
 
 .pagination-container .pagination {
     display: flex;
+    justify-content: center;
     gap: 0.5rem;
     flex-wrap: wrap;
     margin: 0;
@@ -757,6 +485,7 @@
 
 .pagination-container .page-item {
     display: inline-block;
+    margin: 0;
 }
 
 .pagination-container .page-link {
@@ -768,6 +497,7 @@
     justify-content: center;
     text-decoration: none;
     font-weight: 600;
+    font-size: 0.9rem;
     transition: all 0.3s ease;
     background: white;
     color: #495057;
@@ -777,8 +507,8 @@
 }
 
 .pagination-container .page-link:hover {
-    background: #f0f4ff;
-    color: #0b34bb;
+    background: linear-gradient(135deg, #0b34bb, #4c71eb);
+    color: white;
     border-color: #0b34bb;
     transform: translateY(-2px);
 }
@@ -791,171 +521,84 @@
 }
 
 .pagination-container .disabled .page-link {
-    border-color: #ced4da;
-    color: #ced4da;
+    background: #f8f9fa;
+    border-color: #e9ecef;
+    color: #adb5bd;
     cursor: not-allowed;
     pointer-events: none;
-    background: #f8f9fa;
 }
 
-/* Кнопки Previous/Next */
-.pagination-container .page-item:first-child .page-link,
-.pagination-container .page-item:last-child .page-link {
-    width: 40px;
-    padding: 0;
+/* Скрываем текст "Showing..." если он есть */
+.pagination-container p[role="status"] {
+    display: none;
 }
 
-/* Информация о пагинации */
-.pagination-info {
-    text-align: center;
-    color: #495057;
-    font-size: 0.95rem;
-    margin-bottom: 1.5rem;
-    padding: 0.7rem 1.5rem;
-    background: white;
-    border-radius: 50px;
-    display: inline-block;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    border: 1px solid #e9ecef;
-    font-weight: 500;
-    width: auto;
-    margin-left: auto;
-    margin-right: auto;
-}
+/* ----------------------------------------
+   9. АДАПТИВНОСТЬ
+   ---------------------------------------- */
 
-.pagination-info i {
-    color: #0b34bb;
-    margin-right: 0.5rem;
-}
-
-.pagination-info strong {
-    color: #0b34bb;
-    font-weight: 700;
-    margin: 0 0.2rem;
-}
-
-/* Мобильная адаптация пагинации */
 @media (max-width: 768px) {
+    .notifications-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .notifications-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .notification-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .notification-actions {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 0.5rem;
+    }
+    
+    .mark-read-btn,
+    .delete-notification-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+    }
+    
+    .filter-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+    }
+    
     .pagination-container .page-link {
         min-width: 35px;
         height: 35px;
         font-size: 0.85rem;
         padding: 0 10px;
     }
-    
-    .pagination-container .page-item:first-child .page-link,
-    .pagination-container .page-item:last-child .page-link {
-        width: 35px;
-    }
-    
-    .pagination-info {
-        font-size: 0.85rem;
-        padding: 0.5rem 1rem;
-        width: 100%;
-    }
 }
 
 @media (max-width: 480px) {
+    .notifications-header h1 {
+        font-size: 1.2rem;
+    }
+    
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .notification-icon i {
+        font-size: 1.2rem;
+    }
+    
+    .notification-message {
+        font-size: 0.9rem;
+    }
+    
     .pagination-container .page-link {
         min-width: 32px;
         height: 32px;
         font-size: 0.8rem;
         padding: 0 8px;
     }
-    
-    .pagination-container .page-item:first-child .page-link,
-    .pagination-container .page-item:last-child .page-link {
-        width: 32px;
-    }
 }
 
-/* Анимация для кнопок фильтров */
-.filter-btn {
-    position: relative;
-    overflow: hidden;
-}
-
-.filter-btn::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.5s, height 0.5s;
-}
-
-.filter-btn:active::after {
-    width: 100%;
-    height: 100%;
-    transition: 0s;
-}
-
-/* Активная кнопка фильтра */
-.filter-btn.active {
-    background: linear-gradient(135deg, #0b34bb, #0e2778);
-    border-color: #0b34bb;
-    color: white;
-    box-shadow: 0 4px 12px rgba(11, 52, 187, 0.3);
-}
-
-/* Кнопки действий в уведомлениях */
-.mark-read-btn {
-    background: linear-gradient(135deg, #0b34bb, #4c71eb);
-    border: none;
-    border-radius: 50px;
-    padding: 0.5rem 1.2rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: white;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.mark-read-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(11, 52, 187, 0.3);
-}
-
-.delete-notification-btn {
-    background: rgba(220, 53, 69, 0.1);
-    border: 1px solid #dc3545;
-    border-radius: 50px;
-    padding: 0.5rem 1.2rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #dc3545;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.delete-notification-btn:hover {
-    background: #dc3545;
-    color: white;
-    transform: translateY(-2px);
-}
-
-.notification-actions {
-    display: flex;
-    gap: 0.8rem;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-/* Мобильная адаптация */
-@media (max-width: 768px) {
-    .mark-read-btn,
-    .delete-notification-btn {
-        padding: 0.4rem 1rem;
-        font-size: 0.8rem;
-    }
-}
