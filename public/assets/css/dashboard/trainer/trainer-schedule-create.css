@@ -74,6 +74,25 @@
     margin-right: 0.5rem;
 }
 
+/* Адаптация для мобильных устройств */
+@media (max-width: 768px) {
+    .create-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.2rem 1.5rem;
+    }
+    
+    .create-header h1 {
+        font-size: 1.5rem;
+        white-space: normal;
+    }
+    
+    .create-header .back-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
 /* ----------------------------------------
    3. АЛЕРТЫ
    ---------------------------------------- */

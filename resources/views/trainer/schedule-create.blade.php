@@ -11,7 +11,7 @@
 <div class="container py-4 schedule-create-page">
     <div class="create-header d-flex justify-content-between align-items-center">
         <h1 class="mb-0">
-            <i class="fas fa-plus-circle me-3"></i>Создание тренировки
+            Создание тренировки
         </h1>
         <a href="{{ route('trainer.schedule') }}" class="back-btn">
             <i class="fas fa-arrow-left me-2"></i>Назад
