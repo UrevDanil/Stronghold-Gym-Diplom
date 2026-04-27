@@ -366,30 +366,6 @@ body {
     box-shadow: var(--shadow-lg);
 }
 
-.stat-card .stat-icon {
-    font-size: 2rem;
-    margin-bottom: 15px;
-    display: inline-block;
-    padding: 12px;
-    border-radius: var(--border-radius-md);
-    background: rgba(67, 97, 238, 0.1);
-    color: #ffffff;
-}
-
-.stat-card .stat-label {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--gray);
-    font-weight: 500;
-}
-
-.stat-card .stat-value {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #d6d6d6;
-}
-
 /* ----------------------------------------
    11. АДАПТАЦИЯ КОНТЕНТА
    ---------------------------------------- */
