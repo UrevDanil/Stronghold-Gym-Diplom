@@ -9,80 +9,60 @@
 
 @section('content')
 <div class="container py-4 schedule-page">
-<!-- Заголовок -->
-<div class="schedule-header d-flex justify-content-between align-items-center">
-    <h1 class="mb-0">
-        <i class="fas fa-calendar-alt me-3"></i>Моё расписание
-    </h1>
-    <a href="{{ route('trainer.dashboard') }}" class="back-btn">
-        <i class="fas fa-arrow-left me-2"></i>Назад
-    </a>
-</div>
+    <!-- Заголовок -->
+    <div class="schedule-header d-flex justify-content-between align-items-center">
+        <h1 class="mb-0">
+            <i class="fas fa-calendar-alt me-3"></i>Моё расписание
+        </h1>
+        <a href="{{ route('trainer.dashboard') }}" class="back-btn">
+            <i class="fas fa-arrow-left me-2"></i>Назад
+        </a>
+    </div>
 
-<!-- Навигация по датам -->
-<div class="date-nav-card">
-    <div class="card-body">
-        <div class="date-nav-controls">
-            <a href="{{ route('trainer.schedule') }}?date={{ \Carbon\Carbon::parse(request('date', now()))->subDay()->format('Y-m-d') }}" 
-               class="nav-btn">
-                <i class="fas fa-chevron-left"></i>
-            </a>
-            
-            <div class="date-display">
-                <h3>
-                    {{ \Carbon\Carbon::parse(request('date', now()))->isoFormat('dddd, D MMMM YYYY') }}
-                </h3>
-                <span class="trainings-count">
-                    <i class="fas fa-dumbbell me-1"></i>
-                    {{ $schedules->count() ?? 0 }} тренировок
-                </span>
+    <!-- Навигация по датам -->
+    <div class="date-nav-card">
+        <div class="card-body">
+            <div class="date-nav-controls">
+                <a href="{{ route('trainer.schedule') }}?date={{ \Carbon\Carbon::parse(request('date', now()))->subDay()->format('Y-m-d') }}" 
+                   class="nav-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                
+                <div class="date-display">
+                    <h3>
+                        {{ \Carbon\Carbon::parse(request('date', now()))->isoFormat('dddd, D MMMM YYYY') }}
+                    </h3>
+                    <span class="trainings-count">
+                        <i class="fas fa-dumbbell me-1"></i>
+                        {{ $schedules->count() ?? 0 }} тренировок
+                    </span>
+                </div>
+                
+                <a href="{{ route('trainer.schedule') }}?date={{ \Carbon\Carbon::parse(request('date', now()))->addDay()->format('Y-m-d') }}" 
+                   class="nav-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
             </div>
             
-            <a href="{{ route('trainer.schedule') }}?date={{ \Carbon\Carbon::parse(request('date', now()))->addDay()->format('Y-m-d') }}" 
-               class="nav-btn">
-                <i class="fas fa-chevron-right"></i>
-            </a>
-        </div>
-        
-        <!-- Кнопки действий: Сегодня и Создать тренировку -->
-        <div class="action-buttons-row">
-            <a href="{{ route('trainer.schedule') }}" class="btn-today">
-                <i class="fas fa-calendar-day me-2"></i>Сегодня
-            </a>
-            <a href="{{ route('trainer.schedule.create') }}" class="btn-create-workout">
-                <i class="fas fa-plus me-2"></i>Создать тренировку
-            </a>
+            <!-- Кнопки действий: Сегодня и Создать тренировку -->
+            <div class="action-buttons-row">
+                <a href="{{ route('trainer.schedule') }}" class="btn-today">
+                    <i class="fas fa-calendar-day me-2"></i>Сегодня
+                </a>
+                <a href="{{ route('trainer.schedule.create') }}" class="btn-create-workout">
+                    <i class="fas fa-plus me-2"></i>Создать тренировку
+                </a>
+            </div>
         </div>
     </div>
-</div>
 
     <!-- Расписание на день -->
     @if(isset($schedules) && $schedules->count() > 0)
         <div class="row g-4">
             @foreach($schedules as $schedule)
                 <div class="col-lg-6 col-md-12">
-                    <div class="workout-card {{ $schedule->isPast() ? 'past' : '' }}" style="position: relative;">
-                        <!-- Кнопки действий (редактировать и удалить) -->
-                        <div class="card-actions">
-                            @if(!$schedule->isPast())
-                                <a href="{{ route('trainer.schedule.edit', $schedule->id) }}" 
-                                   class="btn-edit" title="Редактировать тренировку">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <div class="card-delete-btn">
-                                    <form action="{{ route('trainer.schedule.delete', $schedule->id) }}" 
-                                          method="POST" 
-                                          onsubmit="return confirm('Вы уверены, что хотите удалить эту тренировку? Все записанные клиенты получат уведомление, тренировки будут возвращены в их абонементы.')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-delete" title="Удалить тренировку">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            @endif
-                        </div>
-                        
+                    <div class="workout-card {{ $schedule->isPast() ? 'past' : '' }}">
+                        <!-- Время и зал (шапка) -->
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="time-badge">
@@ -96,6 +76,28 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- КНОПКИ ДЕЙСТВИЙ (перемещены под шапку, НО над телом карточки) -->
+                        @if(!$schedule->isPast())
+                            <div class="card-actions">
+                                <a href="{{ route('trainer.schedule.edit', $schedule->id) }}" 
+                                   class="btn-edit" title="Редактировать тренировку">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('trainer.schedule.delete', $schedule->id) }}" 
+                                      method="POST" 
+                                      onsubmit="return confirm('Вы уверены, что хотите удалить эту тренировку? Все записанные клиенты получат уведомление, тренировки будут возвращены в их абонементы.')"
+                                      class="card-delete-form">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-delete" title="Удалить тренировку">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
+                        
+                        <!-- Тело карточки (контент) -->
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
