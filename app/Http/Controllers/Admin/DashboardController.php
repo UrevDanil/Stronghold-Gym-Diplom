@@ -437,61 +437,69 @@ public function updateUser(Request $request, $id)
 /**
  * Отметка посещаемости клиента (для обычных абонементов)
  */
-public function markClientAttendance(Request $request, $clientId){
-    {
-        $admin = auth()->user();
-        $client = User::findOrFail($clientId);
-        
-        if (!$client->isClient()) {
-            return back()->with('error', 'Пользователь не является клиентом');
-        }
-        
-        $validated = $request->validate([
-            'date' => 'required|date',
-            'workout_name' => 'nullable|string|max:255',
-            'comment' => 'nullable|string',
-        ]);
-        
-        $activeSubscription = $client->activeSubscription();
-        
-        if (!$activeSubscription) {
-            return back()->with('error', 'У клиента нет активного абонемента');
-        }
-        
-        if ($activeSubscription->remaining_workouts <= 0 && $activeSubscription->subscription->workouts_count > 0) {
-            return back()->with('error', 'У клиента закончились тренировки в абонементе');
-        }
-        
-        Attendance::create([
-            'booking_id' => null,
-            'user_id' => $client->id,
-            'marked_by' => $admin->id,
-            'attended_at' => $validated['date'],
-            'comment' => $validated['comment'] ?? null,
-            'attendance_type' => 'attended'
-        ]);
-        
-        if ($activeSubscription->subscription->workouts_count > 0) {
-            $activeSubscription->decrement('remaining_workouts');
-            if ($activeSubscription->remaining_workouts <= 0) {
-                $activeSubscription->status = UserSubscription::STATUS_EXPIRED;
-                $activeSubscription->save();
-            }
-        }
-        
-        $this->notify->send(
-            $client->id,
-            "✅ Администратор отметил ваше посещение {$validated['date']}. Осталось тренировок: " . ($activeSubscription->remaining_workouts ?? 0),
-            'attendance',
-            ['date' => $validated['date'], 'workout' => $validated['workout_name'] ?? 'Тренировка']
-        );
-        
-        $remainingText = $activeSubscription->subscription->workouts_count > 0 
-            ? "Осталось тренировок: " . ($activeSubscription->remaining_workouts ?? 0)
-            : "Безлимитный абонемент";
-        
-        return back()->with('success', "Посещение клиента {$client->name} отмечено. " . $remainingText);
+public function markClientAttendance(Request $request, $clientId)
+{
+    $admin = auth()->user();
+    $client = User::findOrFail($clientId);
+    
+    if (!$client->isClient()) {
+        return back()->with('error', 'Пользователь не является клиентом');
     }
+    
+    $validated = $request->validate([
+        'date' => 'required|date',
+        'workout_name' => 'nullable|string|max:255',
+        'comment' => 'nullable|string',
+    ]);
+    
+    $activeSubscription = $client->activeSubscription();
+    
+    if (!$activeSubscription) {
+        return back()->with('error', 'У клиента нет активного абонемента');
+    }
+    
+    if ($activeSubscription->remaining_workouts <= 0 && $activeSubscription->subscription->workouts_count > 0) {
+        return back()->with('error', 'У клиента закончились тренировки в абонементе');
+    }
+    
+    Attendance::create([
+        'booking_id' => null,
+        'user_id' => $client->id,
+        'marked_by' => $admin->id,
+        'attended_at' => $validated['date'],
+        'comment' => $validated['comment'] ?? null,
+        'attendance_type' => 'attended'
+    ]);
+    
+    if ($activeSubscription->subscription->workouts_count > 0) {
+        $activeSubscription->decrement('remaining_workouts');
+        if ($activeSubscription->remaining_workouts <= 0) {
+            $activeSubscription->status = UserSubscription::STATUS_EXPIRED;
+            $activeSubscription->save();
+        }
+    }
+    
+    // 1. Уведомление клиенту
+    $this->notify->send(
+        $client->id,
+        "✅ Администратор отметил ваше посещение {$validated['date']}. Осталось тренировок: " . ($activeSubscription->remaining_workouts ?? 0),
+        'attendance',
+        ['date' => $validated['date'], 'workout' => $validated['workout_name'] ?? 'Тренировка']
+    );
+    
+    // 2. Уведомление админу (подтверждение)
+    $this->notify->send(
+        $admin->id,
+        "✅ Вы отметили посещение клиента {$client->name} на {$validated['date']}. Осталось тренировок: " . ($activeSubscription->remaining_workouts ?? 0),
+        'attendance',
+        ['client_id' => $client->id, 'date' => $validated['date']]
+    );
+    
+    $remainingText = $activeSubscription->subscription->workouts_count > 0 
+        ? "Осталось тренировок: " . ($activeSubscription->remaining_workouts ?? 0)
+        : "Безлимитный абонемент";
+    
+    return back()->with('success', "Посещение клиента {$client->name} отмечено. " . $remainingText);
 }
 
 /**
@@ -598,45 +606,52 @@ public function createSchedule()
 }
 
 /**
-     * Сохранение нового занятия
-     */
-    public function storeSchedule(Request $request)
-    {
-        $validated = $request->validate([
-            'workout_id' => 'required|exists:workouts,id',
-            'trainer_id' => 'required|exists:users,id',
-            'date' => 'required|date|after_or_equal:today',
-            'start_time' => 'required',
-            'end_time' => 'required|after:start_time',
-            'room' => 'nullable|string|max:255',
-            'capacity' => 'required|integer|min:1|max:100',
-        ]);
-        
-        $schedule = Schedule::create([
-            'workout_id' => $validated['workout_id'],
-            'trainer_id' => $validated['trainer_id'],
-            'date' => $validated['date'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'room' => $validated['room'] ?? null,
-            'capacity' => $validated['capacity'],
-            'status' => 'scheduled',
-            'current_participants' => 0,
-        ]);
-        
-        // Уведомление тренеру через сервис
-        $this->notify->send(
-            $validated['trainer_id'],
-            "Администратор добавил вам тренировку '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
-            'schedule',
-            ['schedule_id' => $schedule->id]
-        );
-        
-        // ВЫЗЫВАЕМ СОБЫТИЕ СОЗДАНИЯ ТРЕНИРОВКИ (для уведомления админов)
-        event(new ScheduleCreated($schedule));
-        
-        return redirect()->route('admin.schedule.index')
-            ->with('success', 'Занятие успешно добавлено в расписание');
+ * Сохранение нового занятия (админ создает тренировку для тренера)
+ */
+public function storeSchedule(Request $request)
+{
+    $validated = $request->validate([
+        'workout_id' => 'required|exists:workouts,id',
+        'trainer_id' => 'required|exists:users,id',
+        'date' => 'required|date|after_or_equal:today',
+        'start_time' => 'required',
+        'end_time' => 'required|after:start_time',
+        'room' => 'nullable|string|max:255',
+        'capacity' => 'required|integer|min:1|max:100',
+    ]);
+    
+    $schedule = Schedule::create([
+        'workout_id' => $validated['workout_id'],
+        'trainer_id' => $validated['trainer_id'],
+        'date' => $validated['date'],
+        'start_time' => $validated['start_time'],
+        'end_time' => $validated['end_time'],
+        'room' => $validated['room'] ?? null,
+        'capacity' => $validated['capacity'],
+        'status' => 'scheduled',
+        'current_participants' => 0,
+    ]);
+    
+    // 1. Уведомление тренеру
+    $this->notify->send(
+        $validated['trainer_id'],
+        "📢 Администратор " . auth()->user()->name . " добавил вам тренировку '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+        'schedule',
+        ['schedule_id' => $schedule->id]
+    );
+    
+    // 2. Уведомление самому админу (подтверждение)
+    $this->notify->send(
+        auth()->id(),
+        "✅ Вы успешно создали тренировку '{$schedule->workout->name}' для тренера {$schedule->trainer->name} на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+        'schedule',
+        ['schedule_id' => $schedule->id]
+    );
+    
+    // НЕ вызываем event(new ScheduleCreated($schedule)) - чтобы не было дублей
+    
+    return redirect()->route('admin.schedule.index')
+        ->with('success', 'Занятие успешно добавлено в расписание');
 }
 
 /**
@@ -1086,10 +1101,7 @@ public function refundTraining(Request $request, $clientId)
     // Просто добавляем одну тренировку обратно в абонемент
     $activeSubscription->increment('remaining_workouts');
     
-    // Создаем запись о возврате (опционально)
-    $refundNote = "Возврат тренировки администратором {$admin->name}. Причина: " . ($validated['reason'] ?? 'Не указана');
-    
-    // Можно создать уведомление или запись в лог
+    // 1. Уведомление клиенту
     \App\Models\Notification::create([
         'user_id' => $client->id,
         'type' => 'attendance',
@@ -1103,12 +1115,31 @@ public function refundTraining(Request $request, $clientId)
         ])
     ]);
     
-    // Уведомление админам
-    $this->notify->notifyAdmins(
-        "🔄 Администратор {$admin->name} вернул тренировку клиенту {$client->name}. Теперь у клиента {$activeSubscription->remaining_workouts} тренировок в абонементе",
+    // 2. Уведомление админу (подтверждение)
+    $this->notify->send(
+        $admin->id,
+        "✅ Вы успешно вернули тренировку клиенту {$client->name}. Теперь у клиента {$activeSubscription->remaining_workouts} тренировок в абонементе",
         'attendance',
-        ['client_id' => $client->id, 'admin_id' => $admin->id]
+        ['client_id' => $client->id, 'new_balance' => $activeSubscription->remaining_workouts]
     );
+    
+    // 3. Уведомление остальным админам
+    // Исключаем текущего админа, чтобы не дублировать
+    $otherAdminIds = User::whereHas('role', function($q) {
+            $q->whereIn('name', ['admin', 'owner']);
+        })
+        ->where('id', '!=', $admin->id)
+        ->pluck('id')
+        ->toArray();
+    
+    if (!empty($otherAdminIds)) {
+        $this->notify->sendBulk(
+            $otherAdminIds,
+            "🔄 Администратор {$admin->name} вернул тренировку клиенту {$client->name}. Теперь у клиента {$activeSubscription->remaining_workouts} тренировок",
+            'attendance',
+            ['client_id' => $client->id, 'admin_id' => $admin->id]
+        );
+    }
     
     $remainingText = $activeSubscription->subscription->workouts_count > 0 
         ? "Теперь у клиента {$activeSubscription->remaining_workouts} тренировок в абонементе"

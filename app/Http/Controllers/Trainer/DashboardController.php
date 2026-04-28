@@ -337,88 +337,76 @@ public function clientDetails($id)
      * Отметка посещаемости
      */
     public function markAttendance(Request $request, Schedule $schedule)
-    {
-        if ($schedule->trainer_id !== auth()->id()) {
-            abort(403);
-        }
+{
+    if ($schedule->trainer_id !== auth()->id()) {
+        abort(403);
+    }
+    
+    if ($schedule->status !== Schedule::STATUS_SCHEDULED) {
+        return back()->with('error', 'Нельзя отмечать посещаемость на отмененной тренировке');
+    }
+    
+    $validated = $request->validate([
+        'booking_id' => 'required|exists:bookings,id',
+        'status' => 'required|in:attended,missed'
+    ]);
+    
+    $booking = Booking::find($validated['booking_id']);
+    
+    if ($booking->status !== Booking::STATUS_BOOKED) {
+        return back()->with('error', 'Это бронирование уже отмечено');
+    }
+    
+    if ($validated['status'] === 'attended') {
+        $booking->markAttended();
         
-        if ($schedule->status !== Schedule::STATUS_SCHEDULED) {
-            return back()->with('error', 'Нельзя отмечать посещаемость на отмененной тренировке');
-        }
-        
-        $validated = $request->validate([
-            'booking_id' => 'required|exists:bookings,id',
-            'status' => 'required|in:attended,missed'
+        Attendance::create([
+            'booking_id' => $booking->id,
+            'marked_by' => auth()->id(),
+            'attended_at' => now(),
+            'attendance_type' => 'attended'
         ]);
         
-        $booking = Booking::find($validated['booking_id']);
-        
-        if ($booking->status !== Booking::STATUS_BOOKED) {
-            return back()->with('error', 'Это бронирование уже отмечено');
+        $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
+            ->where('status', 'active')
+            ->first();
+        if ($activeSubscription && $activeSubscription->remaining_workouts > 0) {
+            $activeSubscription->decrement('remaining_workouts');
         }
         
-        if ($validated['status'] === 'attended') {
-            $booking->markAttended();
-            
-            Attendance::create([
-                'booking_id' => $booking->id,
-                'marked_by' => auth()->id(),
-                'attended_at' => now(),
-                'attendance_type' => 'attended'
-            ]);
-            
-            $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
-                ->where('status', 'active')
-                ->first();
-            if ($activeSubscription && $activeSubscription->remaining_workouts > 0) {
-                $activeSubscription->decrement('remaining_workouts');
-            }
-            
-            // Уведомление клиенту
-            $this->notify->send(
-                $booking->user_id,
-                "✅ Тренер отметил ваше посещение тренировки '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')}",
-                'attendance',
-                ['schedule_id' => $schedule->id]
-            );
-            
-            // Уведомление тренеру (подтверждение)
-            $this->notify->send(
-                auth()->id(),
-                "✅ Вы отметили посещение клиента {$booking->user->name} на тренировке '{$schedule->workout->name}'",
-                'attendance',
-                ['schedule_id' => $schedule->id, 'client_id' => $booking->user_id]
-            );
-            
-        } else {
-            $booking->markMissed();
-            
-            Attendance::create([
-                'booking_id' => $booking->id,
-                'marked_by' => auth()->id(),
-                'attended_at' => now(),
-                'attendance_type' => 'left_early'
-            ]);
-            
-            // Уведомление клиенту
-            $this->notify->send(
-                $booking->user_id,
-                "⚠️ Тренер отметил что вы пропустили тренировку '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')}",
-                'attendance',
-                ['schedule_id' => $schedule->id]
-            );
-            
-            // Уведомление тренеру (подтверждение)
-            $this->notify->send(
-                auth()->id(),
-                "⚠️ Вы отметили пропуск клиента {$booking->user->name} на тренировке '{$schedule->workout->name}'",
-                'attendance',
-                ['schedule_id' => $schedule->id, 'client_id' => $booking->user_id]
-            );
-        }
+    } else {
+        $booking->markMissed();
         
-        return back()->with('success', 'Посещаемость отмечена');
+        Attendance::create([
+            'booking_id' => $booking->id,
+            'marked_by' => auth()->id(),
+            'attended_at' => now(),
+            'attendance_type' => 'left_early'
+        ]);
     }
+    
+    // ВЫЗЫВАЕМ СОБЫТИЕ (отправляет уведомление клиенту)
+    event(new AttendanceMarked($booking, auth()->user(), $validated['status']));
+    
+    // Дополнительно отправляем уведомление тренеру (подтверждение)
+    if ($validated['status'] === 'attended') {
+        $this->notify->send(
+            auth()->id(),
+            "✅ Вы отметили посещение клиента {$booking->user->name} на тренировке '{$schedule->workout->name}'",
+            'attendance',
+            ['schedule_id' => $schedule->id, 'client_id' => $booking->user_id]
+        );
+    } else {
+        $this->notify->send(
+            auth()->id(),
+            "⚠️ Вы отметили пропуск клиента {$booking->user->name} на тренировке '{$schedule->workout->name}'",
+            'attendance',
+            ['schedule_id' => $schedule->id, 'client_id' => $booking->user_id]
+        );
+    }
+    
+    return back()->with('success', 'Посещаемость отмечена');
+}
 
    public function attendance(Request $request)
 {
