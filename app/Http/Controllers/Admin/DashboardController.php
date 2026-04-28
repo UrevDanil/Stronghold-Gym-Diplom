@@ -731,7 +731,7 @@ public function cancelSchedule($id)
         $this->notify->send(
             $booking->user_id,
             "❌ Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} отменено администратором. Тренировка возвращена в абонемент.",
-            'schedule',
+            'system',
             ['schedule_id' => $schedule->id]
         );
         
@@ -787,7 +787,7 @@ public function restoreSchedule($id)
         // Уведомляем клиента, что занятие восстановлено и нужно записаться заново
         \App\Models\Notification::create([
             'user_id' => $booking->user_id,
-            'type' => 'booking',
+            'type' => 'system',
             'message' => "Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} было восстановлено. Вы можете записаться заново через расписание.",
             'is_read' => false,
             'data' => json_encode([

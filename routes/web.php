@@ -244,19 +244,6 @@ Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('su
 Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
 Route::post('/freeze-subscription', [ClientDashboardController::class, 'freezeSubscription'])->name('freeze-subscription');
 
-// Аутентифицированные маршруты
-Route::middleware(['auth'])->group(function () {
-    // Покупка абонемента
-    Route::post('/subscriptions/{subscription}/purchase', 
-               [SubscriptionController::class, 'purchase'])
-           ->name('subscriptions.purchase');
-    
-    // Продление абонемента
-    Route::post('/subscriptions/{subscription}/renew', 
-               [SubscriptionController::class, 'renew'])
-           ->name('subscriptions.renew');
-});
-
 // Уведомления
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', function () {

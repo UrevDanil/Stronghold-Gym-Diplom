@@ -275,32 +275,60 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function purchaseSubscription(Subscription $subscription)
-    {
-        $user = Auth::user();
-        
-        $userSubscription = $user->subscriptions()->attach($subscription->id, [
-            'start_date' => now(),
-            'end_date' => now()->addDays($subscription->duration_days),
+ /**
+ * Покупка абонемента
+ */
+public function purchaseSubscription(Subscription $subscription)
+{
+    $user = Auth::user();
+    
+    // Создаем запись о покупке абонемента
+    $userSubscription = $user->subscriptions()->attach($subscription->id, [
+        'start_date' => now(),
+        'end_date' => now()->addDays($subscription->duration_days),
+        'remaining_workouts' => $subscription->workouts_count,
+        'status' => 'active',
+        'activated_by' => $user->id,
+        'activated_at' => now(),
+    ]);
+    
+    // Получаем созданную запись user_subscription
+    $userSubscription = UserSubscription::where('user_id', $user->id)
+        ->where('subscription_id', $subscription->id)
+        ->where('status', 'active')
+        ->latest()
+        ->first();
+    
+    // 1. Уведомление клиенту
+    $this->notify->send(
+        $user->id,
+        "🎉 Вы приобрели абонемент '{$subscription->name}'!\n📅 Действителен до: " . now()->addDays($subscription->duration_days)->format('d.m.Y') . "\n🏋️ Тренировок: " . ($subscription->workouts_count == 0 ? 'Безлимит' : $subscription->workouts_count),
+        'subscription',
+        [
+            'subscription_id' => $subscription->id,
+            'subscription_name' => $subscription->name,
+            'end_date' => now()->addDays($subscription->duration_days)->format('d.m.Y'),
             'remaining_workouts' => $subscription->workouts_count,
-            'status' => 'active',
-            'activated_by' => $user->id,
-            'activated_at' => now(),
-        ]);
-        
-        // Получаем созданную запись
-        $userSubscription = UserSubscription::where('user_id', $user->id)
-            ->where('subscription_id', $subscription->id)
-            ->latest()
-            ->first();
-        
-        // Вызываем событие
-        if ($userSubscription) {
-            event(new SubscriptionPurchased($userSubscription));
-        }
-        
-        return back()->with('success', "Абонемент '{$subscription->name}' успешно приобретен!");
-    }
+            'price' => $subscription->price
+        ]
+    );
+    
+    // 2. Уведомление админам
+    $this->notify->notifyAdmins(
+        "💰 Клиент {$user->name} приобрел абонемент '{$subscription->name}'!\n📅 Сумма: {$subscription->price} руб.\n📅 Действует до: " . now()->addDays($subscription->duration_days)->format('d.m.Y'),
+        'subscription',
+        [
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'subscription_id' => $subscription->id,
+            'subscription_name' => $subscription->name,
+            'price' => $subscription->price,
+            'end_date' => now()->addDays($subscription->duration_days)->format('d.m.Y')
+        ]
+    );
+
+    return back()->with('success', "Абонемент '{$subscription->name}' успешно приобретен!");
+}
 
     public function profile()
     {

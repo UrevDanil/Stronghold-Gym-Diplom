@@ -102,9 +102,7 @@
                                     @endphp
                                     
                                     @if($canPurchase)
-                                        <form action="{{ route('subscriptions.purchase', $subscription) }}" 
-                                              method="POST" 
-                                              onsubmit="return confirm('Вы уверены, что хотите приобрести абонемент «{{ $subscription->name }}»?');">
+                                       <form action="{{ route('client.subscriptions.purchase', $subscription) }}" method="POST"> 
                                             @csrf
                                             <button type="submit" class="btn-purchase">
                                                 <i class="fas fa-shopping-cart me-2"></i>Приобрести

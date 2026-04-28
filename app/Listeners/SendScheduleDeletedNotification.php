@@ -44,7 +44,7 @@ class SendScheduleDeletedNotification
                 $this->notificationService->send(
                     $booking->user_id,
                     "❌ Тренировка '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} отменена. Посещение возвращено в ваш абонемент.",
-                    'warning',  // ← ИЗМЕНИ С schedule НА warning
+                    'system',
                     ['link' => route('client.schedule')]
                 );
             }
