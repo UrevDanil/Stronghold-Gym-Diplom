@@ -541,21 +541,21 @@ public function deleteSchedule($id)
                 $activeSubscription->increment('remaining_workouts');
             }
             
-            // Создаем уведомление для клиента
-            \App\Models\Notification::create([
-                'user_id' => $booking->user_id,
-                'type' => 'booking_cancelled',
-                'message' => "Тренировка '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} была удалена тренером. Тренировка возвращена в ваш абонемент.",
-                'is_read' => false,
-                'data' => json_encode([
-                    'schedule_id' => $schedule->id,
-                    'workout_name' => $schedule->workout->name,
-                    'date' => $schedule->date->format('d.m.Y'),
-                    'time' => $schedule->start_time,
-                    'deleted_by_trainer' => true,
-                    'trainer_name' => $trainer->name
-                ])
-            ]);
+ // Создаем уведомление для клиента
+\App\Models\Notification::create([
+    'user_id' => $booking->user_id,
+    'type' => 'warning',  // ✅ ИСПРАВЛЕНО
+    'message' => "Тренировка '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} была удалена тренером. Тренировка возвращена в ваш абонемент.",
+    'is_read' => false,
+    'data' => json_encode([
+        'schedule_id' => $schedule->id,
+        'workout_name' => $schedule->workout->name,
+        'date' => $schedule->date->format('d.m.Y'),
+        'time' => $schedule->start_time,
+        'deleted_by_trainer' => true,
+        'trainer_name' => $trainer->name
+    ])
+]);
             
             $notifiedCount++;
         }

@@ -65,6 +65,12 @@
                class="filter-btn {{ request('filter') == 'system' ? 'active' : '' }}">
                 <i class="fas fa-bell me-1"></i>Системные
             </a>
+            @if(auth()->user()->isAdmin())
+                <a href="{{ route('notifications', ['filter' => 'warning']) }}" 
+                   class="filter-btn {{ request('filter') == 'warning' ? 'active' : '' }}">
+                    <i class="fas fa-exclamation-triangle me-1"></i>Предупреждения
+                </a>
+            @endif
         </div>
     </div>
 
@@ -82,6 +88,7 @@
                                     @elseif($notification->type == 'subscription') subscription
                                     @elseif($notification->type == 'attendance') attendance
                                     @elseif($notification->type == 'schedule') schedule
+                                    @elseif($notification->type == 'warning') warning
                                     @else system
                                     @endif">
                                     @if($notification->type == 'booking')
@@ -92,6 +99,8 @@
                                         <i class="fas fa-user-check"></i>
                                     @elseif($notification->type == 'schedule')
                                         <i class="fas fa-calendar-alt"></i>
+                                    @elseif($notification->type == 'warning')
+                                        <i class="fas fa-exclamation-triangle"></i>
                                     @else
                                         <i class="fas fa-bell"></i>
                                     @endif
@@ -107,6 +116,8 @@
                                                 <i class="fas fa-user-check"></i> Посещаемость
                                             @elseif($notification->type == 'schedule')
                                                 <i class="fas fa-calendar-alt"></i> Расписание
+                                            @elseif($notification->type == 'warning')
+                                                <i class="fas fa-exclamation-triangle"></i> Предупреждение
                                             @else
                                                 <i class="fas fa-bell"></i> Система
                                             @endif
@@ -188,7 +199,6 @@
                                     $start = max(1, $currentPage - 2);
                                     $end = min($lastPage, $currentPage + 2);
                                     
-                                    // Первая страница
                                     if ($start > 1) {
                                         echo '<li class="page-item"><a class="page-link" href="' . $notifications->url(1) . '&filter=' . request('filter') . '">1</a></li>';
                                         if ($start > 2) {
@@ -196,7 +206,6 @@
                                         }
                                     }
                                     
-                                    // Диапазон страниц
                                     for ($i = $start; $i <= $end; $i++) {
                                         if ($i == $currentPage) {
                                             echo '<li class="page-item active"><span class="page-link">' . $i . '</span></li>';
@@ -205,7 +214,6 @@
                                         }
                                     }
                                     
-                                    // Последняя страница
                                     if ($end < $lastPage) {
                                         if ($end < $lastPage - 1) {
                                             echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
@@ -257,7 +265,6 @@
 
 @push('scripts')
 <script>
-    // Автоматическое скрытие сообщений об успехе через 3 секунды
     document.addEventListener('DOMContentLoaded', function() {
         const successMessages = document.querySelectorAll('.alert-success');
         successMessages.forEach(function(message) {
@@ -270,7 +277,6 @@
             }, 3000);
         });
         
-        // Подтверждение отметки всех уведомлений
         const markAllForm = document.querySelector('form[action*="read-all"]');
         if (markAllForm) {
             markAllForm.addEventListener('submit', function(e) {
@@ -280,7 +286,6 @@
             });
         }
         
-        // Плавная анимация при загрузке
         const notificationItems = document.querySelectorAll('.notification-item');
         notificationItems.forEach((item, index) => {
             item.style.opacity = '0';

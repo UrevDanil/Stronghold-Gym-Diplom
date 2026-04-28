@@ -11,6 +11,7 @@ use App\Services\NotificationService;
 use App\Models\UserSubscription;
 use App\Models\Notification;
 use App\Models\User;
+use App\Events\SubscriptionPurchased;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -278,7 +279,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        $user->subscriptions()->attach($subscription->id, [
+        $userSubscription = $user->subscriptions()->attach($subscription->id, [
             'start_date' => now(),
             'end_date' => now()->addDays($subscription->duration_days),
             'remaining_workouts' => $subscription->workouts_count,
@@ -287,13 +288,17 @@ class DashboardController extends Controller
             'activated_at' => now(),
         ]);
         
-        $this->notify->send(
-            $user->id,
-            "Вы приобрели абонемент '{$subscription->name}'!",
-            'subscription',
-            ['subscription_id' => $subscription->id]
-        );
-
+        // Получаем созданную запись
+        $userSubscription = UserSubscription::where('user_id', $user->id)
+            ->where('subscription_id', $subscription->id)
+            ->latest()
+            ->first();
+        
+        // Вызываем событие
+        if ($userSubscription) {
+            event(new SubscriptionPurchased($userSubscription));
+        }
+        
         return back()->with('success', "Абонемент '{$subscription->name}' успешно приобретен!");
     }
 
