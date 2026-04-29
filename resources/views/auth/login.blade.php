@@ -24,32 +24,36 @@
                         <h4 class="text-center mb-4">Вход в систему</h4>
                         
                         @if($errors->any())
-                            <div class="alert-modern alert-danger alert-dismissible fade show" role="alert">
-                                <div class="d-flex align-items-center">
-                                    <div class="alert-icon">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                    </div>
-                                    <div class="alert-content">
+                            <div class="alert-modern error">
+                                <div class="alert-icon">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <div class="alert-title">Ошибка входа</div>
+                                    <div class="alert-message">
                                         @foreach($errors->all() as $error)
                                             <p class="mb-1">{{ $error }}</p>
                                         @endforeach
                                     </div>
                                 </div>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                <button type="button" class="alert-close">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         @endif
                         
                         @if(session('status'))
-                            <div class="alert-modern alert-success alert-dismissible fade show" role="alert">
-                                <div class="d-flex align-items-center">
-                                    <div class="alert-icon">
-                                        <i class="fas fa-check-circle"></i>
-                                    </div>
-                                    <div class="alert-content">
-                                        {{ session('status') }}
-                                    </div>
+                            <div class="alert-modern success">
+                                <div class="alert-icon">
+                                    <i class="fas fa-check-circle"></i>
                                 </div>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                <div class="alert-content">
+                                    <div class="alert-title">Готово!</div>
+                                    <div class="alert-message">{{ session('status') }}</div>
+                                </div>
+                                <button type="button" class="alert-close">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         @endif
                         

@@ -1,4 +1,4 @@
-<!-- Личный кабинет -->
+<!-- Кабинет клиента -->
 @extends('layouts.app')
 
 @section('title', 'Личный кабинет')
@@ -196,17 +196,19 @@
     </div>
 
     <!-- Предупреждение о деактивации -->
-    @if(!auth()->user()->is_active)
-        <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
-                <div>
-                    <strong>Внимание!</strong> Ваш аккаунт деактивирован. 
-                    Некоторые функции могут быть недоступны. Обратитесь к администратору.
-                </div>
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        @if(!auth()->user()->is_active)
+    <div class="alert-modern warning">
+        <div class="alert-icon">
+            <i class="fas fa-exclamation-triangle"></i>
         </div>
+        <div class="alert-content">
+            <div class="alert-title">Внимание!</div>
+            <div class="alert-message">Ваш аккаунт деактивирован. Некоторые функции могут быть недоступны. Обратитесь к администратору.</div>
+        </div>
+        <button type="button" class="alert-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
     @endif
 
 <!-- Предстоящие тренировки - показываем только если есть абонемент с тренером -->

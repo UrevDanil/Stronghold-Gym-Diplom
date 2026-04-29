@@ -20,18 +20,24 @@
     </div>
 
     @if(session('success'))
-        <div class="alert attendance-alert success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern success">
+            <div class="alert-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="alert-content">
+                <div class="alert-title">Отлично!</div>
+                <div class="alert-message">{{ session('success') }}</div>
+            </div>
+            <button type="button" class="alert-close"><i class="fas fa-times"></i></button>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert attendance-alert error alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i>
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern error">
+            <div class="alert-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="alert-content">
+                <div class="alert-title">Ошибка!</div>
+                <div class="alert-message">{{ session('error') }}</div>
+            </div>
+            <button type="button" class="alert-close"><i class="fas fa-times"></i></button>
         </div>
     @endif
 

@@ -33,18 +33,32 @@
     @endif
     
     @if(session('warning'))
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            {{ session('warning') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern warning">
+            <div class="alert-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="alert-content">
+                <div class="alert-title">Внимание!</div>
+                <div class="alert-message">{{ session('warning') }}</div>
+            </div>
+            <button type="button" class="alert-close">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
     @endif
     
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i>
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern error">
+            <div class="alert-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="alert-content">
+                <div class="alert-title">Ошибка!</div>
+                <div class="alert-message">{{ session('error') }}</div>
+            </div>
+            <button type="button" class="alert-close">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
     @endif
     

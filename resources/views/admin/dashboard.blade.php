@@ -22,10 +22,13 @@
     </div>
 
     @if(!auth()->user()->is_active)
-        <div class="alert dashboard-alert warning alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong>Внимание!</strong> Ваш аккаунт деактивирован. Обратитесь к администратору.
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern warning">
+            <div class="alert-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="alert-content">
+                <div class="alert-title">Внимание!</div>
+                <div class="alert-message">Ваш аккаунт деактивирован. Обратитесь к владельцу.</div>
+            </div>
+            <button type="button" class="alert-close"><i class="fas fa-times"></i></button>
         </div>
     @endif
 

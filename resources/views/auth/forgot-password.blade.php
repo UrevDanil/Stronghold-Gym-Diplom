@@ -11,8 +11,17 @@
 
                 <div class="card-body">
                     @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
+                        <div class="alert-modern success">
+                            <div class="alert-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">Готово!</div>
+                                <div class="alert-message">{{ session('status') }}</div>
+                            </div>
+                            <button type="button" class="alert-close">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
                     @endif
 

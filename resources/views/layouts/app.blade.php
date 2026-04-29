@@ -12,6 +12,96 @@
     <!-- Наши стили для сайдбара -->
     <link href="{{ asset('assets/css/sidebar.css') }}" rel="stylesheet">
     
+    <!-- ===== СТИЛИ ДЛЯ СОВРЕМЕННЫХ АЛЕРТОВ ===== -->
+    <style>
+        .alert-modern {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border: none;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            animation: alertSlideIn 0.3s ease forwards;
+            overflow: hidden;
+        }
+        .alert-modern::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 4px 0 0 4px;
+        }
+        .alert-modern.success::before { background: linear-gradient(135deg, #28a745, #20c997); }
+        .alert-modern.info::before { background: linear-gradient(135deg, #007bff, #00bcd4); }
+        .alert-modern.warning::before { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+        .alert-modern.error::before,
+        .alert-modern.danger::before { background: linear-gradient(135deg, #dc3545, #c82333); }
+        .alert-modern .alert-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        .alert-modern.success .alert-icon { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+        .alert-modern.info .alert-icon { background: rgba(0, 123, 255, 0.1); color: #007bff; }
+        .alert-modern.warning .alert-icon { background: rgba(255, 193, 7, 0.1); color: #fd7e14; }
+        .alert-modern.error .alert-icon,
+        .alert-modern.danger .alert-icon { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+        .alert-modern .alert-content { flex: 1; position: relative; z-index: 1; }
+        .alert-modern .alert-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; }
+        .alert-modern.success .alert-title { color: #28a745; }
+        .alert-modern.info .alert-title { color: #007bff; }
+        .alert-modern.warning .alert-title { color: #fd7e14; }
+        .alert-modern.error .alert-title,
+        .alert-modern.danger .alert-title { color: #dc3545; }
+        .alert-modern .alert-message { color: #6c757d; font-size: 0.95rem; line-height: 1.5; }
+        .alert-modern .alert-close {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: #adb5bd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+        .alert-modern .alert-close:hover {
+            background: #f8f9fa;
+            color: #495057;
+            transform: rotate(90deg);
+        }
+        @keyframes alertSlideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 576px) {
+            .alert-modern { padding: 0.875rem 1rem; gap: 0.75rem; }
+            .alert-modern .alert-icon { width: 36px; height: 36px; font-size: 1.3rem; }
+            .alert-modern .alert-title { font-size: 0.95rem; }
+            .alert-modern .alert-message { font-size: 0.875rem; }
+            .alert-modern .alert-close { width: 28px; height: 28px; }
+        }
+    </style>
+    
     @yield('styles')
 </head>
 <body>
@@ -170,7 +260,6 @@
                 sidebar.classList.toggle('active');
                 overlay.classList.toggle('active');
                 
-                // Меняем иконку
                 const icon = menuToggle.querySelector('i');
                 if (sidebar.classList.contains('active')) {
                     icon.classList.remove('fa-bars');
@@ -181,17 +270,9 @@
                 }
             }
             
-            // Открытие/закрытие меню
-            if (menuToggle) {
-                menuToggle.addEventListener('click', toggleMenu);
-            }
+            if (menuToggle) menuToggle.addEventListener('click', toggleMenu);
+            if (overlay) overlay.addEventListener('click', toggleMenu);
             
-            // Закрытие при клике на overlay
-            if (overlay) {
-                overlay.addEventListener('click', toggleMenu);
-            }
-            
-            // Закрытие при клике на ссылку (на мобильных)
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
                 link.addEventListener('click', function() {
@@ -201,7 +282,6 @@
                 });
             });
             
-            // При изменении размера окна
             window.addEventListener('resize', function() {
                 if (window.innerWidth >= 992) {
                     sidebar.classList.remove('active');
@@ -212,6 +292,21 @@
                         icon.classList.add('fa-bars');
                     }
                 }
+            });
+            
+            // ===== ЗАКРЫТИЕ СОВРЕМЕННЫХ АЛЕРТОВ =====
+            document.querySelectorAll('.alert-close').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var alert = this.closest('.alert-modern');
+                    if (alert) {
+                        alert.style.opacity = '0';
+                        alert.style.transform = 'translateY(-20px)';
+                        alert.style.transition = 'all 0.3s ease';
+                        setTimeout(function() {
+                            alert.remove();
+                        }, 300);
+                    }
+                });
             });
         });
     </script>
@@ -225,4 +320,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @yield('scripts')
 </body>
-</html> 
+</html>

@@ -25,14 +25,19 @@
     </div>
 
     @if($errors->any())
-        <div class="alert edit-alert danger alert-dismissible fade show">
-            <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Ошибки валидации:</h5>
-            <ul class="mb-0">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern error">
+            <div class="alert-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="alert-content">
+                <div class="alert-title">Ошибки валидации</div>
+                <div class="alert-message">
+                    <ul class="mb-0 ps-3">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+            <button type="button" class="alert-close"><i class="fas fa-times"></i></button>
         </div>
     @endif
 
