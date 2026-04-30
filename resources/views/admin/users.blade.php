@@ -133,31 +133,54 @@
                                             {{ $user->role->name == 'client' ? 'Клиент' : ($user->role->name == 'trainer' ? 'Тренер' : ($user->role->name == 'admin' ? 'Админ' : 'Владелец')) }}
                                         </span>
                                     </td>
-                                    <td data-label="Абонемент">
-                                        @if($user->role->name == 'client')
-                                            @php
-                                                $activeSub = $user->activeSubscription();
-                                            @endphp
-                                            @if($activeSub)
-                                                <span class="badge-subscription">
-                                                    <i class="fas fa-id-card me-1"></i>{{ $activeSub->subscription->name ?? 'Абонемент' }}
-                                                </span>
-                                                <br>
-                                                <small class="text-muted">до {{ \Carbon\Carbon::parse($activeSub->end_date)->format('d.m.Y') }}</small>
+                                        <td data-label="Абонемент">
+                                            @if($user->role->name == 'client')
+                                                @php
+                                                    $activeSub = $user->activeSubscription();
+                                                    $frozenSub = $user->frozenSubscription();
+                                                @endphp
+                                                @if($activeSub)
+                                                    <span class="badge-subscription">
+                                                        <i class="fas fa-id-card me-1"></i>{{ $activeSub->subscription->name ?? 'Абонемент' }}
+                                                        @if($activeSub->status === 'frozen')
+                                                            <span class="badge-frozen ms-1">
+                                                                <i class="fas fa-snowflake"></i> Заморожен
+                                                            </span>
+                                                        @endif
+                                                    </span>
+                                                    <br>
+                                                    <small class="text-muted">до {{ \Carbon\Carbon::parse($activeSub->end_date)->format('d.m.Y') }}</small>
+                                                    @if($activeSub->remaining_workouts > 0)
+                                                        <br>
+                                                        <small>Осталось: {{ $activeSub->remaining_workouts }} тренировок</small>
+                                                    @endif
+                                                @elseif($frozenSub)
+                                                    <span class="badge-subscription frozen">
+                                                        <i class="fas fa-snowflake me-1"></i>{{ $frozenSub->subscription->name ?? 'Абонемент' }}
+                                                        <span class="badge-frozen ms-1">
+                                                            <i class="fas fa-clock"></i> Заморожен
+                                                        </span>
+                                                    </span>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        Заморожен до: {{ \Carbon\Carbon::parse($frozenSub->paused_until)->format('d.m.Y') }}
+                                                    </small>
+                                                    <br>
+                                                    <small>Активен до: {{ \Carbon\Carbon::parse($frozenSub->end_date)->format('d.m.Y') }}</small>
+                                                @else
+                                                    <span class="badge-subscription-expired">
+                                                        <i class="fas fa-times me-1"></i>Нет
+                                                    </span>
+                                                @endif
                                             @else
-                                                <span class="badge-subscription-expired">
-                                                    <i class="fas fa-times me-1"></i>Нет
-                                                </span>
+                                                <span class="text-muted">—</span>
                                             @endif
-                                        @else
-                                            <span class="text-muted">—</span>
-                                        @endif
-                                    </td>
+                                        </td>
                                     <td data-label="Дата рег.">{{ $user->created_at->format('d.m.Y') }}</td>
                                     <td data-label="Статус">
                                         @if($user->deleted_at)
                                             <span class="badge-status blocked">
-                                                <i class="fas fa-ban me-1"></i>Заблокирован
+                                                <i class="fas fa-ban me-1"></i>Удален
                                             </span>
                                         @elseif($user->is_active)
                                             <span class="badge-status active">

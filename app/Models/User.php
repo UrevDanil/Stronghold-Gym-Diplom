@@ -151,7 +151,9 @@ public function trainings()
 
 // =========== HELPERS ===========
 
-// ИСПРАВЛЕНО: теперь используем UserSubscription
+/**
+ * Проверка, есть ли активный незамороженный абонемент
+ */
 public function hasActiveSubscription(): bool
 {
     return $this->userSubscriptions()
@@ -163,6 +165,17 @@ public function hasActiveSubscription(): bool
             $q->whereNull('paused_at')
               ->orWhereDate('paused_until', '<', Carbon::today());
         })
+        ->exists();
+}
+
+/**
+ * Проверка, есть ли замороженный абонемент
+ */
+public function hasFrozenSubscription(): bool
+{
+    return $this->userSubscriptions()
+        ->where('status', UserSubscription::STATUS_FROZEN)
+        ->whereDate('end_date', '>=', Carbon::today())
         ->exists();
 }
 
@@ -187,11 +200,12 @@ public function hasActiveTrainerSubscription(): bool
 }
 
 /**
- * Получить активный абонемент
+ * Получить активный ИЛИ замороженный абонемент
  */
 public function activeSubscription()
 {
-    return $this->userSubscriptions()
+    // Сначала ищем активный (не замороженный)
+    $active = $this->userSubscriptions()
         ->where('status', UserSubscription::STATUS_ACTIVE)
         ->whereDate('start_date', '<=', Carbon::today())
         ->whereDate('end_date', '>=', Carbon::today())
@@ -202,6 +216,23 @@ public function activeSubscription()
         })
         ->latest()
         ->first();
+    
+    if ($active) {
+        return $active;
+    }
+    
+    // Если нет активного, ищем замороженный
+    $frozen = $this->userSubscriptions()
+        ->where('status', UserSubscription::STATUS_FROZEN)
+        ->whereDate('end_date', '>=', Carbon::today())
+        ->where(function($q) {
+            $q->whereNotNull('paused_at')
+              ->whereDate('paused_until', '>=', Carbon::today());
+        })
+        ->latest()
+        ->first();
+    
+    return $frozen;
 }
 
     // НОВОЕ: получить замороженный абонемент

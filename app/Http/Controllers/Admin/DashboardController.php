@@ -103,32 +103,45 @@ class DashboardController extends Controller
  * Удаление (блокировка) пользователя
  */
 public function deleteUser($id)
-    {
-        if ($id == auth()->id()) {
-            return redirect()->route('admin.users.index')
-                ->with('error', 'Вы не можете заблокировать самого себя');
-        }
-        
-        $user = User::findOrFail($id);
-        
-        if ($user->isOwner()) {
-            return redirect()->route('admin.users.index')
-                ->with('error', 'Вы не можете заблокировать владельца системы');
-        }
-        
-        // Уведомление пользователю
-        $this->notify->send(
-            $user->id,
-            "⚠️ Ваш аккаунт был заблокирован администратором. Для получения информации обратитесь в поддержку.",
-            'warning',
-            ['user_id' => $user->id]
-        );
-        
-        $user->delete();
-        
+{
+    if ($id == auth()->id()) {
         return redirect()->route('admin.users.index')
-            ->with('success', "Пользователь {$user->name} успешно заблокирован");
+            ->with('error', 'Вы не можете заблокировать самого себя');
     }
+    
+    $user = User::findOrFail($id);
+    
+    if ($user->isOwner()) {
+        return redirect()->route('admin.users.index')
+            ->with('error', 'Вы не можете заблокировать владельца системы');
+    }
+    
+    // Уведомление пользователю
+    $this->notify->send(
+        $user->id,
+        "⚠️ Ваш аккаунт был заблокирован администратором. Для получения информации обратитесь в поддержку.",
+        'warning',
+        ['user_id' => $user->id]
+    );
+    
+    // Удаляем связанные уведомления
+    \App\Models\Notification::where('user_id', $user->id)->delete();
+    
+    // Удаляем бронирования
+    \App\Models\Booking::where('user_id', $user->id)->delete();
+    
+    // Удаляем абонементы
+    \App\Models\UserSubscription::where('user_id', $user->id)->delete();
+    
+    // Удаляем посещаемость
+    \App\Models\Attendance::where('user_id', $user->id)->delete();
+    
+    // Теперь можно удалить пользователя
+    $user->delete();
+    
+    return redirect()->route('admin.users.index')
+        ->with('success', "Пользователь {$user->name} успешно заблокирован");
+}
 
 /**
  * Полное удаление пользователя из БД (осторожно!)
@@ -142,17 +155,21 @@ public function forceDeleteUser($id)
     
     $user = User::withTrashed()->findOrFail($id);
     
-    // Не даем удалить владельца (даже владельцу нельзя удалить самого себя)
     if ($user->isOwner()) {
         return redirect()->route('admin.users.index')
             ->with('error', 'Нельзя удалить владельца системы');
     }
     
-    // Не даем удалить самого себя (дополнительная защита)
     if ($id == auth()->id()) {
         return redirect()->route('admin.users.index')
             ->with('error', 'Вы не можете удалить самого себя');
     }
+    
+    // Удаляем все связанные данные
+    \App\Models\Notification::where('user_id', $user->id)->forceDelete();
+    \App\Models\Booking::where('user_id', $user->id)->forceDelete();
+    \App\Models\UserSubscription::where('user_id', $user->id)->forceDelete();
+    \App\Models\Attendance::where('user_id', $user->id)->forceDelete();
     
     $userName = $user->name;
     $user->forceDelete();
@@ -181,57 +198,61 @@ public function restoreUser($id)
 }
 
     /**
-     * Список пользователей
-     */
-    public function users(Request $request)
-    {
-        $query = User::with('role');
-        
-        // Поиск
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
+ * Список пользователей
+ */
+public function users(Request $request)
+{
+    $query = User::with('role');
+    
+    // Поиск
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%")
                 ->orWhere('phone', 'like', "%{$search}%");
-            });
-        }
-        
-        // Фильтр по роли
-        if ($request->filled('role')) {
-            $query->whereHas('role', function($q) use ($request) {
-                $q->where('name', $request->role);
-            });
-        }
-        
-        // Фильтр по статусу
-        if ($request->filled('status')) {
-            if ($request->status === 'active') {
-                $query->whereNotNull('email_verified_at')->whereNull('deleted_at');
-            } elseif ($request->status === 'inactive') {
-                $query->whereNull('email_verified_at')->orWhereNotNull('deleted_at');
-            }
-        }
-        
-        // Фильтр по дате
-        if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-        
-        $users = $query->orderBy('created_at', 'desc')->paginate(15);
-        $roles = Role::all(); // Теперь класс Role найден
-        
-        return view('admin.users', compact('users', 'roles'));
+        });
     }
+    
+    // Фильтр по роли
+    if ($request->filled('role')) {
+        $query->whereHas('role', function($q) use ($request) {
+            $q->where('name', $request->role);
+        });
+    }
+    
+    // ФИЛЬТР ПО СТАТУСУ - ИСПРАВЛЕНО
+    if ($request->filled('status')) {
+        if ($request->status === 'active') {
+            // Активные: не удален И is_active = true
+            $query->whereNull('deleted_at')->where('is_active', true);
+        } elseif ($request->status === 'inactive') {
+            // Неактивные: удален ИЛИ is_active = false
+            $query->where(function($q) {
+                $q->whereNotNull('deleted_at')->orWhere('is_active', false);
+            });
+        }
+    }
+    
+    // Фильтр по дате
+    if ($request->filled('date_from')) {
+        $query->whereDate('created_at', '>=', $request->date_from);
+    }
+    
+    $users = $query->orderBy('created_at', 'desc')->paginate(15);
+    $roles = Role::all();
+    
+    return view('admin.users', compact('users', 'roles'));
+}
 
-    /**
-     * Форма создания пользователя
-     */
-    public function createUser()
-    {
-        $roles = Role::all();
-        return view('admin.users-create', compact('roles'));
-    }
+/**
+ * Форма создания пользователя
+ */
+public function createUser()
+{
+    $roles = Role::all();
+    return view('admin.users-create', compact('roles'));
+}
 
 /**
  * Сохранение нового пользователя

@@ -69,8 +69,8 @@ class UserSubscription extends Pivot
 
     // НОВЫЕ МЕТОДЫ ДЛЯ ЗАМОРОЗКИ (добавляем)
     
-    /**
- * Проверка, заморожен ли абонемент
+/**
+ * Проверка, заморожен ли абонемент в данный момент
  */
 public function isPaused(): bool
 {
@@ -81,7 +81,6 @@ public function isPaused(): bool
     $now = Carbon::now();
     $pausedUntil = Carbon::parse($this->paused_until);
     
-    // Возвращаем true, если текущая дата меньше даты окончания заморозки
     return $now->lessThan($pausedUntil);
 }
 
