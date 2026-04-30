@@ -87,20 +87,20 @@ class DashboardController extends Controller
     
     $date = $request->get('date', now()->toDateString());
     
-    // Тренировки на выбранный день - ТОЛЬКО ЗАПЛАНИРОВАННЫЕ
+    // УБИРАЕМ фильтр по статусу - показываем ВСЕ тренировки
     $schedules = $user->trainings()
         ->with(['workout', 'bookings.user'])
         ->whereDate('date', $date)
-        ->where('status', Schedule::STATUS_SCHEDULED) // <-- ДОБАВЛЕНО
+        // УДАЛЯЕМ ЭТУ СТРОКУ: ->where('status', Schedule::STATUS_SCHEDULED)
         ->orderBy('start_time')
         ->get();
     
-    // Тренировки на неделю для краткого обзора - ТОЛЬКО ЗАПЛАНИРОВАННЫЕ
+    // Тренировки на неделю - тоже показываем все
     $weekSchedules = $user->trainings()
         ->with('workout')
         ->whereDate('date', '>=', now()->toDateString())
         ->whereDate('date', '<=', now()->addDays(7)->toDateString())
-        ->where('status', Schedule::STATUS_SCHEDULED) // <-- ДОБАВЛЕНО
+        // УДАЛЯЕМ ЭТУ СТРОКУ: ->where('status', Schedule::STATUS_SCHEDULED)
         ->orderBy('date')
         ->orderBy('start_time')
         ->get();
@@ -112,7 +112,6 @@ class DashboardController extends Controller
         'currentDate' => $date
     ]);
 }
-
 public function clients(Request $request)
 {
     $user = auth()->user();
@@ -676,46 +675,48 @@ public function editSchedule($id)
 }
 
 /**
-     * Обновить тренировку
-     */
-    public function updateSchedule(Request $request, $id)
-    {
-        $schedule = Schedule::findOrFail($id);
-        
-        // Проверяем, что тренировка принадлежит этому тренеру
-        if ($schedule->trainer_id !== auth()->id()) {
-            abort(403, 'У вас нет прав на редактирование этой тренировки');
-        }
-        
-        // Проверяем, что тренировка не прошла
-        if ($schedule->isPast()) {
-            return back()->with('error', 'Нельзя редактировать прошедшую тренировку');
-        }
-        
-        $validated = $request->validate([
-            'workout_id' => 'required|exists:workouts,id',
-            'date' => 'required|date',
-            'start_time' => 'required',
-            'end_time' => 'required|after:start_time',
-            'room' => 'nullable|string|max:255',
-            'capacity' => 'required|integer|min:1|max:100',
-        ]);
-        
-        // Сохраняем старые данные для события
-        $oldData = [
-            'date' => $schedule->date->format('d.m.Y'),
-            'start_time' => $schedule->start_time,
-            'end_time' => $schedule->end_time,
-            'capacity' => $schedule->capacity,
-            'room' => $schedule->room
-        ];
-        
-        $schedule->update($validated);
-        
-        // Вызываем событие обновления тренировки
-        event(new ScheduleUpdated($schedule, auth()->user(), $oldData));
-        
-        return redirect()->route('trainer.schedule')
-            ->with('success', 'Тренировка успешно обновлена');
+ * Обновить тренировку
+ */
+public function updateSchedule(Request $request, $id)
+{
+    $schedule = Schedule::findOrFail($id);
+    
+    // Проверяем, что тренировка принадлежит этому тренеру
+    if ($schedule->trainer_id !== auth()->id()) {
+        abort(403, 'У вас нет прав на редактирование этой тренировки');
     }
+    
+    // Проверяем, что тренировка не прошла
+    if ($schedule->isPast()) {
+        return back()->with('error', 'Нельзя редактировать прошедшую тренировку');
+    }
+    
+    $validated = $request->validate([
+        'workout_id' => 'required|exists:workouts,id',
+        'date' => 'required|date',
+        'start_time' => 'required',
+        'end_time' => 'required|after:start_time',
+        'room' => 'nullable|string|max:255',
+        'capacity' => 'required|integer|min:1|max:100',
+        'status' => 'required|in:scheduled,cancelled,completed', // ← ДОБАВЛЕНО
+    ]);
+    
+    // Сохраняем старые данные для события
+    $oldData = [
+        'date' => $schedule->date->format('d.m.Y'),
+        'start_time' => $schedule->start_time,
+        'end_time' => $schedule->end_time,
+        'capacity' => $schedule->capacity,
+        'room' => $schedule->room,
+        'status' => $schedule->status, // ← ДОБАВЛЕНО
+    ];
+    
+    $schedule->update($validated);
+    
+    // Вызываем событие обновления тренировки
+    event(new ScheduleUpdated($schedule, auth()->user(), $oldData));
+    
+    return redirect()->route('trainer.schedule')
+        ->with('success', 'Тренировка успешно обновлена');
+}
 }

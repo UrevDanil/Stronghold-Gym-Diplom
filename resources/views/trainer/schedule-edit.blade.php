@@ -118,6 +118,28 @@
                     </div>
                 </div>
 
+                <!-- СТАТУС - ДОБАВЛЕНО -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="status" class="form-label required-field">Статус</label>
+                        <select class="form-select @error('status') is-invalid @enderror" 
+                                id="status" name="status" required>
+                            <option value="scheduled" {{ (old('status', $schedule->status) == 'scheduled') ? 'selected' : '' }}>
+                                Запланировано
+                            </option>
+                            <option value="cancelled" {{ (old('status', $schedule->status) == 'cancelled') ? 'selected' : '' }}>
+                                Отменено
+                            </option>
+                            <option value="completed" {{ (old('status', $schedule->status) == 'completed') ? 'selected' : '' }}>
+                                Завершено
+                            </option>
+                        </select>
+                        @error('status')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
                 <div class="info-block">
                     <i class="fas fa-chart-line"></i>
                     <div class="info-content">

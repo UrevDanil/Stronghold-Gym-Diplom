@@ -480,7 +480,7 @@
     background: linear-gradient(135deg, #5682a4);
     color: white;
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.075);
 }
 
 .quick-action-btn.success {

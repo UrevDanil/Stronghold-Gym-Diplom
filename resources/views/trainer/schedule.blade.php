@@ -61,7 +61,7 @@
         <div class="row g-4">
             @foreach($schedules as $schedule)
                 <div class="col-lg-6 col-md-12">
-                    <div class="workout-card {{ $schedule->isPast() ? 'past' : '' }}">
+                    <div class="workout-card {{ $schedule->status == 'completed' ? 'completed' : ($schedule->status == 'cancelled' ? 'cancelled' : '') }}">
                         <!-- Время и зал (шапка) -->
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center">
@@ -77,25 +77,23 @@
                             </div>
                         </div>
                         
-                        <!-- КНОПКИ ДЕЙСТВИЙ (перемещены под шапку, НО над телом карточки) -->
-                        @if(!$schedule->isPast())
-                            <div class="card-actions">
-                                <a href="{{ route('trainer.schedule.edit', $schedule->id) }}" 
-                                   class="btn-edit" title="Редактировать тренировку">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('trainer.schedule.delete', $schedule->id) }}" 
-                                      method="POST" 
-                                      onsubmit="return confirm('Вы уверены, что хотите удалить эту тренировку? Все записанные клиенты получат уведомление, тренировки будут возвращены в их абонементы.')"
-                                      class="card-delete-form">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-delete" title="Удалить тренировку">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        @endif
+                        <!-- КНОПКИ ДЕЙСТВИЙ (ВСЕГДА ПОКАЗЫВАЕМ, даже для завершенных) -->
+                        <div class="card-actions">
+                            <a href="{{ route('trainer.schedule.edit', $schedule->id) }}" 
+                               class="btn-edit" title="Редактировать тренировку">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ route('trainer.schedule.delete', $schedule->id) }}" 
+                                  method="POST" 
+                                  onsubmit="return confirm('Вы уверены, что хотите удалить эту тренировку? Все записанные клиенты получат уведомление, тренировки будут возвращены в их абонементы.')"
+                                  class="card-delete-form">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-delete" title="Удалить тренировку">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
                         
                         <!-- Тело карточки (контент) -->
                         <div class="card-body">
