@@ -275,60 +275,60 @@ class DashboardController extends Controller
         ]);
     }
 
- /**
- * Покупка абонемента
- */
-public function purchaseSubscription(Subscription $subscription)
-{
-    $user = Auth::user();
-    
-    // Создаем запись о покупке абонемента
-    $userSubscription = $user->subscriptions()->attach($subscription->id, [
-        'start_date' => now(),
-        'end_date' => now()->addDays($subscription->duration_days),
-        'remaining_workouts' => $subscription->workouts_count,
-        'status' => 'active',
-        'activated_by' => $user->id,
-        'activated_at' => now(),
-    ]);
-    
-    // Получаем созданную запись user_subscription
-    $userSubscription = UserSubscription::where('user_id', $user->id)
-        ->where('subscription_id', $subscription->id)
-        ->where('status', 'active')
-        ->latest()
-        ->first();
-    
-    // 1. Уведомление клиенту
-    $this->notify->send(
-        $user->id,
-        "🎉 Вы приобрели абонемент '{$subscription->name}'!\n📅 Действителен до: " . now()->addDays($subscription->duration_days)->format('d.m.Y') . "\n🏋️ Тренировок: " . ($subscription->workouts_count == 0 ? 'Безлимит' : $subscription->workouts_count),
-        'subscription',
-        [
-            'subscription_id' => $subscription->id,
-            'subscription_name' => $subscription->name,
-            'end_date' => now()->addDays($subscription->duration_days)->format('d.m.Y'),
+/**
+* Покупка абонемента
+*/
+    public function purchaseSubscription(Subscription $subscription)
+    {
+        $user = Auth::user();
+        
+        // Создаем запись о покупке абонемента
+        $userSubscription = $user->subscriptions()->attach($subscription->id, [
+            'start_date' => now(),
+            'end_date' => now()->addDays($subscription->duration_days),
             'remaining_workouts' => $subscription->workouts_count,
-            'price' => $subscription->price
-        ]
-    );
-    
-    // 2. Уведомление админам
-    $this->notify->notifyAdmins(
-        "💰 Клиент {$user->name} приобрел абонемент '{$subscription->name}'!\n📅 Сумма: {$subscription->price} руб.\n📅 Действует до: " . now()->addDays($subscription->duration_days)->format('d.m.Y'),
-        'subscription',
-        [
-            'user_id' => $user->id,
-            'user_name' => $user->name,
-            'subscription_id' => $subscription->id,
-            'subscription_name' => $subscription->name,
-            'price' => $subscription->price,
-            'end_date' => now()->addDays($subscription->duration_days)->format('d.m.Y')
-        ]
-    );
+            'status' => 'active',
+            'activated_by' => $user->id,
+            'activated_at' => now(),
+        ]);
+        
+        // Получаем созданную запись user_subscription
+        $userSubscription = UserSubscription::where('user_id', $user->id)
+            ->where('subscription_id', $subscription->id)
+            ->where('status', 'active')
+            ->latest()
+            ->first();
+        
+        // 1. Уведомление клиенту
+        $this->notify->send(
+            $user->id,
+            "🎉 Вы приобрели абонемент '{$subscription->name}'!\n📅 Действителен до: " . now()->addDays($subscription->duration_days)->format('d.m.Y') . "\n🏋️ Тренировок: " . ($subscription->workouts_count == 0 ? 'Безлимит' : $subscription->workouts_count),
+            'subscription',
+            [
+                'subscription_id' => $subscription->id,
+                'subscription_name' => $subscription->name,
+                'end_date' => now()->addDays($subscription->duration_days)->format('d.m.Y'),
+                'remaining_workouts' => $subscription->workouts_count,
+                'price' => $subscription->price
+            ]
+        );
+        
+        // 2. Уведомление админам
+        $this->notify->notifyAdmins(
+            "💰 Клиент {$user->name} приобрел абонемент '{$subscription->name}'!\n📅 Сумма: {$subscription->price} руб.\n📅 Действует до: " . now()->addDays($subscription->duration_days)->format('d.m.Y'),
+            'subscription',
+            [
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'subscription_id' => $subscription->id,
+                'subscription_name' => $subscription->name,
+                'price' => $subscription->price,
+                'end_date' => now()->addDays($subscription->duration_days)->format('d.m.Y')
+            ]
+        );
 
-    return back()->with('success', "Абонемент '{$subscription->name}' успешно приобретен!");
-}
+        return back()->with('success', "Абонемент '{$subscription->name}' успешно приобретен!");
+    }
 
     public function profile()
     {
@@ -339,7 +339,7 @@ public function purchaseSubscription(Subscription $subscription)
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
-        
+            
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
@@ -347,11 +347,11 @@ public function purchaseSubscription(Subscription $subscription)
             'birth_date' => 'nullable|date|before:today',
             'notes' => 'nullable|string|max:1000',
         ]);
-        
+            
         $user->update($validated);
-        
+            
         return redirect()->route('client.profile')
-            ->with('success', 'Профиль успешно обновлен');
+        ->with('success', 'Профиль успешно обновлен');
     }
 
     public function updatePassword(Request $request)
@@ -360,15 +360,15 @@ public function purchaseSubscription(Subscription $subscription)
             'current_password' => 'required|current_password',
             'password' => 'required|string|min:8|confirmed',
         ]);
-        
+            
         $user = Auth::user();
         $user->update([
             'password' => Hash::make($request->password)
         ]);
-        
+            
         return redirect()->route('client.profile')
-            ->with('success', 'Пароль успешно изменен');
-    }
+        ->with('success', 'Пароль успешно изменен');
+        }
 
     public function freezeSubscription(Request $request)
     {
@@ -376,33 +376,33 @@ public function purchaseSubscription(Subscription $subscription)
             'reason' => 'required|string|max:255',
             'days' => 'required|integer|min:1|max:14',
         ]);
-        
+            
         $user = Auth::user();
         $userSubscription = $user->activeSubscription();
-        
+            
         if (!$userSubscription) {
             return back()->with('error', 'У вас нет активного абонемента');
         }
-        
+            
         if ($userSubscription->isPaused()) {
             return back()->with('error', 'Абонемент уже заморожен');
         }
-        
+            
         try {
             $userSubscription->pause($request->days);
             $userSubscription->pause_reason = $request->reason;
             $userSubscription->save();
-            
+                
             $this->notify->send(
                 $user->id,
                 "Ваш абонемент заморожен на {$request->days} дней. Причина: {$request->reason}",
                 'subscription',
                 ['subscription_id' => $userSubscription->subscription_id]
             );
-            
+                
             return back()->with('success', "Абонемент успешно заморожен на {$request->days} дней");
-            
-        } catch (\Exception $e) {
+                
+        }catch (\Exception $e) {
             return back()->with('error', 'Ошибка при заморозке: ' . $e->getMessage());
         }
     }
@@ -410,17 +410,17 @@ public function purchaseSubscription(Subscription $subscription)
     public function resumeSubscription(Request $request)
     {
         $user = Auth::user();
-        
+            
         $userSubscription = $user->userSubscriptions()
             ->where('status', UserSubscription::STATUS_FROZEN)
             ->whereNotNull('paused_at')
             ->whereNotNull('paused_until')
             ->first();
-        
+            
         if (!$userSubscription) {
             return back()->with('error', 'У вас нет замороженного абонемента');
         }
-        
+            
         try {
             if (!$userSubscription->isPaused()) {
                 $userSubscription->status = UserSubscription::STATUS_ACTIVE;
@@ -431,74 +431,74 @@ public function purchaseSubscription(Subscription $subscription)
             } else {
                 $userSubscription->resume();
             }
-            
+                
             $this->notify->send(
                 $user->id,
                 "Ваш абонемент успешно разморожен. Срок действия обновлен.",
                 'subscription',
                 ['subscription_id' => $userSubscription->subscription_id]
             );
-            
+                
             return back()->with('success', 'Абонемент успешно разморожен');
-            
+                
         } catch (\Exception $e) {
-            return back()->with('error', 'Ошибка при разморозке: ' . $e->getMessage());
+                return back()->with('error', 'Ошибка при разморозке: ' . $e->getMessage());
         }
     }
 
-    /**
- * Получить информацию о тренере для модального окна
- */
-public function getTrainerInfo($trainerId)
-{
-    $trainer = User::where('role_id', 3) // ID роли тренера
-        ->withCount(['trainings as total_trainings' => function($q) {
-            $q->where('status', 'completed');
-        }])
-        ->find($trainerId);
-    
-    if (!$trainer) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Тренер не найден'
-        ], 404);
-    }
-    
-    // Количество уникальных клиентов
-    $totalClients = Booking::whereHas('schedule', function($q) use ($trainerId) {
+/**
+* Получить информацию о тренере для модального окна
+*/
+    public function getTrainerInfo($trainerId)
+    {
+        $trainer = User::where('role_id', 3) 
+            ->withCount(['trainings as total_trainings' => function($q) {
+                $q->where('status', 'completed');
+            }])
+            ->find($trainerId);
+        
+        if (!$trainer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Тренер не найден'
+            ], 404);
+        }
+        
+        // Количество уникальных клиентов
+        $totalClients = Booking::whereHas('schedule', function($q) use ($trainerId) {
+                $q->where('trainer_id', $trainerId);
+            })
+            ->distinct('user_id')
+            ->count('user_id');
+        
+        // Процент посещаемости клиентов этого тренера
+        $totalBookings = Booking::whereHas('schedule', function($q) use ($trainerId) {
             $q->where('trainer_id', $trainerId);
-        })
-        ->distinct('user_id')
-        ->count('user_id');
-    
-    // Процент посещаемости клиентов этого тренера
-    $totalBookings = Booking::whereHas('schedule', function($q) use ($trainerId) {
-        $q->where('trainer_id', $trainerId);
-    })->count();
-    
-    $attendedBookings = Booking::whereHas('schedule', function($q) use ($trainerId) {
-        $q->where('trainer_id', $trainerId);
-    })->where('status', 'attended')->count();
-    
-    $attendanceRate = $totalBookings > 0 ? round(($attendedBookings / $totalBookings) * 100) : 0;
-    
-    return response()->json([
-        'success' => true,
-        'trainer' => [
-            'id' => $trainer->id,
-            'name' => $trainer->name,
-            'email' => $trainer->email,
-            'phone' => $trainer->phone,
-            'qualification' => $trainer->qualification,
-            'specialization' => $trainer->specialization,
-            'bio' => $trainer->bio ?? null,
-            'avatar' => $trainer->avatar ? asset('storage/' . $trainer->avatar) : null,
-        ],
-        'stats' => [
-            'total_trainings' => $trainer->total_trainings ?? 0,
-            'total_clients' => $totalClients,
-            'attendance_rate' => $attendanceRate,
-        ]
-    ]);
-}
+        })->count();
+        
+        $attendedBookings = Booking::whereHas('schedule', function($q) use ($trainerId) {
+            $q->where('trainer_id', $trainerId);
+        })->where('status', 'attended')->count();
+        
+        $attendanceRate = $totalBookings > 0 ? round(($attendedBookings / $totalBookings) * 100) : 0;
+        
+        return response()->json([
+            'success' => true,
+            'trainer' => [
+                'id' => $trainer->id,
+                'name' => $trainer->name,
+                'email' => $trainer->email,
+                'phone' => $trainer->phone,
+                'qualification' => $trainer->qualification,
+                'specialization' => $trainer->specialization,
+                'bio' => $trainer->bio ?? null,
+                'avatar' => $trainer->avatar ? asset('storage/' . $trainer->avatar) : null,
+            ],
+            'stats' => [
+                'total_trainings' => $trainer->total_trainings ?? 0,
+                'total_clients' => $totalClients,
+                'attendance_rate' => $attendanceRate,
+            ]
+        ]);
+    }
 }

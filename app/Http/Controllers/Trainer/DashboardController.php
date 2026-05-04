@@ -23,7 +23,7 @@ class DashboardController extends Controller
 {
     protected $notify;
 
-    public function __construct(NotificationService $notificationService)  // ← ДОБАВЬ ЭТО
+    public function __construct(NotificationService $notificationService)
     {
         $this->notify = $notificationService;
     }
@@ -42,7 +42,7 @@ class DashboardController extends Controller
     $todaySchedules = $user->trainings()
         ->with(['workout', 'bookings.user'])
         ->whereDate('date', Carbon::today())
-        ->where('status', Schedule::STATUS_SCHEDULED) // <-- ДОБАВЛЕНО
+        ->where('status', Schedule::STATUS_SCHEDULED)
         ->orderBy('start_time')
         ->get();
         
@@ -50,7 +50,7 @@ class DashboardController extends Controller
     $upcomingSchedules = $user->trainings()
         ->with(['workout', 'bookings.user'])
         ->whereDate('date', '>', Carbon::today())
-        ->where('status', Schedule::STATUS_SCHEDULED) // <-- ДОБАВЛЕНО
+        ->where('status', Schedule::STATUS_SCHEDULED)
         ->orderBy('date')
         ->orderBy('start_time')
         ->limit(10)
@@ -79,8 +79,8 @@ class DashboardController extends Controller
         'totalAttendances' => $totalAttendances,
         'uniqueClients' => $uniqueClients
     ]);
-}
 
+}
     public function schedule(Request $request)
 {
     $user = auth()->user();
@@ -91,7 +91,6 @@ class DashboardController extends Controller
     $schedules = $user->trainings()
         ->with(['workout', 'bookings.user'])
         ->whereDate('date', $date)
-        // УДАЛЯЕМ ЭТУ СТРОКУ: ->where('status', Schedule::STATUS_SCHEDULED)
         ->orderBy('start_time')
         ->get();
     
@@ -100,7 +99,6 @@ class DashboardController extends Controller
         ->with('workout')
         ->whereDate('date', '>=', now()->toDateString())
         ->whereDate('date', '<=', now()->addDays(7)->toDateString())
-        // УДАЛЯЕМ ЭТУ СТРОКУ: ->where('status', Schedule::STATUS_SCHEDULED)
         ->orderBy('date')
         ->orderBy('start_time')
         ->get();
@@ -111,230 +109,229 @@ class DashboardController extends Controller
         'weekSchedules' => $weekSchedules,
         'currentDate' => $date
     ]);
+
 }
-public function clients(Request $request)
+    public function clients(Request $request)
 {
-    $user = auth()->user();
-    
-    // ============= НОВЫЙ КОД: Статистика для верхних карточек =============
-    
-    // 1. Количество тренировок на сегодня
-    $todayTrainings = Schedule::where('trainer_id', $user->id)
-        ->whereDate('date', today())
-        ->count();
-    
-    // 2. Средняя посещаемость всех клиентов этого тренера
-    $avgAttendance = Booking::whereHas('schedule', function($q) use ($user) {
-            $q->where('trainer_id', $user->id);
-        })
-        ->selectRaw('AVG(CASE WHEN status = "attended" THEN 100 ELSE 0 END) as avg')
-        ->value('avg') ?? 0;
-    
-    $avgAttendance = round($avgAttendance); // Округляем до целого
-    
-    // ============= ОСНОВНОЙ ЗАПРОС КЛИЕНТОВ =============
-    
-    // Получаем уникальных клиентов, которые посещали тренировки тренера
-    $query = User::whereHas('bookings.schedule', function($q) use ($user) {
-            $q->where('trainer_id', $user->id);
-        })
-        ->with(['bookings' => function($q) use ($user) {
-            $q->whereHas('schedule', function($sq) use ($user) {
-                $sq->where('trainer_id', $user->id);
+        $user = auth()->user();
+        
+        // 1. Количество тренировок на сегодня
+        $todayTrainings = Schedule::where('trainer_id', $user->id)
+            ->whereDate('date', today())
+            ->count();
+        
+        // 2. Средняя посещаемость всех клиентов этого тренера
+        $avgAttendance = Booking::whereHas('schedule', function($q) use ($user) {
+                $q->where('trainer_id', $user->id);
             })
-            ->with('schedule.workout')
-            ->latest();
-        }]);
+            ->selectRaw('AVG(CASE WHEN status = "attended" THEN 100 ELSE 0 END) as avg')
+            ->value('avg') ?? 0;
+        
+        $avgAttendance = round($avgAttendance); // Округляем до целого
+        
+        // ============= ОСНОВНОЙ ЗАПРОС КЛИЕНТОВ =============
+        
+        // Получаем уникальных клиентов, которые посещали тренировки тренера
+        $query = User::whereHas('bookings.schedule', function($q) use ($user) {
+                $q->where('trainer_id', $user->id);
+            })
+            ->with(['bookings' => function($q) use ($user) {
+                $q->whereHas('schedule', function($sq) use ($user) {
+                    $sq->where('trainer_id', $user->id);
+                })
+                ->with('schedule.workout')
+                ->latest();
+            }]);
 
-    // Поиск по имени, email или телефону
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%")
-              ->orWhere('phone', 'like', "%{$search}%");
-        });
+        // Поиск по имени, email или телефону
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        // Фильтр по типу тренировки
+        if ($request->filled('workout_id')) {
+            $query->whereHas('bookings.schedule', function($q) use ($request) {
+                $q->where('workout_id', $request->workout_id);
+            });
+        }
+
+        // Получаем клиентов
+        $clients = $query->get();
+
+        // Добавляем дополнительную информацию
+        foreach ($clients as $client) {
+            // Количество тренировок у этого тренера
+            $client->trainings_count = $client->bookings()
+                ->whereHas('schedule', function($q) use ($user) {
+                    $q->where('trainer_id', $user->id);
+                })
+                ->count();
+            
+            // Последняя тренировка
+            $client->last_booking = $client->bookings()
+                ->whereHas('schedule', function($q) use ($user) {
+                    $q->where('trainer_id', $user->id);
+                })
+                ->with('schedule.workout')
+                ->latest()
+                ->first();
+            
+            // Прогресс (посещаемость)
+            $total = $client->bookings()
+                ->whereHas('schedule', function($q) use ($user) {
+                    $q->where('trainer_id', $user->id);
+                })
+                ->count();
+            
+            $attended = $client->bookings()
+                ->whereHas('schedule', function($q) use ($user) {
+                    $q->where('trainer_id', $user->id);
+                })
+                ->where('status', 'attended')
+                ->count();
+            
+            $client->progress = $total > 0 ? round(($attended / $total) * 100) : 0;
+        }
+
+        // Сортировка
+        if ($request->filled('sort')) {
+            switch ($request->sort) {
+                case 'name_asc':
+                    $clients = $clients->sortBy('name');
+                    break;
+                case 'name_desc':
+                    $clients = $clients->sortByDesc('name');
+                    break;
+                case 'trainings_desc':
+                    $clients = $clients->sortByDesc('trainings_count');
+                    break;
+                case 'trainings_asc':
+                    $clients = $clients->sortBy('trainings_count');
+                    break;
+                case 'recent':
+                    $clients = $clients->sortByDesc(function($client) {
+                        return $client->last_booking->schedule->date ?? null;
+                    });
+                    break;
+            }
+        }
+
+        // Получаем все тренировки для фильтра
+        $workouts = Workout::whereHas('schedules', function($q) use ($user) {
+            $q->where('trainer_id', $user->id);
+        })->get();
+
+        // Пагинация
+        $perPage = 12;
+        $page = $request->get('page', 1);
+        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+            $clients->forPage($page, $perPage),
+            $clients->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return view('trainer.clients', [
+            'user' => $user,
+            'clients' => $paginated,
+            'workouts' => $workouts,
+            'todayTrainings' => $todayTrainings,
+            'avgAttendance' => $avgAttendance
+        ]);
     }
 
-    // Фильтр по типу тренировки
-    if ($request->filled('workout_id')) {
-        $query->whereHas('bookings.schedule', function($q) use ($request) {
-            $q->where('workout_id', $request->workout_id);
-        });
-    }
-
-    // Получаем клиентов
-    $clients = $query->get();
-
-    // Добавляем дополнительную информацию
-    foreach ($clients as $client) {
-        // Количество тренировок у этого тренера
-        $client->trainings_count = $client->bookings()
+/**
+* Детальная информация о клиенте
+*/
+    public function clientDetails($id)
+    {
+        $user = auth()->user();
+        
+        // Находим клиента
+        $client = User::where('role_id', 4) // role_id = 4 для клиентов
+            ->with(['bookings' => function($q) use ($user) {
+                $q->whereHas('schedule', function($sq) use ($user) {
+                    $sq->where('trainer_id', $user->id);
+                })
+                ->with('schedule.workout')
+                ->latest();
+            }])
+            ->findOrFail($id);
+        
+        // Проверяем, что этот клиент действительно посещал тренировки этого тренера
+        $hasTrainings = $client->bookings()
+            ->whereHas('schedule', function($q) use ($user) {
+                $q->where('trainer_id', $user->id);
+            })
+            ->exists();
+        
+        if (!$hasTrainings) {
+            abort(404, 'Клиент не найден или не посещал ваши тренировки');
+        }
+        
+        // Статистика по клиенту
+        $totalTrainings = $client->bookings()
             ->whereHas('schedule', function($q) use ($user) {
                 $q->where('trainer_id', $user->id);
             })
             ->count();
         
-        // Последняя тренировка
-        $client->last_booking = $client->bookings()
-            ->whereHas('schedule', function($q) use ($user) {
-                $q->where('trainer_id', $user->id);
-            })
-            ->with('schedule.workout')
-            ->latest()
-            ->first();
-        
-        // Прогресс (посещаемость)
-        $total = $client->bookings()
-            ->whereHas('schedule', function($q) use ($user) {
-                $q->where('trainer_id', $user->id);
-            })
-            ->count();
-        
-        $attended = $client->bookings()
+        $attendedTrainings = $client->bookings()
             ->whereHas('schedule', function($q) use ($user) {
                 $q->where('trainer_id', $user->id);
             })
             ->where('status', 'attended')
             ->count();
         
-        $client->progress = $total > 0 ? round(($attended / $total) * 100) : 0;
-    }
-
-    // Сортировка
-    if ($request->filled('sort')) {
-        switch ($request->sort) {
-            case 'name_asc':
-                $clients = $clients->sortBy('name');
-                break;
-            case 'name_desc':
-                $clients = $clients->sortByDesc('name');
-                break;
-            case 'trainings_desc':
-                $clients = $clients->sortByDesc('trainings_count');
-                break;
-            case 'trainings_asc':
-                $clients = $clients->sortBy('trainings_count');
-                break;
-            case 'recent':
-                $clients = $clients->sortByDesc(function($client) {
-                    return $client->last_booking->schedule->date ?? null;
-                });
-                break;
-        }
-    }
-
-    // Получаем все тренировки для фильтра
-    $workouts = Workout::whereHas('schedules', function($q) use ($user) {
-        $q->where('trainer_id', $user->id);
-    })->get();
-
-    // Пагинация
-    $perPage = 12;
-    $page = $request->get('page', 1);
-    $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
-        $clients->forPage($page, $perPage),
-        $clients->count(),
-        $perPage,
-        $page,
-        ['path' => $request->url(), 'query' => $request->query()]
-    );
-
-    return view('trainer.clients', [
-        'user' => $user,
-        'clients' => $paginated,
-        'workouts' => $workouts,
-        'todayTrainings' => $todayTrainings,      // <-- НОВОЕ
-        'avgAttendance' => $avgAttendance          // <-- НОВОЕ
-    ]);
-}
-
-/**
- * Детальная информация о клиенте
- */
-public function clientDetails($id)
-{
-    $user = auth()->user();
-    
-    // Находим клиента
-    $client = User::where('role_id', 4) // role_id = 4 для клиентов
-        ->with(['bookings' => function($q) use ($user) {
-            $q->whereHas('schedule', function($sq) use ($user) {
-                $sq->where('trainer_id', $user->id);
+        $missedTrainings = $client->bookings()
+            ->whereHas('schedule', function($q) use ($user) {
+                $q->where('trainer_id', $user->id);
+            })
+            ->where('status', 'missed')
+            ->count();
+        
+        $cancelledTrainings = $client->bookings()
+            ->whereHas('schedule', function($q) use ($user) {
+                $q->where('trainer_id', $user->id);
+            })
+            ->where('status', 'cancelled')
+            ->count();
+        
+        $attendanceRate = $totalTrainings > 0 
+            ? round(($attendedTrainings / $totalTrainings) * 100, 1) 
+            : 0;
+        
+        // Последние 10 тренировок
+        $recentBookings = $client->bookings()
+            ->whereHas('schedule', function($q) use ($user) {
+                $q->where('trainer_id', $user->id);
             })
             ->with('schedule.workout')
-            ->latest();
-        }])
-        ->findOrFail($id);
-    
-    // Проверяем, что этот клиент действительно посещал тренировки этого тренера
-    $hasTrainings = $client->bookings()
-        ->whereHas('schedule', function($q) use ($user) {
-            $q->where('trainer_id', $user->id);
-        })
-        ->exists();
-    
-    if (!$hasTrainings) {
-        abort(404, 'Клиент не найден или не посещал ваши тренировки');
+            ->latest()
+            ->limit(10)
+            ->get();
+        
+        return view('trainer.client-details', [
+            'user' => $user,
+            'client' => $client,
+            'totalTrainings' => $totalTrainings,
+            'attendedTrainings' => $attendedTrainings,
+            'missedTrainings' => $missedTrainings,
+            'cancelledTrainings' => $cancelledTrainings,
+            'attendanceRate' => $attendanceRate,
+            'recentBookings' => $recentBookings
+        ]);
     }
-    
-    // Статистика по клиенту
-    $totalTrainings = $client->bookings()
-        ->whereHas('schedule', function($q) use ($user) {
-            $q->where('trainer_id', $user->id);
-        })
-        ->count();
-    
-    $attendedTrainings = $client->bookings()
-        ->whereHas('schedule', function($q) use ($user) {
-            $q->where('trainer_id', $user->id);
-        })
-        ->where('status', 'attended')
-        ->count();
-    
-    $missedTrainings = $client->bookings()
-        ->whereHas('schedule', function($q) use ($user) {
-            $q->where('trainer_id', $user->id);
-        })
-        ->where('status', 'missed')
-        ->count();
-    
-    $cancelledTrainings = $client->bookings()
-        ->whereHas('schedule', function($q) use ($user) {
-            $q->where('trainer_id', $user->id);
-        })
-        ->where('status', 'cancelled')
-        ->count();
-    
-    $attendanceRate = $totalTrainings > 0 
-        ? round(($attendedTrainings / $totalTrainings) * 100, 1) 
-        : 0;
-    
-    // Последние 10 тренировок
-    $recentBookings = $client->bookings()
-        ->whereHas('schedule', function($q) use ($user) {
-            $q->where('trainer_id', $user->id);
-        })
-        ->with('schedule.workout')
-        ->latest()
-        ->limit(10)
-        ->get();
-    
-    return view('trainer.client-details', [
-        'user' => $user,
-        'client' => $client,
-        'totalTrainings' => $totalTrainings,
-        'attendedTrainings' => $attendedTrainings,
-        'missedTrainings' => $missedTrainings,
-        'cancelledTrainings' => $cancelledTrainings,
-        'attendanceRate' => $attendanceRate,
-        'recentBookings' => $recentBookings
-    ]);
-}
 
 /**
-     * Отметка посещаемости
-     */
+ * Отметка посещаемости
+ */
     public function markAttendance(Request $request, Schedule $schedule)
 {
     if ($schedule->trainer_id !== auth()->id()) {
@@ -418,7 +415,7 @@ public function clientDetails($id)
     $query = Schedule::with(['workout', 'bookings.user'])
         ->where('trainer_id', $user->id)
         ->whereDate('date', $date)
-        ->where('status', Schedule::STATUS_SCHEDULED); // <-- ДОБАВЛЕНО
+        ->where('status', Schedule::STATUS_SCHEDULED);
     
     if ($scheduleId) {
         $query->where('id', $scheduleId);

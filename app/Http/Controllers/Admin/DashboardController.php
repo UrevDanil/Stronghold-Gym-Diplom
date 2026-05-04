@@ -737,470 +737,469 @@ class DashboardController extends Controller
     }
 
 /**
- * Отмена занятия (мягкое удаление)
- */
-public function cancelSchedule($id)
-{
-    $schedule = Schedule::findOrFail($id);
-    
-    $schedule->status = 'cancelled';
-    $schedule->save();
-    
-    $notifiedCount = 0;
-    
-    foreach ($schedule->bookings()->where('status', 'booked')->get() as $booking) {
-        $booking->status = 'cancelled';
-        $booking->cancelled_at = now();
-        $booking->save();
+* Отмена занятия (мягкое удаление)
+*/
+    public function cancelSchedule($id)
+    {
+        $schedule = Schedule::findOrFail($id);
         
-        $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
-            ->where('status', 'active')
-            ->first();
-        if ($activeSubscription) {
-            $activeSubscription->increment('remaining_workouts');
+        $schedule->status = 'cancelled';
+        $schedule->save();
+        
+        $notifiedCount = 0;
+        
+        foreach ($schedule->bookings()->where('status', 'booked')->get() as $booking) {
+            $booking->status = 'cancelled';
+            $booking->cancelled_at = now();
+            $booking->save();
+            
+            $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
+                ->where('status', 'active')
+                ->first();
+            if ($activeSubscription) {
+                $activeSubscription->increment('remaining_workouts');
+            }
+            
+            $schedule->decrement('current_participants');
+            
+            $this->notify->send(
+                $booking->user_id,
+                "❌ Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} отменено администратором. Тренировка возвращена в абонемент.",
+                'system',
+                ['schedule_id' => $schedule->id]
+            );
+            
+            $notifiedCount++;
         }
         
-        $schedule->decrement('current_participants');
-        
         $this->notify->send(
-            $booking->user_id,
-            "❌ Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} отменено администратором. Тренировка возвращена в абонемент.",
-            'system',
+            $schedule->trainer_id,
+            "⚠️ Администратор отменил вашу тренировку '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
+            'schedule',
             ['schedule_id' => $schedule->id]
         );
         
-        $notifiedCount++;
+        event(new \App\Events\ScheduleDeleted($schedule, auth()->user()));
+        
+        return redirect()->route('admin.schedule.index')
+            ->with('success', "Занятие отменено, оповещено {$notifiedCount} клиентов");
     }
-    
-    $this->notify->send(
-        $schedule->trainer_id,
-        "⚠️ Администратор отменил вашу тренировку '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time}",
-        'schedule',
-        ['schedule_id' => $schedule->id]
-    );
-    
-    // ВЫЗЫВАЕМ СОБЫТИЕ ОТМЕНЫ ТРЕНИРОВКИ
-    event(new \App\Events\ScheduleDeleted($schedule, auth()->user()));
-    
-    return redirect()->route('admin.schedule.index')
-        ->with('success', "Занятие отменено, оповещено {$notifiedCount} клиентов");
-}
 
 /**
- * Восстановление отмененного занятия
- */
-public function restoreSchedule($id)
-{
-    $schedule = Schedule::findOrFail($id);
-    
-    // Сбрасываем счетчик участников на 0 (все места свободны)
-    $schedule->current_participants = 0;
-    $schedule->status = 'scheduled';
-    $schedule->save();
-    
-    // Получаем все отмененные бронирования этого занятия
-    $cancelledBookings = $schedule->bookings()
-        ->where('status', 'cancelled')
-        ->get();
-    
-    $restoredCount = 0;
-    
-    foreach ($cancelledBookings as $booking) {
-        // Возвращаем тренировку в абонемент (если она была списана)
-        $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
-            ->where('status', 'active')
-            ->first();
-        if ($activeSubscription) {
-            $activeSubscription->increment('remaining_workouts');
+* Восстановление отмененного занятия
+*/
+    public function restoreSchedule($id)
+    {
+        $schedule = Schedule::findOrFail($id);
+        
+        // Сбрасываем счетчик участников на 0 (все места свободны)
+        $schedule->current_participants = 0;
+        $schedule->status = 'scheduled';
+        $schedule->save();
+        
+        // Получаем все отмененные бронирования этого занятия
+        $cancelledBookings = $schedule->bookings()
+            ->where('status', 'cancelled')
+            ->get();
+        
+        $restoredCount = 0;
+        
+        foreach ($cancelledBookings as $booking) {
+            // Возвращаем тренировку в абонемент (если она была списана)
+            $activeSubscription = UserSubscription::where('user_id', $booking->user_id)
+                ->where('status', 'active')
+                ->first();
+            if ($activeSubscription) {
+                $activeSubscription->increment('remaining_workouts');
+            }
+            
+            // Удаляем бронирование (оно больше не актуально)
+            $booking->delete();
+            $restoredCount++;
+            
+            // Уведомляем клиента, что занятие восстановлено и нужно записаться заново
+            \App\Models\Notification::create([
+                'user_id' => $booking->user_id,
+                'type' => 'system',
+                'message' => "Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} было восстановлено. Вы можете записаться заново через расписание.",
+                'is_read' => false,
+                'data' => json_encode([
+                    'schedule_id' => $schedule->id,
+                    'workout_name' => $schedule->workout->name,
+                    'date' => $schedule->date->format('d.m.Y'),
+                    'time' => $schedule->start_time,
+                    'restored_by' => 'admin',
+                    'requires_new_booking' => true
+                ])
+            ]);
         }
         
-        // Удаляем бронирование (оно больше не актуально)
-        $booking->delete();
-        $restoredCount++;
+        $message = "Занятие восстановлено. Свободных мест: {$schedule->capacity()}. ";
+        if ($restoredCount > 0) {
+            $message .= "Отмененные бронирования ({$restoredCount}) удалены. Клиенты уведомлены о необходимости повторной записи.";
+        } else {
+            $message .= "Не было отмененных бронирований.";
+        }
         
-        // Уведомляем клиента, что занятие восстановлено и нужно записаться заново
-        \App\Models\Notification::create([
-            'user_id' => $booking->user_id,
-            'type' => 'system',
-            'message' => "Занятие '{$schedule->workout->name}' на {$schedule->date->format('d.m.Y')} в {$schedule->start_time} было восстановлено. Вы можете записаться заново через расписание.",
-            'is_read' => false,
-            'data' => json_encode([
-                'schedule_id' => $schedule->id,
-                'workout_name' => $schedule->workout->name,
-                'date' => $schedule->date->format('d.m.Y'),
-                'time' => $schedule->start_time,
-                'restored_by' => 'admin',
-                'requires_new_booking' => true
-            ])
+        return redirect()->route('admin.schedule.index')
+            ->with('success', $message);
+    }
+
+/**
+* Управление абонементами
+*/
+    public function subscriptions(Request $request)
+    {
+        $query = Subscription::query();
+        
+        // Поиск
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+        
+        // Фильтр по статусу
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+        
+        // Сортировка по умолчанию - по ID (новые сверху)
+        $subscriptions = $query->orderBy('id', 'desc')->paginate(10);
+        
+        return view('admin.subscriptions', compact('subscriptions'));
+    }
+
+/**
+* Форма создания абонемента
+*/
+    public function createSubscription()
+    {
+        return view('admin.subscriptions-create');
+    }
+
+/**
+* Сохранение нового абонемента
+*/
+    public function storeSubscription(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'duration_days' => 'required|integer|min:1',
+            'workouts_count' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
+            'type' => 'required|in:time,count',
+            'has_trainer' => 'nullable|boolean',
+            'is_active' => 'boolean',
+        ]);
+        
+        $validated['has_trainer'] = $request->has('has_trainer');
+        $validated['is_active'] = $request->has('is_active');
+        
+        Subscription::create($validated);
+        
+        return redirect()->route('admin.subscriptions.index')
+            ->with('success', 'Абонемент успешно создан');
+    }
+
+/**
+* Форма редактирования абонемента
+*/
+    public function editSubscription($id)
+    {
+        $subscription = Subscription::findOrFail($id);
+        return view('admin.subscriptions-edit', compact('subscription'));
+    }
+
+/**
+* Обновление абонемента
+*/
+    public function updateSubscription(Request $request, $id)
+    {
+        $subscription = Subscription::findOrFail($id);
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'duration_days' => 'required|integer|min:1',
+            'workouts_count' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
+            'type' => 'required|in:time,count',
+            'has_trainer' => 'nullable|boolean',
+            'is_active' => 'boolean',
+        ]);
+        
+        $validated['has_trainer'] = $request->has('has_trainer');
+        $validated['is_active'] = $request->has('is_active');
+        
+        $subscription->update($validated);
+        
+        return redirect()->route('admin.subscriptions.index')
+            ->with('success', 'Абонемент обновлен');
+    }
+
+/**
+* Удаление абонемента
+*/
+    public function deleteSubscription($id)
+    {
+        $subscription = Subscription::findOrFail($id);
+        
+        // Проверяем, есть ли активные подписки на этот абонемент
+        $activeSubscriptions = UserSubscription::where('subscription_id', $id)
+            ->where('status', 'active')
+            ->count();
+        
+        if ($activeSubscriptions > 0) {
+            return back()->with('error', 'Нельзя удалить абонемент, на который есть активные подписки');
+        }
+        
+        $subscription->delete();
+        
+        return redirect()->route('admin.subscriptions.index')
+            ->with('success', 'Абонемент удален');
+    }
+
+/**
+* Страница отчетов
+*/
+    public function reports(Request $request)
+    {
+        // Фильтры
+        $period = $request->get('period', 'month');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+        
+        // Устанавливаем даты в зависимости от периода
+        if ($period === 'month') {
+            $dateFrom = Carbon::now()->startOfMonth();
+            $dateTo = Carbon::now()->endOfMonth();
+        } elseif ($period === 'quarter') {
+            $dateFrom = Carbon::now()->startOfQuarter();
+            $dateTo = Carbon::now()->endOfQuarter();
+        } elseif ($period === 'year') {
+            $dateFrom = Carbon::now()->startOfYear();
+            $dateTo = Carbon::now()->endOfYear();
+        } elseif ($period === 'custom' && $dateFrom && $dateTo) {
+            $dateFrom = Carbon::parse($dateFrom);
+            $dateTo = Carbon::parse($dateTo);
+        } else {
+            $dateFrom = Carbon::now()->startOfMonth();
+            $dateTo = Carbon::now()->endOfMonth();
+        }
+        
+        // 1. Общая статистика
+        $totalClients = User::clients()->count();
+        $totalTrainers = User::trainers()->count();
+        $totalWorkouts = Workout::count();
+        
+        // 2. Финансовая статистика
+        $totalRevenue = UserSubscription::where('status', 'active')
+            ->whereBetween('created_at', [$dateFrom, $dateTo])
+            ->with('subscription')
+            ->get()
+            ->sum(function($sub) {
+                return $sub->subscription->price ?? 0;
+            });
+        
+        $revenueBySubscription = UserSubscription::where('status', 'active')
+            ->whereBetween('created_at', [$dateFrom, $dateTo])
+            ->with('subscription')
+            ->get()
+            ->groupBy('subscription.name')
+            ->map(function($group) {
+                return [
+                    'count' => $group->count(),
+                    'revenue' => $group->sum(function($item) {
+                        return $item->subscription->price ?? 0;
+                    })
+                ];
+            });
+        
+        // 3. Статистика тренировок
+        $totalTrainings = Schedule::whereBetween('date', [$dateFrom, $dateTo])->count();
+        $completedTrainings = Schedule::where('status', 'completed')
+            ->whereBetween('date', [$dateFrom, $dateTo])
+            ->count();
+        $cancelledTrainings = Schedule::where('status', 'cancelled')
+            ->whereBetween('date', [$dateFrom, $dateTo])
+            ->count();
+        
+        // 4. Статистика посещаемости
+        $totalBookings = Booking::whereBetween('created_at', [$dateFrom, $dateTo])->count();
+        $attendedCount = Booking::where('status', 'attended')
+            ->whereBetween('created_at', [$dateFrom, $dateTo])
+            ->count();
+        $missedCount = Booking::where('status', 'missed')
+            ->whereBetween('created_at', [$dateFrom, $dateTo])
+            ->count();
+        $cancelledCount = Booking::where('status', 'cancelled')
+            ->whereBetween('created_at', [$dateFrom, $dateTo])
+            ->count();
+        
+        $attendanceRate = $totalBookings > 0 
+            ? round(($attendedCount / $totalBookings) * 100, 1) 
+            : 0;
+        
+        // 5. Популярные тренировки
+        $popularWorkouts = Workout::withCount(['schedules' => function($q) use ($dateFrom, $dateTo) {
+                $q->whereBetween('date', [$dateFrom, $dateTo]);
+            }])
+            ->orderBy('schedules_count', 'desc')
+            ->limit(5)
+            ->get();
+        
+        // 6. Топ тренеров
+        $topTrainers = User::trainers()
+            ->withCount(['trainings as trainings_count' => function($q) use ($dateFrom, $dateTo) {
+                $q->whereBetween('date', [$dateFrom, $dateTo]);
+            }])
+            ->orderBy('trainings_count', 'desc')
+            ->limit(5)
+            ->get();
+        
+        // 7. Топ клиентов
+        $topClients = User::clients()
+            ->withCount(['bookings as bookings_count' => function($q) use ($dateFrom, $dateTo) {
+                $q->whereBetween('created_at', [$dateFrom, $dateTo]);
+            }])
+            ->orderBy('bookings_count', 'desc')
+            ->limit(5)
+            ->get();
+        
+        return view('admin.reports', [
+            'period' => $period,
+            'dateFrom' => $dateFrom->format('Y-m-d'),
+            'dateTo' => $dateTo->format('Y-m-d'),
+            'totalClients' => $totalClients,
+            'totalTrainers' => $totalTrainers,
+            'totalWorkouts' => $totalWorkouts,
+            'totalRevenue' => $totalRevenue,
+            'revenueBySubscription' => $revenueBySubscription,
+            'totalTrainings' => $totalTrainings,
+            'completedTrainings' => $completedTrainings,
+            'cancelledTrainings' => $cancelledTrainings,
+            'totalBookings' => $totalBookings,
+            'attendedCount' => $attendedCount,
+            'missedCount' => $missedCount,
+            'cancelledCount' => $cancelledCount,
+            'attendanceRate' => $attendanceRate,
+            'popularWorkouts' => $popularWorkouts,
+            'topTrainers' => $topTrainers,
+            'topClients' => $topClients,
         ]);
     }
-    
-    $message = "Занятие восстановлено. Свободных мест: {$schedule->capacity()}. ";
-    if ($restoredCount > 0) {
-        $message .= "Отмененные бронирования ({$restoredCount}) удалены. Клиенты уведомлены о необходимости повторной записи.";
-    } else {
-        $message .= "Не было отмененных бронирований.";
-    }
-    
-    return redirect()->route('admin.schedule.index')
-        ->with('success', $message);
-}
 
 /**
- * Управление абонементами
- */
-public function subscriptions(Request $request)
-{
-    $query = Subscription::query();
-    
-    // Поиск
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-              ->orWhere('description', 'like', "%{$search}%");
-        });
-    }
-    
-    // Фильтр по статусу
-    if ($request->filled('status')) {
-        if ($request->status === 'active') {
-            $query->where('is_active', true);
-        } elseif ($request->status === 'inactive') {
-            $query->where('is_active', false);
+* Простой возврат тренировки в абонемент
+*/
+    public function refundTraining(Request $request, $clientId)
+    {
+        $admin = auth()->user();
+        $client = User::findOrFail($clientId);
+        
+        if (!$client->isClient()) {
+            return back()->with('error', 'Пользователь не является клиентом');
         }
-    }
-    
-    // Сортировка по умолчанию - по ID (новые сверху)
-    $subscriptions = $query->orderBy('id', 'desc')->paginate(10);
-    
-    return view('admin.subscriptions', compact('subscriptions'));
-}
-
-/**
- * Форма создания абонемента
- */
-public function createSubscription()
-{
-    return view('admin.subscriptions-create');
-}
-
-/**
- * Сохранение нового абонемента
- */
-public function storeSubscription(Request $request)
-{
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'description' => 'nullable|string',
-        'duration_days' => 'required|integer|min:1',
-        'workouts_count' => 'required|integer|min:1',
-        'price' => 'required|numeric|min:0',
-        'type' => 'required|in:time,count',
-        'has_trainer' => 'nullable|boolean', // ДОБАВИТЬ
-        'is_active' => 'boolean',
-    ]);
-    
-    $validated['has_trainer'] = $request->has('has_trainer');
-    $validated['is_active'] = $request->has('is_active');
-    
-    Subscription::create($validated);
-    
-    return redirect()->route('admin.subscriptions.index')
-        ->with('success', 'Абонемент успешно создан');
-}
-
-/**
- * Форма редактирования абонемента
- */
-public function editSubscription($id)
-{
-    $subscription = Subscription::findOrFail($id);
-    return view('admin.subscriptions-edit', compact('subscription'));
-}
-
-/**
- * Обновление абонемента
- */
-public function updateSubscription(Request $request, $id)
-{
-    $subscription = Subscription::findOrFail($id);
-    
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'description' => 'nullable|string',
-        'duration_days' => 'required|integer|min:1',
-        'workouts_count' => 'required|integer|min:1',
-        'price' => 'required|numeric|min:0',
-        'type' => 'required|in:time,count',
-        'has_trainer' => 'nullable|boolean', // ДОБАВИТЬ
-        'is_active' => 'boolean',
-    ]);
-    
-    $validated['has_trainer'] = $request->has('has_trainer');
-    $validated['is_active'] = $request->has('is_active');
-    
-    $subscription->update($validated);
-    
-    return redirect()->route('admin.subscriptions.index')
-        ->with('success', 'Абонемент обновлен');
-}
-
-/**
- * Удаление абонемента
- */
-public function deleteSubscription($id)
-{
-    $subscription = Subscription::findOrFail($id);
-    
-    // Проверяем, есть ли активные подписки на этот абонемент
-    $activeSubscriptions = UserSubscription::where('subscription_id', $id)
-        ->where('status', 'active')
-        ->count();
-    
-    if ($activeSubscriptions > 0) {
-        return back()->with('error', 'Нельзя удалить абонемент, на который есть активные подписки');
-    }
-    
-    $subscription->delete();
-    
-    return redirect()->route('admin.subscriptions.index')
-        ->with('success', 'Абонемент удален');
-}
-
-/**
- * Страница отчетов
- */
-public function reports(Request $request)
-{
-    // Фильтры
-    $period = $request->get('period', 'month');
-    $dateFrom = $request->get('date_from');
-    $dateTo = $request->get('date_to');
-    
-    // Устанавливаем даты в зависимости от периода
-    if ($period === 'month') {
-        $dateFrom = Carbon::now()->startOfMonth();
-        $dateTo = Carbon::now()->endOfMonth();
-    } elseif ($period === 'quarter') {
-        $dateFrom = Carbon::now()->startOfQuarter();
-        $dateTo = Carbon::now()->endOfQuarter();
-    } elseif ($period === 'year') {
-        $dateFrom = Carbon::now()->startOfYear();
-        $dateTo = Carbon::now()->endOfYear();
-    } elseif ($period === 'custom' && $dateFrom && $dateTo) {
-        $dateFrom = Carbon::parse($dateFrom);
-        $dateTo = Carbon::parse($dateTo);
-    } else {
-        $dateFrom = Carbon::now()->startOfMonth();
-        $dateTo = Carbon::now()->endOfMonth();
-    }
-    
-    // 1. Общая статистика
-    $totalClients = User::clients()->count();
-    $totalTrainers = User::trainers()->count();
-    $totalWorkouts = Workout::count();
-    
-    // 2. Финансовая статистика
-    $totalRevenue = UserSubscription::where('status', 'active')
-        ->whereBetween('created_at', [$dateFrom, $dateTo])
-        ->with('subscription')
-        ->get()
-        ->sum(function($sub) {
-            return $sub->subscription->price ?? 0;
-        });
-    
-    $revenueBySubscription = UserSubscription::where('status', 'active')
-        ->whereBetween('created_at', [$dateFrom, $dateTo])
-        ->with('subscription')
-        ->get()
-        ->groupBy('subscription.name')
-        ->map(function($group) {
-            return [
-                'count' => $group->count(),
-                'revenue' => $group->sum(function($item) {
-                    return $item->subscription->price ?? 0;
-                })
-            ];
-        });
-    
-    // 3. Статистика тренировок
-    $totalTrainings = Schedule::whereBetween('date', [$dateFrom, $dateTo])->count();
-    $completedTrainings = Schedule::where('status', 'completed')
-        ->whereBetween('date', [$dateFrom, $dateTo])
-        ->count();
-    $cancelledTrainings = Schedule::where('status', 'cancelled')
-        ->whereBetween('date', [$dateFrom, $dateTo])
-        ->count();
-    
-    // 4. Статистика посещаемости
-    $totalBookings = Booking::whereBetween('created_at', [$dateFrom, $dateTo])->count();
-    $attendedCount = Booking::where('status', 'attended')
-        ->whereBetween('created_at', [$dateFrom, $dateTo])
-        ->count();
-    $missedCount = Booking::where('status', 'missed')
-        ->whereBetween('created_at', [$dateFrom, $dateTo])
-        ->count();
-    $cancelledCount = Booking::where('status', 'cancelled')
-        ->whereBetween('created_at', [$dateFrom, $dateTo])
-        ->count();
-    
-    $attendanceRate = $totalBookings > 0 
-        ? round(($attendedCount / $totalBookings) * 100, 1) 
-        : 0;
-    
-    // 5. Популярные тренировки
-    $popularWorkouts = Workout::withCount(['schedules' => function($q) use ($dateFrom, $dateTo) {
-            $q->whereBetween('date', [$dateFrom, $dateTo]);
-        }])
-        ->orderBy('schedules_count', 'desc')
-        ->limit(5)
-        ->get();
-    
-    // 6. Топ тренеров
-    $topTrainers = User::trainers()
-        ->withCount(['trainings as trainings_count' => function($q) use ($dateFrom, $dateTo) {
-            $q->whereBetween('date', [$dateFrom, $dateTo]);
-        }])
-        ->orderBy('trainings_count', 'desc')
-        ->limit(5)
-        ->get();
-    
-    // 7. Топ клиентов
-    $topClients = User::clients()
-        ->withCount(['bookings as bookings_count' => function($q) use ($dateFrom, $dateTo) {
-            $q->whereBetween('created_at', [$dateFrom, $dateTo]);
-        }])
-        ->orderBy('bookings_count', 'desc')
-        ->limit(5)
-        ->get();
-    
-    return view('admin.reports', [
-        'period' => $period,
-        'dateFrom' => $dateFrom->format('Y-m-d'),
-        'dateTo' => $dateTo->format('Y-m-d'),
-        'totalClients' => $totalClients,
-        'totalTrainers' => $totalTrainers,
-        'totalWorkouts' => $totalWorkouts,
-        'totalRevenue' => $totalRevenue,
-        'revenueBySubscription' => $revenueBySubscription,
-        'totalTrainings' => $totalTrainings,
-        'completedTrainings' => $completedTrainings,
-        'cancelledTrainings' => $cancelledTrainings,
-        'totalBookings' => $totalBookings,
-        'attendedCount' => $attendedCount,
-        'missedCount' => $missedCount,
-        'cancelledCount' => $cancelledCount,
-        'attendanceRate' => $attendanceRate,
-        'popularWorkouts' => $popularWorkouts,
-        'topTrainers' => $topTrainers,
-        'topClients' => $topClients,
-    ]);
-}
-
-/**
- * Простой возврат тренировки в абонемент
- */
-public function refundTraining(Request $request, $clientId)
-{
-    $admin = auth()->user();
-    $client = User::findOrFail($clientId);
-    
-    if (!$client->isClient()) {
-        return back()->with('error', 'Пользователь не является клиентом');
-    }
-    
-    $validated = $request->validate([
-        'reason' => 'nullable|string|max:500',
-    ]);
-    
-    // Получаем активный абонемент клиента
-    $activeSubscription = $client->activeSubscription();
-    
-    if (!$activeSubscription) {
-        return back()->with('error', 'У клиента нет активного абонемента');
-    }
-    
-    // Просто добавляем одну тренировку обратно в абонемент
-    $activeSubscription->increment('remaining_workouts');
-    
-    // 1. Уведомление клиенту
-    \App\Models\Notification::create([
-        'user_id' => $client->id,
-        'type' => 'attendance',
-        'message' => "🔄 Администратор вернул одну тренировку в ваш абонемент. Причина: " . ($validated['reason'] ?? 'Ошибка учета'),
-        'is_read' => false,
-        'data' => json_encode([
-            'refunded_by' => $admin->id,
-            'refunded_at' => now()->format('d.m.Y H:i'),
-            'reason' => $validated['reason'] ?? null,
-            'new_balance' => $activeSubscription->remaining_workouts
-        ])
-    ]);
-    
-    // 2. Уведомление админу (подтверждение)
-    $this->notify->send(
-        $admin->id,
-        "✅ Вы успешно вернули тренировку клиенту {$client->name}. Теперь у клиента {$activeSubscription->remaining_workouts} тренировок в абонементе",
-        'attendance',
-        ['client_id' => $client->id, 'new_balance' => $activeSubscription->remaining_workouts]
-    );
-    
-    // 3. Уведомление остальным админам
-    // Исключаем текущего админа, чтобы не дублировать
-    $otherAdminIds = User::whereHas('role', function($q) {
-            $q->whereIn('name', ['admin', 'owner']);
-        })
-        ->where('id', '!=', $admin->id)
-        ->pluck('id')
-        ->toArray();
-    
-    if (!empty($otherAdminIds)) {
-        $this->notify->sendBulk(
-            $otherAdminIds,
-            "🔄 Администратор {$admin->name} вернул тренировку клиенту {$client->name}. Теперь у клиента {$activeSubscription->remaining_workouts} тренировок",
+        
+        $validated = $request->validate([
+            'reason' => 'nullable|string|max:500',
+        ]);
+        
+        // Получаем активный абонемент клиента
+        $activeSubscription = $client->activeSubscription();
+        
+        if (!$activeSubscription) {
+            return back()->with('error', 'У клиента нет активного абонемента');
+        }
+        
+        // Просто добавляем одну тренировку обратно в абонемент
+        $activeSubscription->increment('remaining_workouts');
+        
+        // 1. Уведомление клиенту
+        \App\Models\Notification::create([
+            'user_id' => $client->id,
+            'type' => 'attendance',
+            'message' => "🔄 Администратор вернул одну тренировку в ваш абонемент. Причина: " . ($validated['reason'] ?? 'Ошибка учета'),
+            'is_read' => false,
+            'data' => json_encode([
+                'refunded_by' => $admin->id,
+                'refunded_at' => now()->format('d.m.Y H:i'),
+                'reason' => $validated['reason'] ?? null,
+                'new_balance' => $activeSubscription->remaining_workouts
+            ])
+        ]);
+        
+        // 2. Уведомление админу (подтверждение)
+        $this->notify->send(
+            $admin->id,
+            "✅ Вы успешно вернули тренировку клиенту {$client->name}. Теперь у клиента {$activeSubscription->remaining_workouts} тренировок в абонементе",
             'attendance',
-            ['client_id' => $client->id, 'admin_id' => $admin->id]
+            ['client_id' => $client->id, 'new_balance' => $activeSubscription->remaining_workouts]
         );
+        
+        // 3. Уведомление остальным админам
+        // Исключаем текущего админа, чтобы не дублировать
+        $otherAdminIds = User::whereHas('role', function($q) {
+                $q->whereIn('name', ['admin', 'owner']);
+            })
+            ->where('id', '!=', $admin->id)
+            ->pluck('id')
+            ->toArray();
+        
+        if (!empty($otherAdminIds)) {
+            $this->notify->sendBulk(
+                $otherAdminIds,
+                "🔄 Администратор {$admin->name} вернул тренировку клиенту {$client->name}. Теперь у клиента {$activeSubscription->remaining_workouts} тренировок",
+                'attendance',
+                ['client_id' => $client->id, 'admin_id' => $admin->id]
+            );
+        }
+        
+        $remainingText = $activeSubscription->subscription->workouts_count > 0 
+            ? "Теперь у клиента {$activeSubscription->remaining_workouts} тренировок в абонементе"
+            : "Безлимитный абонемент";
+        
+        return back()->with('success', "Тренировка успешно возвращена! " . $remainingText);
     }
-    
-    $remainingText = $activeSubscription->subscription->workouts_count > 0 
-        ? "Теперь у клиента {$activeSubscription->remaining_workouts} тренировок в абонементе"
-        : "Безлимитный абонемент";
-    
-    return back()->with('success', "Тренировка успешно возвращена! " . $remainingText);
-}
 
 /**
- * Получить список списанных тренировок клиента (AJAX)
- */
-public function getClientAttendanceHistory($clientId)
-{
-    $client = User::findOrFail($clientId);
-    
-    if (!$client->isClient()) {
-        return response()->json(['error' => 'Не клиент'], 404);
+* Получить список списанных тренировок клиента (AJAX)
+*/
+    public function getClientAttendanceHistory($clientId)
+    {
+        $client = User::findOrFail($clientId);
+        
+        if (!$client->isClient()) {
+            return response()->json(['error' => 'Не клиент'], 404);
+        }
+        
+        $attendances = Attendance::where('user_id', $client->id)
+            ->whereNotNull('booking_id')
+            ->with(['booking.schedule.workout'])
+            ->orderBy('attended_at', 'desc')
+            ->get()
+            ->map(function($attendance) {
+                return [
+                    'id' => $attendance->id,
+                    'date' => $attendance->attended_at->format('Y-m-d'),
+                    'date_formatted' => $attendance->attended_at->format('d.m.Y'),
+                    'workout_name' => $attendance->booking->schedule->workout->name ?? 'Тренировка',
+                    'time' => substr($attendance->booking->schedule->start_time ?? '', 0, 5),
+                ];
+            });
+        
+        return response()->json([
+            'success' => true,
+            'attendances' => $attendances
+        ]);
     }
-    
-    $attendances = Attendance::where('user_id', $client->id)
-        ->whereNotNull('booking_id')
-        ->with(['booking.schedule.workout'])
-        ->orderBy('attended_at', 'desc')
-        ->get()
-        ->map(function($attendance) {
-            return [
-                'id' => $attendance->id,
-                'date' => $attendance->attended_at->format('Y-m-d'),
-                'date_formatted' => $attendance->attended_at->format('d.m.Y'),
-                'workout_name' => $attendance->booking->schedule->workout->name ?? 'Тренировка',
-                'time' => substr($attendance->booking->schedule->start_time ?? '', 0, 5),
-            ];
-        });
-    
-    return response()->json([
-        'success' => true,
-        'attendances' => $attendances
-    ]);
-}
 
-}
+ }
