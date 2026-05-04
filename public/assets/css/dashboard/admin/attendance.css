@@ -17,11 +17,11 @@
    ---------------------------------------- */
 
 .attendance-header {
-    background: linear-gradient(135deg, #198cf7, #17dd8b);
+    background: linear-gradient(135deg, #198cf7, #31ec9e);
     border-radius: 24px;
     padding: 1.8rem 2.2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 15px 35px rgba(14, 39, 120, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(86, 77, 99, 0.1);
     position: relative;
     overflow: hidden;
     display: flex;
