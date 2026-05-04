@@ -25,32 +25,24 @@
     </div>
 
     @if(session('success'))
-        <div class="alert-modern alert-success alert-dismissible fade show" role="alert">
-            <div class="d-flex align-items-center gap-3">
-                <div class="alert-icon">
-                    <i class="fas fa-check-circle fa-lg"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <strong class="d-block">Успешно!</strong>
-                    {{ session('success') }}
-                </div>
+        <div class="alert-modern success">
+            <div class="alert-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="alert-content">
+                <div class="alert-title">Отлично!</div>
+                <div class="alert-message">{{ session('success') }}</div>
             </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="alert-close"><i class="fas fa-times"></i></button>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert-modern alert-danger alert-dismissible fade show" role="alert">
-            <div class="d-flex align-items-center gap-3">
-                <div class="alert-icon">
-                    <i class="fas fa-exclamation-circle fa-lg"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <strong class="d-block">Ошибка!</strong>
-                    {{ session('error') }}
-                </div>
+        <div class="alert-modern error">
+            <div class="alert-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="alert-content">
+                <div class="alert-title">Ошибка!</div>
+                <div class="alert-message">{{ session('error') }}</div>
             </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="alert-close"><i class="fas fa-times"></i></button>
         </div>
     @endif
 

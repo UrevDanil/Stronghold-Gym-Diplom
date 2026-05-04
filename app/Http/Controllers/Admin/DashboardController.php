@@ -899,9 +899,11 @@ public function storeSubscription(Request $request)
         'workouts_count' => 'required|integer|min:1',
         'price' => 'required|numeric|min:0',
         'type' => 'required|in:time,count',
+        'has_trainer' => 'nullable|boolean', // ДОБАВИТЬ
         'is_active' => 'boolean',
     ]);
     
+    $validated['has_trainer'] = $request->has('has_trainer');
     $validated['is_active'] = $request->has('is_active');
     
     Subscription::create($validated);
@@ -933,9 +935,11 @@ public function updateSubscription(Request $request, $id)
         'workouts_count' => 'required|integer|min:1',
         'price' => 'required|numeric|min:0',
         'type' => 'required|in:time,count',
+        'has_trainer' => 'nullable|boolean', // ДОБАВИТЬ
         'is_active' => 'boolean',
     ]);
     
+    $validated['has_trainer'] = $request->has('has_trainer');
     $validated['is_active'] = $request->has('is_active');
     
     $subscription->update($validated);

@@ -130,8 +130,23 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
+                        <div class="form-check form-switch mt-4 pt-2">
+                            <input class="form-check-input" type="checkbox" id="has_trainer" name="has_trainer" value="1" 
+                                   {{ old('has_trainer') ? 'checked' : '' }} style="width: 50px; height: 25px; cursor: pointer;">
+                            <label class="form-check-label ms-2 fw-bold" for="has_trainer" style="cursor: pointer;">
+                                <i class="fas fa-chalkboard-user me-1"></i> Абонемент с тренером
+                            </label>
+                            <div class="form-text text-muted mt-1">
+                                <small>При включении этой опции клиент сможет записываться на тренировки с тренером и видеть расписание.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
                         <label for="is_active" class="form-label">Статус</label>
-                        <div class="form-check mt-2">
+                        <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="is_active" 
                                    name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
                             <label class="form-check-label" for="is_active">Абонемент активен и доступен для покупки</label>
