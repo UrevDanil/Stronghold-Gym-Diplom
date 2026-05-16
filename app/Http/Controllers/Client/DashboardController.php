@@ -26,46 +26,59 @@ class DashboardController extends Controller
         $this->notify = $notificationService;
     }
     
-    public function dashboard()
-    {
-        $user = Auth::user();
+public function dashboard()
+{
+    $user = Auth::user();
 
-        $user->refreshSubscriptionStatuses();
-        
-        if (!$user->is_active) {
-            Auth::logout();
-            return redirect()->route('login')
-                ->withErrors(['email' => 'Ваш аккаунт деактивирован.']);
-        }
-
-        $userSubscriptions = $user->userSubscriptions()
-            ->with('subscription')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $hasTrainerSubscription = $user->hasActiveTrainerSubscription();
-        
-        $upcomingBookings = $hasTrainerSubscription 
-            ? $user->upcomingBookings()->limit(5)->get() 
-            : collect();
-
-        $data = [
-            'user' => $user,
-            'userSubscriptions' => $userSubscriptions,
-            'upcomingBookings' => $upcomingBookings,
-            'hasTrainerSubscription' => $hasTrainerSubscription,
-            'pastBookings' => Booking::where('user_id', $user->id)
-                ->whereIn('status', ['attended', 'missed'])
-                ->with('schedule.workout', 'schedule.trainer')
-                ->orderBy('created_at', 'desc')
-                ->limit(5)
-                ->get(),
-            'activeSubscription' => $user->activeSubscription(),
-            'availableSubscriptions' => Subscription::where('is_active', true)->get(),
-        ];
-        
-        return view('client.dashboard', $data);
+    $user->refreshSubscriptionStatuses();
+    
+    if (!$user->is_active) {
+        Auth::logout();
+        return redirect()->route('login')
+            ->withErrors(['email' => 'Ваш аккаунт деактивирован.']);
     }
+
+    $userSubscriptions = $user->userSubscriptions()
+        ->with('subscription')
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    $hasTrainerSubscription = $user->hasActiveTrainerSubscription();
+    
+    // Проверяем замороженный абонемент
+    $hasFrozen = false;
+    $frozenSub = null;
+    foreach($userSubscriptions as $sub) {
+        if($sub->status === 'frozen' && $sub->isPaused()) {
+            $hasFrozen = true;
+            $frozenSub = $sub;
+            break;
+        }
+    }
+    
+    $upcomingBookings = $hasTrainerSubscription 
+        ? $user->upcomingBookings()->limit(5)->get() 
+        : collect();
+
+    $data = [
+        'user' => $user,
+        'userSubscriptions' => $userSubscriptions,
+        'upcomingBookings' => $upcomingBookings,
+        'hasTrainerSubscription' => $hasTrainerSubscription,
+        'pastBookings' => Booking::where('user_id', $user->id)
+            ->whereIn('status', ['attended', 'missed'])
+            ->with('schedule.workout', 'schedule.trainer')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get(),
+        'activeSubscription' => $user->activeSubscription(),
+        'availableSubscriptions' => Subscription::where('is_active', true)->get(),
+        'hasFrozen' => $hasFrozen,
+        'frozenSub' => $frozenSub,
+    ];
+    
+    return view('client.dashboard', $data);
+}
 
     public function schedule(Request $request)
     {
@@ -370,42 +383,51 @@ class DashboardController extends Controller
         ->with('success', 'Пароль успешно изменен');
         }
 
-    public function freezeSubscription(Request $request)
-    {
-        $request->validate([
-            'reason' => 'required|string|max:255',
-            'days' => 'required|integer|min:1|max:14',
-        ]);
-            
-        $user = Auth::user();
-        $userSubscription = $user->activeSubscription();
-            
-        if (!$userSubscription) {
-            return back()->with('error', 'У вас нет активного абонемента');
-        }
-            
-        if ($userSubscription->isPaused()) {
-            return back()->with('error', 'Абонемент уже заморожен');
-        }
-            
-        try {
-            $userSubscription->pause($request->days);
-            $userSubscription->pause_reason = $request->reason;
-            $userSubscription->save();
-                
-            $this->notify->send(
-                $user->id,
-                "Ваш абонемент заморожен на {$request->days} дней. Причина: {$request->reason}",
-                'subscription',
-                ['subscription_id' => $userSubscription->subscription_id]
-            );
-                
-            return back()->with('success', "Абонемент успешно заморожен на {$request->days} дней");
-                
-        }catch (\Exception $e) {
-            return back()->with('error', 'Ошибка при заморозке: ' . $e->getMessage());
-        }
+public function freezeSubscription(Request $request)
+{
+    $request->validate([
+        'reason' => 'required|string|max:255',
+        'days' => 'required|integer|min:1|max:14',
+    ]);
+    
+    $user = Auth::user();
+    
+    // Ищем ТОЛЬКО активный (не замороженный) абонемент
+    $userSubscription = $user->userSubscriptions()
+        ->where('status', UserSubscription::STATUS_ACTIVE)
+        ->whereDate('start_date', '<=', Carbon::today())
+        ->whereDate('end_date', '>=', Carbon::today())
+        ->where('remaining_workouts', '>', 0)
+        ->where(function($q) {
+            $q->whereNull('paused_at')
+              ->orWhereDate('paused_until', '<', Carbon::today());
+        })
+        ->first();
+    
+    if (!$userSubscription) {
+        return back()->with('error', 'У вас нет активного абонемента для заморозки');
     }
+    
+    if ($userSubscription->isPaused()) {
+        return back()->with('error', 'Абонемент уже заморожен');
+    }
+    
+    try {
+        $userSubscription->pause($request->days, $request->reason);
+        
+        $this->notify->send(
+            $user->id,
+            "❄️ Ваш абонемент заморожен на {$request->days} дней. Причина: {$request->reason}",
+            'subscription',
+            ['subscription_id' => $userSubscription->subscription_id]
+        );
+        
+        return back()->with('success', "Абонемент успешно заморожен на {$request->days} дней");
+        
+    } catch (\Exception $e) {
+        return back()->with('error', 'Ошибка при заморозке: ' . $e->getMessage());
+    }
+}
 
     public function resumeSubscription(Request $request)
     {

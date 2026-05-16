@@ -39,86 +39,93 @@
     @endphp
 
     <!-- Активный абонемент -->
-    <div class="main-card fade-in mb-5" style="animation-delay: 0.7s">
-        <div class="card-header">
-            <i class="fas fa-id-card"></i> Ваш абонемент
-        </div>
-        <div class="card-body">
-            @if($activeSubscription)
-                @php
-                    $subscription = $activeSubscription->subscription;
-                    $totalWorkouts = $subscription->workouts_count ?? 0;
-                    $remaining = $activeSubscription->remaining_workouts;
-                    $used = max(0, $totalWorkouts - $remaining);
-                    $percentage = $totalWorkouts > 0 ? round(($used / $totalWorkouts) * 100) : 0;
-                @endphp
-            
-                <div class="text-center mb-4">
-                    <div class="subscription-icon mb-3">
-                        <i class="fas fa-id-card"></i>
-                    </div>
-                    <h4 class="subscription-title">{{ $subscription->name ?? 'Абонемент' }}</h4>
-                    <p class="subscription-description">{{ $subscription->description ?? '' }}</p>
-                </div>            
-                
-                <!-- Прогресс бар -->
-                <div class="progress-wrapper mb-4">
-                    <div class="progress-label">
-                        <span>Прогресс абонемента</span>
-                        <span class="progress-percentage">{{ $percentage }}%</span>
-                    </div>
-                    <div class="subscription-progress">
-                        <div class="progress-bar" style="width: {{ $percentage }}%"></div>
-                    </div>
-                </div>
-                
-                <!-- Кнопка -->
-                <div class="subscription-action">
-                    <a href="{{ route('client.subscriptions') }}" class="btn-gradient btn-gradient-primary w-100 py-3">
-                        <i class="fas fa-sync-alt me-2"></i>Продлить или купить новый
-                        <span class="btn-glow"></span>
-                    </a>
-                </div>
-                @elseif($hasFrozen)
-                    {{-- Абонемент заморожен --}}
-                    <div class="frozen-subscription-container">
-                        <!-- Декоративные снежинки -->
-                        <div class="snowflake">❄️</div>
-                        <div class="snowflake">❄️</div>
-                        <div class="snowflake">❄️</div>
-                        <div class="snowflake">❄️</div>
-                        
-                        <div class="text-center">
-                            <div class="frozen-icon-large">
-                                <i class="fas fa-snowflake"></i>
-                            </div>
-                            
-                            <h2 class="frozen-title">❄️ Ваш абонемент заморожен</h2>
-                            
-                            <p class="frozen-message">
-                                Абонемент временно заморожен. Вы можете разморозить его в любой момент 
-                                в разделе "Абонементы".
-                            </p>
-                            
-                            <a href="{{ route('client.subscriptions') }}" class="btn-frozen">
-                                <i class="fas fa-play"></i>
-                                Разморозить абонемент
-                            </a>
-                        </div>
-                    </div>
-                @else
-                {{-- Нет абонемента --}}
-                <div class="empty-state">
-                    <i class="fas fa-id-card"></i>
-                    <h4>Нет активного абонемента</h4>
-                    <p class="mb-4">Приобретите абонемент, чтобы начать тренировки</p>
-                    <a href="{{ route('client.subscriptions') }}" class="btn-gradient btn-gradient-primary w-100 py-3">
-                        <i class="fas fa-shopping-cart me-2"></i>Купить абонемент
-                    </a>
-                </div>
-            @endif
-        </div>
+<div class="main-card fade-in mb-5" style="animation-delay: 0.7s">
+    <div class="card-header">
+        <i class="fas fa-id-card"></i> Ваш абонемент
     </div>
+    <div class="card-body">
+        @if($activeSubscription && $activeSubscription->status !== 'frozen')
+            @php
+                $subscription = $activeSubscription->subscription;
+                $totalWorkouts = $subscription->workouts_count ?? 0;
+                $remaining = $activeSubscription->remaining_workouts;
+                $used = max(0, $totalWorkouts - $remaining);
+                $percentage = $totalWorkouts > 0 ? round(($used / $totalWorkouts) * 100) : 0;
+            @endphp
+        
+            <div class="text-center mb-4">
+                <div class="subscription-icon mb-3">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <h4 class="subscription-title">{{ $subscription->name ?? 'Абонемент' }}</h4>
+                <p class="subscription-description">{{ $subscription->description ?? '' }}</p>
+            </div>            
+            
+            <!-- Прогресс бар -->
+            <div class="progress-wrapper mb-4">
+                <div class="progress-label">
+                    <span>Прогресс абонемента</span>
+                    <span class="progress-percentage">{{ $percentage }}%</span>
+                </div>
+                <div class="subscription-progress">
+                    <div class="progress-bar" style="width: {{ $percentage }}%"></div>
+                </div>
+            </div>
+            
+            <!-- Кнопка -->
+            <div class="subscription-action">
+                <a href="{{ route('client.subscriptions') }}" class="btn-gradient btn-gradient-primary w-100 py-3">
+                    <i class="fas fa-sync-alt me-2"></i>Продлить или купить новый
+                    <span class="btn-glow"></span>
+                </a>
+            </div>
+            
+        @elseif($activeSubscription && $activeSubscription->status === 'frozen')
+            {{-- Абонемент заморожен - оригинальный стиль --}}
+            <div class="frozen-subscription-container">
+                <div class="snowflake">❄️</div>
+                <div class="snowflake">❄️</div>
+                <div class="snowflake">❄️</div>
+                <div class="snowflake">❄️</div>
+                
+                <div class="text-center">
+                    <div class="frozen-icon-large">
+                        <i class="fas fa-snowflake"></i>
+                    </div>
+                    
+                    <h2 class="frozen-title">❄️ Ваш абонемент заморожен</h2>
+                    
+                    <p class="frozen-message">
+                        Абонемент <strong>{{ $activeSubscription->subscription->name ?? 'Абонемент' }}</strong> заморожен до<br>
+                        <strong>{{ \Carbon\Carbon::parse($activeSubscription->paused_until)->format('d.m.Y H:i') }}</strong>
+                    </p>
+                    <p class="frozen-message">
+                        В период заморозки запись на тренировки недоступна.<br>
+                        Вы можете разморозить абонемент досрочно.
+                    </p>
+                    
+                    <form action="{{ route('client.subscriptions.resume') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn-frozen">
+                            <i class="fas fa-play me-2"></i>Разморозить абонемент
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+        @else
+            {{-- Нет абонемента --}}
+            <div class="empty-state">
+                <i class="fas fa-id-card"></i>
+                <h4>Нет активного абонемента</h4>
+                <p class="mb-4">Приобретите абонемент, чтобы начать тренировки</p>
+                <a href="{{ route('client.subscriptions') }}" class="btn-gradient btn-gradient-primary w-100 py-3">
+                    <i class="fas fa-shopping-cart me-2"></i>Купить абонемент
+                </a>
+            </div>
+        @endif
+    </div>
+</div>
 
     <!-- 4 маленьких блока статистики -->
     <div class="row g-4 mb-5">

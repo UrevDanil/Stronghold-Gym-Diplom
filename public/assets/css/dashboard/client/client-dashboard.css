@@ -651,7 +651,7 @@
 
 .btn-frozen:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(7, 32, 255, 0.5);
+    box-shadow: 0 12px 30px rgba(62, 80, 241, 0.5);
     color: white;
     text-decoration: none;
 }
@@ -659,7 +659,6 @@
 .btn-frozen i {
     font-size: 1.2rem;
     animation: spin 3s linear infinite;
-    text-decoration: none;
 }
 
 @keyframes spin {
@@ -807,3 +806,4 @@
         font-size: 1.3rem;
     }
 }
+
