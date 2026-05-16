@@ -302,7 +302,7 @@
                         <tbody>
                             @foreach($todayTrainings as $training)
                                 @php
-                                    $capacity = $training->workout->capacity ?? 10;
+                                    $capacity = $training->capacity ?? 10;
                                     $booked = $training->bookings_count ?? 0;
                                     $isFull = $booked >= $capacity;
                                 @endphp
