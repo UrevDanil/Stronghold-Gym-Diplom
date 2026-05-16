@@ -498,7 +498,8 @@
             <li><a href="{{ route('home') }}">Главная</a></li>
             <li><a href="{{ route('about') }}">О нас</a></li>
             <li><a href="{{ route('service') }}">Услуги</a></li>
-            <li><a href="{{ route('contact') }}">Контакты</a></li>
+            <li><a href="{{ route('subscriptions.index') }}">Абонементы</a></li>
+            <li><a href="{{ route('login') }}">Войти</a></li>
           </ul>
         </div>
         <div class="col-md-3">

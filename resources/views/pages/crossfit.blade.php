@@ -92,7 +92,7 @@
                     <a class="nav-link" href="{{ route('service') }}">Услуги </a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="{{ route('contact') }}">Связаться с нами</a>
+                    <a class="nav-link" href="{{ route('subscriptions.index') }}">Абонементы</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="{{ route('login') }}">Войти</a>
@@ -325,18 +325,11 @@
             Меню
           </h6>
           <ul>
-            <li class=" active">
-              <a class="" href="{{ route('home') }}">Главная <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="">
-              <a class="" href="{{ route('about') }}">О нас </a>
-            </li>
-            <li class="">
-              <a class="" href="{{ route('service') }}">Услуги </a>
-            </li>
-            <li class="">
-              <a class="" href="{{ route('contact') }}">Связаться с нами</a>
-            </li>
+            <li><a href="{{ route('home') }}">Главная</a></li>
+            <li><a href="{{ route('about') }}">О нас</a></li>
+            <li><a href="{{ route('service') }}">Услуги</a></li>
+            <li><a href="{{ route('subscriptions.index') }}">Абонементы</a></li>
+            <li><a href="{{ route('login') }}">Войти</a></li>
           </ul>
         </div>
         <div class="col-md-3">
@@ -383,28 +376,6 @@
               <img src="{{ asset('assets/images/mail-white.png') }}" alt="" />
               <span> Stronghold@gmail.com</span>
             </a>
-          </div>
-          <div class="info_social">
-            <div>
-              <a href="">
-                <img src="{{ asset('assets/images/facebook-logo-button.png') }}" alt="" />
-              </a>
-            </div>
-            <div>
-              <a href="">
-                <img src="{{ asset('assets/images/twitter-logo-button.png') }}" alt="" /> 
-              </a>
-            </div>
-            <div>
-              <a href="">
-                <img src="{{ asset('assets/images/linkedin.png') }}" alt="" />
-              </a>
-            </div>
-            <div>
-              <a href="https://vk.com/id320753965">
-                <img src="{{ asset('assets/images/instagram.png') }}" alt="" />
-              </a>
-            </div>
           </div>
         </div>
       </div>

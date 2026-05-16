@@ -90,7 +90,7 @@
                   <a class="nav-link" href="{{ route('service') }}">Услуги</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{{ route('contact') }}">Контакты</a>
+                  <a class="nav-link" href="{{ route('subscriptions.index') }}">Абонементы</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{{ route('login') }}">Войти</a>
@@ -167,18 +167,11 @@
             Меню
           </h6>
           <ul>
-            <li>
-              <a href="{{ route('home') }}">Главная</a>
-            </li>
-            <li class="active">
-              <a href="{{ route('about') }}">О нас</a>
-            </li>
-            <li>
-              <a href="{{ route('service') }}">Услуги</a>
-            </li>
-            <li>
-              <a href="{{ route('contact') }}">Контакты</a>
-            </li>
+            <li><a href="{{ route('home') }}">Главная</a></li>
+            <li><a href="{{ route('about') }}">О нас</a></li>
+            <li><a href="{{ route('service') }}">Услуги</a></li>
+            <li><a href="{{ route('subscriptions.index') }}">Абонементы</a></li>
+            <li><a href="{{ route('login') }}">Войти</a></li>
           </ul>
         </div>
         <div class="col-md-3">
@@ -216,20 +209,6 @@
             <a href="mailto:Stronghold@gmail.com">
               <img src="{{ asset('assets/images/mail-white.png') }}" alt="Email" />
               <span>Stronghold@gmail.com</span>
-            </a>
-          </div>
-          <div class="info_social">
-            <a href="#" target="_blank">
-              <img src="{{ asset('assets/images/facebook-logo-button.png') }}" alt="Facebook" />
-            </a>
-            <a href="#" target="_blank">
-              <img src="{{ asset('assets/images/twitter-logo-button.png') }}" alt="Twitter" />
-            </a>
-            <a href="#" target="_blank">
-              <img src="{{ asset('assets/images/linkedin.png') }}" alt="LinkedIn" />
-            </a>
-            <a href="https://vk.com/id320753965" target="_blank">
-              <img src="{{ asset('assets/images/instagram.png') }}" alt="VK/Instagram" />
             </a>
           </div>
         </div>
