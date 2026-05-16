@@ -411,3 +411,186 @@
         font-size: 0.9rem;
     }
 }
+
+/* ----------------------------------------
+   7. КНОПКА НАЗАД
+   ---------------------------------------- */
+
+.back-to-home {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1.2rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 50px;
+    color: #0e2778;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid #dee2e6;
+}
+
+.back-to-home:hover {
+    background: linear-gradient(135deg, #0e2778, #1a3a9e);
+    color: white;
+    transform: translateX(-3px);
+    border-color: transparent;
+}
+
+.back-to-home i {
+    font-size: 0.85rem;
+    transition: transform 0.3s ease;
+}
+
+.back-to-home:hover i {
+    transform: translateX(-3px);
+}
+
+/* ----------------------------------------
+   8. ВЫРАВНИВАНИЕ КНОПОК
+   ---------------------------------------- */
+
+.subscription-card .card-body {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 70px);
+}
+
+.subscription-card .mt-auto {
+    margin-top: auto !important;
+}
+
+.btn-purchase,
+.btn-outline-purchase {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+.btn-purchase.disabled,
+.btn-outline-purchase.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ----------------------------------------
+   9. СТИЛИ ДЛЯ ССЫЛКИ "ВОЙДИТЕ" (ПРОСТОЙ)
+   ---------------------------------------- */
+
+/* Убираем подчеркивание */
+.text-muted a {
+    text-decoration: none !important;
+    color: #0e2778 !important;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+/* Эффект при наведении */
+.text-muted a:hover {
+    color: #4570f1 !important;
+}
+
+/* ----------------------------------------
+   10. ПОЛНОЭКРАННЫЙ РЕЖИМ
+   ---------------------------------------- */
+
+.subscriptions-page {
+    padding: 0 !important;
+    max-width: 100%;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.subscriptions-page > .container {
+    max-width: 100%;
+    padding: 1rem 2rem;
+    width: 100%;
+}
+
+/* Убираем отступы у row */
+.row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Карточки растягиваются */
+.col-md-6, .col-lg-4 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+/* На мобилках отступы поменьше */
+@media (max-width: 768px) {
+    .subscriptions-page > .container {
+        padding: 0.5rem 1rem;
+    }
+    
+    .col-md-6, .col-lg-4 {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+/* ----------------------------------------
+   11. ОТСТУПЫ ДЛЯ КНОПКИ НАЗАД И FAQ
+   ---------------------------------------- */
+
+/* Отступы для кнопки назад */
+.back-to-home {
+    margin-left: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 50px;
+    color: #0e2778;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid #dee2e6;
+}
+
+/* Отступы для FAQ секции */
+.faq-card {
+    margin: 3rem 1rem 2rem 1rem;
+    border: none;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+/* Для мобильных устройств */
+@media (max-width: 768px) {
+    .back-to-home {
+        margin-left: 0.5rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        padding: 0.4rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    
+    .faq-card {
+        margin: 2rem 0.5rem 1rem 0.5rem;
+    }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 480px) {
+    .back-to-home {
+        margin-left: 0.3rem;
+        margin-top: 0.3rem;
+        margin-bottom: 0.3rem;
+        padding: 0.3rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .faq-card {
+        margin: 1.5rem 0.3rem 0.5rem 0.3rem;
+    }
+}

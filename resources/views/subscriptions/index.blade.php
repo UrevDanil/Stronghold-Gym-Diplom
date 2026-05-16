@@ -9,6 +9,13 @@
 
 @section('content')
 <div class="container py-5 subscriptions-page">
+    <!-- Кнопка назад -->
+    <div class="mb-4">
+        <a href="{{ url()->previous() }}" class="back-to-home">
+            <i class="fas fa-arrow-left me-2"></i>Назад
+        </a>
+    </div>
+
     <!-- Заголовок -->
     <div class="subscriptions-header">
         <h1 class="mb-2">Выберите свой абонемент</h1>
@@ -79,7 +86,7 @@
                                 <span>Доступ ко всем тренажерам</span>
                             </li>
                             
-                            @if(in_array($subscription->id, [6, 7, 8]) || str_contains($subscription->name, 'тренер'))
+                            @if(in_array($subscription->id, [6, 7, 8]) || str_contains($subscription->name, 'тренер') || $subscription->has_trainer)
                                 <li>
                                     <i class="fas fa-chalkboard-user"></i>
                                     <span>Персональные тренировки с тренером</span>
@@ -98,13 +105,13 @@
                             </div>
                         @endif
                         
-                        <div class="mt-auto">
+                        <div class="mt-auto text-center">
                             @auth
                                 @if(auth()->user()->isClient())
                                     @php
                                         $activeSub = auth()->user()->activeSubscription();
-                                        $hasActiveSub = $activeSub !== null;
-                                        $isTrainerSubscription = str_contains($subscription->name, 'тренер') || in_array($subscription->id, [6, 7, 8]);
+                                        $hasActiveSub = $activeSub !== null && $activeSub->status !== 'frozen';
+                                        $isTrainerSubscription = str_contains($subscription->name, 'тренер') || in_array($subscription->id, [6, 7, 8]) || $subscription->has_trainer;
                                         $hasTrainerSub = auth()->user()->hasActiveTrainerSubscription();
                                         
                                         $canPurchase = false;
@@ -116,41 +123,45 @@
                                     @endphp
                                     
                                     @if($canPurchase)
-                                       <form action="{{ route('client.subscriptions.purchase', $subscription) }}" method="POST"> 
+                                        <form action="{{ route('client.subscriptions.purchase', $subscription) }}" method="POST">
                                             @csrf
-                                            <button type="submit" class="btn-purchase">
+                                            <button type="submit" class="btn-purchase w-100">
                                                 <i class="fas fa-shopping-cart me-2"></i>Приобрести
                                             </button>
                                         </form>
                                     @else
                                         @if($hasActiveSub && !$isTrainerSubscription)
-                                            <button class="btn-purchase disabled" disabled>
+                                            <button class="btn-purchase disabled w-100" disabled>
                                                 <i class="fas fa-lock me-2"></i>У вас уже есть активный абонемент
                                             </button>
                                         @elseif($hasTrainerSub && $isTrainerSubscription)
-                                            <button class="btn-purchase disabled" disabled>
+                                            <button class="btn-purchase disabled w-100" disabled>
                                                 <i class="fas fa-lock me-2"></i>У вас уже есть абонемент с тренером
                                             </button>
+                                        @elseif($activeSub && $activeSub->status === 'frozen')
+                                            <button class="btn-purchase disabled w-100" disabled>
+                                                <i class="fas fa-snowflake me-2"></i>Абонемент заморожен. Разморозьте для покупки
+                                            </button>
                                         @else
-                                            <button class="btn-purchase disabled" disabled>
+                                            <button class="btn-purchase disabled w-100" disabled>
                                                 <i class="fas fa-clock me-2"></i>Дождитесь окончания текущего абонемента
                                             </button>
                                         @endif
                                     @endif
                                 @elseif(auth()->user()->isAdmin())
-                                    <a href="{{ route('admin.subscriptions.index') }}" class="btn-outline-purchase">
+                                    <a href="{{ route('admin.subscriptions.index') }}" class="btn-outline-purchase w-100">
                                         <i class="fas fa-cog me-2"></i>Управление абонементами
                                     </a>
                                 @else
-                                    <button class="btn-purchase disabled" disabled>
+                                    <button class="btn-purchase disabled w-100" disabled>
                                         <i class="fas fa-user-lock me-2"></i>Доступно только клиентам
                                     </button>
                                 @endif
                             @else
-                                <a href="{{ route('register') }}" class="btn-purchase">
+                                <a href="{{ route('register') }}" class="btn-purchase w-100">
                                     <i class="fas fa-user-plus me-2"></i>Зарегистрироваться
                                 </a>
-                                <p class="text-center text-muted small mt-2">
+                                <p class="text-center text-muted small mt-3 mb-0">
                                     Уже есть аккаунт? <a href="{{ route('login') }}">Войдите</a>
                                 </p>
                             @endauth
@@ -195,7 +206,7 @@
                     <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
                             Да, вы можете заморозить абонемент на срок до 14 дней по уважительной причине 
-                            (болезнь, командировка, отпуск). Для этого обратитесь к администратору чтобы уточнить.
+                            (болезнь, командировка, отпуск). Для этого обратитесь к администратору.
                         </div>
                     </div>
                 </div>

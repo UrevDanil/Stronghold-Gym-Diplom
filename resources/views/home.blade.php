@@ -89,7 +89,7 @@
                   <a class="nav-link" href="{{ route('service') }}">Услуги</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{{ route('contact') }}">Контакты</a>
+                  <a class="nav-link" href="{{ route('subscriptions.index') }}">Абонементы</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{{ route('login') }}">Войти</a>
@@ -118,11 +118,7 @@
                   <div class="col-lg-8 mx-auto">
                     <div class="detail-box text-center">
                       <h2>Работай над телом</h2>
-                      <h1>Тренируйся с нами</h1>
-                      <p>Выбери программу и стартуй! Твоя трансформация начинается здесь, чтобы ты смог создать тело своей мечты.</p>
-                      <div class="btn-box">
-                        <a href="{{ route('service') }}" class="btn-1">Подробнее</a>
-                      </div>
+                      <h1>Тренируйся с нами</h1>           
                     </div>
                   </div>
                 </div>
@@ -135,11 +131,7 @@
                   <div class="col-lg-8 mx-auto">
                     <div class="detail-box text-center">
                       <h2>Измени свое питание</h2>
-                      <h1>Доверься нам</h1>
-                      <p>Выбери программу и стартуй! Твоя трансформация начинается с тарелки — создай тело своей мечты через правильные привычки.</p>
-                      <div class="btn-box">
-                        <a href="{{ route('nutrition') }}" class="btn-1">Подробнее</a>
-                      </div>
+                      <h1>Доверься нам</h1>                  
                     </div>
                   </div>
                 </div>
@@ -152,11 +144,7 @@
                   <div class="col-lg-8 mx-auto">
                     <div class="detail-box text-center">
                       <h2>ВКЛЮЧАЙСЯ!</h2>
-                      <h1>Достигай цели</h1>
-                      <p>Хотите больше? Тогда записывайтесь! Ваш путь к телу мечты начинается с первого шага — здесь и сейчас.</p>
-                      <div class="btn-box">
-                        <a href="{{ route('contact') }}" class="btn-1">Подробнее</a>
-                      </div>
+                      <h1>Достигай цели</h1>                     
                     </div>
                   </div>
                 </div>
@@ -537,12 +525,6 @@
               <img src="{{ asset('assets/images/mail-white.png') }}" alt="Email" />
               <span>Stronghold@gmail.com</span>
             </a>
-          </div>
-          <div class="info_social">
-            <a href="#" target="_blank"><img src="{{ asset('assets/images/facebook-logo-button.png') }}" alt="Facebook" /></a>
-            <a href="#" target="_blank"><img src="{{ asset('assets/images/twitter-logo-button.png') }}" alt="Twitter" /></a>
-            <a href="#" target="_blank"><img src="{{ asset('assets/images/linkedin.png') }}" alt="LinkedIn" /></a>
-            <a href="https://vk.com/id320753965" target="_blank"><img src="{{ asset('assets/images/instagram.png') }}" alt="Instagram/VK" /></a>
           </div>
         </div>
       </div>
