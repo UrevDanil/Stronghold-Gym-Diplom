@@ -148,85 +148,150 @@ body {
     background: white;
 }
 
-/* ----------------------------------------
-   4. ШАПКА И МЕНЮ (ИЗ ПЕРВОГО ФАЙЛА)
-   ---------------------------------------- */
+/* ========================================
+   4. ШАПКА И МЕНЮ (ОБНОВЛЕННЫЙ ПРЕМИУМ ДИЗАЙН)
+   ======================================== */
+
 .header_section {
-    background-color: rgba(244, 243, 243, 0.95);
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
     backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
-.custom_nav-container { z-index: 99999; padding: 15px 0; }
-.custom_nav-container .contact_nav { width: 100%; }
+
+.custom_nav-container {
+    z-index: 99999;
+    padding: 12px 0;
+}
+
+/* Логотип */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: var(--transition);
+}
+
+.navbar-brand:hover {
+    transform: scale(1.02);
+}
+
+.navbar-brand img {
+    width: 45px;
+    transition: var(--transition);
+}
+
+.navbar-brand span {
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+}
+
+/* Контактная информация в шапке */
 .custom_nav-container .contact_nav .navbar-nav {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    gap: 30px;
+    gap: 20px;
     margin: 0;
     padding: 0;
 }
-.custom_nav-container .contact_nav .nav-item { list-style: none; }
+
+.custom_nav-container .contact_nav .nav-item {
+    list-style: none;
+}
+
 .custom_nav-container .contact_nav .nav-item .nav-link {
-    padding: 5px 0;
+    padding: 8px 15px;
     color: var(--text-dark);
     transition: var(--transition);
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-size: 0.85rem;
     text-decoration: none;
-}
-.custom_nav-container .contact_nav .nav-item .nav-link:hover { color: var(--secondary-color); }
-.custom_nav-container .contact_nav .nav-item .nav-link img { width: 16px; transition: var(--transition); }
-
-.navbar-brand {
-    display: flex;
-    align-items: center;
-    transition: var(--transition);
-    text-decoration: none;
-}
-.navbar-brand:hover { transform: scale(1.02); }
-.navbar-brand img { width: 40px; margin-right: 10px; }
-.navbar-brand span {
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--primary-color);
-    text-transform: uppercase;
-}
-
-/* Основное меню */
-.custom_nav2 { padding: 0 45px; margin-top: 10px; }
-.custom_nav2 .custom_nav-container {
-    padding: 5px 0;
-    background: linear-gradient(135deg, var(--primary-color), #1a3a9e);
     border-radius: 50px;
+    background: rgba(14, 39, 120, 0.05);
 }
-.custom_nav2 .navbar-collapse { justify-content: center; }
+
+.custom_nav-container .contact_nav .nav-item .nav-link:hover {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    transform: translateY(-2px);
+}
+
+.custom_nav-container .contact_nav .nav-item .nav-link img {
+    width: 16px;
+    transition: var(--transition);
+}
+
+.custom_nav-container .contact_nav .nav-item .nav-link:hover img {
+    filter: brightness(0) invert(1);
+}
+
+/* ========================================
+   ОСНОВНОЕ МЕНЮ - НОВЫЙ СТИЛЬ
+   ======================================== */
+
+.custom_nav2 {
+    padding: 0 45px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.custom_nav2 .custom_nav-container {
+    background: linear-gradient(135deg, var(--primary-color), #1a3a9e);
+    border-radius: 60px;
+    padding: 8px 20px;
+    box-shadow: 0 8px 25px rgba(14, 39, 120, 0.25);
+    transition: var(--transition);
+}
+
+.custom_nav2 .custom_nav-container:hover {
+    box-shadow: 0 12px 35px rgba(14, 39, 120, 0.35);
+}
+
+.custom_nav2 .navbar-collapse {
+    justify-content: center;
+}
+
 .custom_nav2 .navbar-nav {
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    margin: 0 auto;
+    gap: 5px;
+    margin: 0;
     padding: 0;
 }
-.custom_nav2 .navbar-nav .nav-item { list-style: none; margin: 0; }
+
+.custom_nav2 .navbar-nav .nav-item {
+    list-style: none;
+    margin: 0;
+}
+
 .custom_nav2 .navbar-nav .nav-item .nav-link {
-    padding: 12px 25px;
-    color: var(--text-light);
+    padding: 10px 22px;
+    color: rgba(255, 255, 255, 0.9);
     text-align: center;
     position: relative;
     font-weight: 500;
-    font-size: 1rem;
+    font-size: 0.95rem;
     transition: var(--transition);
     text-decoration: none;
     display: inline-block;
+    border-radius: 50px;
+    letter-spacing: 0.3px;
 }
+
 .custom_nav2 .navbar-nav .nav-item .nav-link::before {
     content: '';
     position: absolute;
@@ -237,12 +302,21 @@ body {
     background: var(--secondary-color);
     transform: translateX(-50%);
     transition: width 0.3s ease;
+    border-radius: 10px;
 }
-.custom_nav2 .navbar-nav .nav-item .nav-link:hover::before,
-.custom_nav2 .navbar-nav .nav-item.active .nav-link::before { width: 30px; }
-.custom_nav2 .navbar-nav .nav-item.active .nav-link,
-.custom_nav2 .navbar-nav .nav-item:hover .nav-link { color: var(--secondary-color); }
 
+.custom_nav2 .navbar-nav .nav-item .nav-link:hover::before,
+.custom_nav2 .navbar-nav .nav-item.active .nav-link::before {
+    width: 35px;
+}
+
+.custom_nav2 .navbar-nav .nav-item .nav-link:hover,
+.custom_nav2 .navbar-nav .nav-item.active .nav-link {
+    color: var(--secondary-color);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Кнопка поиска */
 .custom_nav2 .nav_search-btn {
     background-image: url(../images/search-icon.png);
     background-size: 18px;
@@ -251,15 +325,134 @@ body {
     width: 40px;
     height: 40px;
     border: none;
-    background-color: transparent;
+    background-color: rgba(255, 255, 255, 0.15);
     cursor: pointer;
-    margin-left: 15px;
+    margin-left: 10px;
+    border-radius: 50%;
+    transition: var(--transition);
 }
 
-/* Скрываем лишние контактные блоки из первого файла */
-.slider_section .contact_info,
-.slider_section .top-bar,
-.slider_section .contact-bar { display: none; }
+.custom_nav2 .nav_search-btn:hover {
+    background-color: var(--secondary-color);
+    transform: rotate(90deg);
+}
+
+/* Кнопка бургер-меню (мобильная версия) */
+.navbar-toggler {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 10px 14px;
+    transition: var(--transition);
+}
+
+.navbar-toggler:hover {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Анимация для меню */
+@keyframes menuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.custom_nav2 .navbar-collapse.show {
+    animation: menuFadeIn 0.3s ease;
+}
+
+/* ========================================
+   МОБИЛЬНАЯ АДАПТАЦИЯ МЕНЮ
+   ======================================== */
+
+@media (max-width: 768px) {
+    .custom_nav2 {
+        padding: 0 15px;
+    }
+    
+    .custom_nav2 .custom_nav-container {
+        border-radius: 20px;
+        padding: 10px 15px;
+    }
+    
+    .custom_nav2 .navbar-nav {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 15px;
+        width: 100%;
+    }
+    
+    .custom_nav2 .navbar-nav .nav-item {
+        width: 100%;
+    }
+    
+    .custom_nav2 .navbar-nav .nav-item .nav-link {
+        padding: 12px 20px;
+        width: 100%;
+        text-align: center;
+        border-radius: 12px;
+    }
+    
+    .custom_nav2 .navbar-nav .nav-item .nav-link::before {
+        display: none;
+    }
+    
+    .custom_nav2 .navbar-nav .nav-item .nav-link:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .custom_nav2 .nav_search-btn {
+        margin: 15px auto 0;
+        display: block;
+        width: 45px;
+        height: 45px;
+    }
+    
+    /* Контакты на мобилках - компактно */
+    .custom_nav-container .contact_nav .navbar-nav {
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .custom_nav-container .contact_nav .nav-item .nav-link span {
+        display: none;
+    }
+    
+    .custom_nav-container .contact_nav .nav-item .nav-link {
+        padding: 8px 12px;
+        background: rgba(14, 39, 120, 0.08);
+    }
+    
+    .navbar-brand span {
+        font-size: 18px;
+    }
+    
+    .navbar-brand img {
+        width: 35px;
+    }
+}
+
+@media (max-width: 480px) {
+    .custom_nav2 .navbar-nav .nav-item .nav-link {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .custom_nav-container .contact_nav .nav-item .nav-link {
+        padding: 6px 10px;
+    }
+}
 
 /* ----------------------------------------
    5. СЛАЙДЕР (ИЗ ПЕРВОГО ФАЙЛА)
