@@ -8,8 +8,8 @@
 :root {
     --primary-color: #0e2778;
     --primary-dark: #0a1f5e;
-    --secondary-color: #fd9e2e;
-    --secondary-dark: #e8890a;
+    --secondary-color: #2a55e2;
+    --secondary-dark: #2a55e2;
     --accent-pink: #fd2eb8;
     --dark-bg: #161616;
     --light-bg: #f8f8f8;
@@ -100,7 +100,7 @@ body {
     position: relative;
     padding-bottom: 15px;
     margin: 0;
-    color: var(--primary-color);
+    color: var(--secondary-color);
     background: none;
     -webkit-text-fill-color: initial;
 }
@@ -126,7 +126,7 @@ body {
 .info_section .info_form form button {
     display: inline-block;
     padding: 12px 35px;
-    background: linear-gradient(135deg, var(--secondary-color), #fd7e14);
+    background: linear-gradient(135deg, var(--secondary-color), #2a55e2);
     border: none;
     border-radius: 50px;
     color: white;
@@ -143,7 +143,9 @@ body {
 .contact_form-container button:hover,
 .info_section .info_form form button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(253, 158, 46, 0.4);
+    box-shadow: 0 10px 25px rgba(27, 60, 250, 0.219);
+    color: #2a55e2;
+    background: white;
 }
 
 /* ----------------------------------------
@@ -417,7 +419,7 @@ body {
 
 .service_section .service_container .box .link_box a:hover {
     transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(253, 158, 46, 0.5);
+    box-shadow: 0 10px 25px rgba(27, 60, 250, 0.219);
 }
 
 .service_section .service_container .box .link_box a img {
@@ -439,7 +441,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(10, 31, 107, 0.85), rgba(253, 158, 46, 0.85));
+    background: linear-gradient(135deg, rgba(10, 31, 107, 0.85), rgba(27, 60, 250, 0.219));
     z-index: 1;
     opacity: 0;
     visibility: hidden;
@@ -667,7 +669,7 @@ body {
 .contact_form-container textarea:focus {
     border-color: var(--secondary-color);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(253, 158, 46, 0.2);
+    box-shadow: 0 10px 25px rgba(43, 74, 248, 0.219);
 }
 
 .map_container {
@@ -806,7 +808,7 @@ body {
 }
 .info_section .info_form form button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(253, 158, 46, 0.3);
+    box-shadow: 0 10px 25px rgba(27, 60, 250, 0.219);
 }
 
 .footer_section {
