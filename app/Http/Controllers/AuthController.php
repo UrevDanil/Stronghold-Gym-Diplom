@@ -21,64 +21,41 @@ class AuthController extends Controller
     /**
      * Обработка входа
      */
-public function login(Request $request)
-{
-    $credentials = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
-
-    if (Auth::attempt($credentials, $request->remember)) {
-        $request->session()->regenerate();
-        
-        $user = Auth::user();
-        
-        // ИСПРАВЛЕНО: проверяем is_active напрямую
-        if (!$user->is_active) {  // ← УБРАЛИ property_exists
-            Auth::logout();
-            return back()->withErrors([
-                'email' => 'Ваш аккаунт деактивирован. Обратитесь к администратору.',
-            ])->onlyInput('email');
-        }
-        
-        // Проверка на мягкое удаление
-        if ($user->trashed()) {
-            Auth::logout();
-            return back()->withErrors([
-                'email' => 'Ваш аккаунт заблокирован. Обратитесь к администратору.',
-            ])->onlyInput('email');
-        }
-        
-        // ДОБАВЬТЕ ДЛЯ ОТЛАДКИ:
-        \Log::info('Успешный вход пользователя', [
-            'id' => $user->id,
-            'email' => $user->email,
-            'is_active' => $user->is_active,
-            'role' => $user->role->name ?? 'unknown'
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
         ]);
-        
-        // Перенаправление в зависимости от роли
-        if ($user->isAdmin()) {
-            return redirect()->route('admin.dashboard');
-        } elseif ($user->isTrainer()) {
-            return redirect()->route('trainer.dashboard');
-        } elseif ($user->isClient()) {
-            return redirect()->route('client.dashboard');
+
+        if (Auth::attempt($credentials, $request->remember)) {
+            $request->session()->regenerate();
+            
+            $user = Auth::user();
+            
+            // ПРОВЕРКА: активен ли пользователь
+            if (property_exists($user, 'is_active') && !$user->is_active) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Ваш аккаунт деактивирован. Обратитесь к администратору.',
+                ])->onlyInput('email');
+            }
+            
+            // Проверка на удаленного (заблокированного)
+            if (method_exists($user, 'trashed') && $user->trashed()) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Ваш аккаунт заблокирован. Обратитесь к администратору.',
+                ])->onlyInput('email');
+            }
+            
+            return redirect()->intended('dashboard');
         }
-        
-        return redirect()->intended('dashboard');
+
+        return back()->withErrors([
+            'email' => 'Неверные учетные данные.',
+        ])->onlyInput('email');
     }
-
-    // ДОБАВЬТЕ ОТЛАДКУ:
-    \Log::warning('Неудачная попытка входа', [
-        'email' => $request->email,
-        'remember' => $request->remember
-    ]);
-
-    return back()->withErrors([
-        'email' => 'Неверные учетные данные.',
-    ])->onlyInput('email');
-}
 
     // Показ формы регистрации
     public function showRegister()
